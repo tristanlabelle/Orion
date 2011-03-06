@@ -264,16 +264,16 @@ namespace Orion.Game.Simulation
         #region Methods
         #region Stats & Technologies
         /// <summary>
-        /// Gets the value of a <see cref="UnitStat"/> which take researched technologies into account
+        /// Gets the value of a <see cref="Stat"/> which take researched technologies into account
         /// for a unit of this <see cref="Faction"/> by its <see cref="Entity"/>.
         /// </summary>
-        /// <param name="type">The <see cref="Entity"/> of the unit for which the stat is to be retrieved.</param>
-        /// <param name="stat">The <see cref="UnitStat"/> to be retrieved.</param>
-        /// <returns>The value of that stat for the specified <see cref="UnitTypeUpgrade"/>.</returns>
-        public int GetStat(Unit type, UnitStat stat)
+        /// <param name="prototype">The <see cref="Entity"/> for which the stat is to be retrieved.</param>
+        /// <param name="stat">The <see cref="Stat"/> to be retrieved.</param>
+        /// <returns>The value of that stat for the specified <see cref="Entity"/>.</returns>
+        public StatValue GetStat(Entity prototype, Stat stat)
         {
-            Argument.EnsureNotNull(type, "type");
-            return type.GetBaseStat(stat) + GetTechnologyBonuses(type, stat);
+            Argument.EnsureNotNull(prototype, "type");
+            return prototype.GetStatValue(stat) + GetTechnologyBonuses(prototype, stat);
         }
 
         /// <summary>
@@ -281,12 +281,12 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="stat">The stat type.</param>
         /// <returns>The sum of the bonuses offered by technologies</returns>
-        public int GetTechnologyBonuses(Unit type, UnitStat stat)
+        public StatValue GetTechnologyBonuses(Entity prototype, Stat stat)
         {
-            int total = 0;
+            StatValue sum = StatValue.CreateZero(stat.Type);
             foreach (Technology technology in technologies)
-                total += technology.GetEffect(type, stat);
-            return total;
+                sum += technology.GetEffect(prototype, stat);
+            return sum;
         }
 
         public bool IsResearchable(Technology technology)
@@ -363,7 +363,7 @@ namespace Orion.Game.Simulation
             Spatial spatialComponent = unit.Spatial;
             spatialComponent.Moved += (s, oldPos, newPos) => OnUnitMoved(unit, oldPos, newPos);
 
-            UsedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
+            UsedFoodAmount += (int)GetStat(type, FactionMembership.FoodCostStat);
 
             return unit;
         }
@@ -389,7 +389,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit != null);
             Debug.Assert(FactionMembership.GetFaction(unit) == this);
 
-            UsedFoodAmount -= GetStat(unit, BasicSkill.FoodCostStat);
+            UsedFoodAmount -= (int)GetStat(unit, FactionMembership.FoodCostStat);
         }
 
         /// <remarks>Invoked by <see cref="Unit"/>.</remarks>
@@ -401,8 +401,8 @@ namespace Orion.Game.Simulation
             Debug.Assert(newType != null);
             Debug.Assert(oldType != newType);
 
-            UsedFoodAmount -= GetStat(oldType, BasicSkill.FoodCostStat);
-            UsedFoodAmount += GetStat(newType, BasicSkill.FoodCostStat);
+            UsedFoodAmount -= (int)GetStat(oldType, FactionMembership.FoodCostStat);
+            UsedFoodAmount += (int)GetStat(newType, FactionMembership.FoodCostStat);
 
             if (entity.Components.Has<BuildProgress>())
             {
@@ -414,10 +414,10 @@ namespace Orion.Game.Simulation
             else
             {
                 Vector2 oldCenter = entity.Position + (Vector2)oldType.Size * 0.5f;
-                int oldSightRange = GetStat(oldType, BasicSkill.SightRangeStat);
+                int oldSightRange = (int)GetStat(oldType, Vision.RangeStat);
                 
                 Vector2 newCenter = entity.Position + (Vector2)newType.Size * 0.5f;
-                int newSightRange = GetStat(newType, BasicSkill.SightRangeStat);
+                int newSightRange = (int)GetStat(newType, Vision.RangeStat);
 
                 localFogOfWar.RemoveLineOfSight(new Circle(oldCenter, oldSightRange));
                 localFogOfWar.AddLineOfSight(new Circle(newCenter, newSightRange));

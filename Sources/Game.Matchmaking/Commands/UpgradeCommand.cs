@@ -64,7 +64,7 @@ namespace Orion.Game.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
 
             Unit targetUnitType = match.UnitTypes.FromHandle(targetUnitTypeHandle);
-            int targetUnitTypeFoodCost = faction.GetStat(targetUnitType, BasicSkill.FoodCostStat);
+            int targetUnitTypeFoodCost = (int)faction.GetStat(targetUnitType, FactionMembership.FoodCostStat);
 
             foreach (Handle unitHandle in unitHandles)
             {

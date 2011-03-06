@@ -2,5 +2,5 @@
 <Technology Name="SwiftSmurf" AladdiumCost="150" AlageneCost="50">
   <Target>Smurf</Target>
   <Target>PapaSmurf</Target>
-  <Effect Stat="Move.Speed" Change="2"/>
+  <Effect Stat="Mobile.Speed" Delta="2"/>
 </Technology>

@@ -346,7 +346,7 @@ namespace Orion.Game.Matchmaking
                 }
             }
 
-            if (unit.Components.Has<Move>())
+            if (unit.Components.Has<Mobile>())
             {
                 var placeToExplore = placesToExplore
                     .Where(p => step.TimeInSeconds - p.TimeLastExplorerSent > minimumTimeBetweenSuccessiveExplorations)

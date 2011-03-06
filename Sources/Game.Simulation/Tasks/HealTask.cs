@@ -36,7 +36,7 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot heal a non-biological entity.", "target");
 
             this.target = target;
-            if (entity.Components.Has<Move>()) this.follow = new FollowTask(entity, target);
+            if (entity.Components.Has<Mobile>()) this.follow = new FollowTask(entity, target);
         }
         #endregion
 
@@ -80,7 +80,7 @@ namespace Orion.Game.Simulation.Tasks
                 spatial.LookAt(target.Center);
                 int speed = (int)Entity.GetStatValue(Healer.SpeedStat);
                 targetHealth.Damage -= speed * step.TimeDeltaInSeconds;
-                if (targetHealth.Value == (int)target.GetStatValue(Health.MaximumValueStat)) MarkAsEnded();
+                if (targetHealth.Value == (int)target.GetStatValue(Health.MaxValueStat)) MarkAsEnded();
                 return;
             }
             else

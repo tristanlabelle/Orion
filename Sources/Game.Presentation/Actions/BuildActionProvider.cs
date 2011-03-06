@@ -93,8 +93,8 @@ namespace Orion.Game.Presentation.Actions
         private ActionDescriptor CreateButton(Unit buildingType)
         {
             Faction faction = inputManager.LocalFaction;
-            int aladdiumCost = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
-            int alageneCost = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
+            int aladdiumCost = (int)faction.GetStat(buildingType, Identity.AladdiumCostStat);
+            int alageneCost = (int)faction.GetStat(buildingType, Identity.AlageneCostStat);
             
             return new ActionDescriptor()
             {
@@ -103,8 +103,8 @@ namespace Orion.Game.Presentation.Actions
                 Texture = graphics.GetUnitTexture(buildingType),
                 Action = () =>
                 {
-                inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
-                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
+                    inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
+                    actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
                 }
             };
         }
@@ -114,7 +114,7 @@ namespace Orion.Game.Presentation.Actions
             for (int y = 0; y < actions.GetLength(1); ++y)
                 for (int x = 0; x < actions.GetLength(0); ++x)
                     actions[x, y] = null;
-                    }
+        }
         #endregion
     }
 }

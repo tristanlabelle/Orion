@@ -66,7 +66,7 @@ namespace Orion.Game.Simulation.Components
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            if (!entity.Components.Has<Move>() || entity.Components.Has<Transporter>()) return false;
+            if (!entity.Components.Has<Mobile>() || entity.Components.Has<Transporter>()) return false;
 
             Spatial embarkeeSpatial = entity.Spatial;
             if (embarkeeSpatial == null || embarkeeSpatial.CollisionLayer != CollisionLayer.Ground) return false;

@@ -73,7 +73,7 @@ namespace Orion.Game.Simulation.Components
             if (health != null)
             {
                 float ratio = (float)(time.TotalSeconds / requiredTime.TotalSeconds);
-                health.Damage -= ratio * (float)Entity.GetStatValue(Health.MaximumValueStat);
+                health.Damage -= ratio * (float)Entity.GetStatValue(Health.MaxValueStat);
             }
         }
 

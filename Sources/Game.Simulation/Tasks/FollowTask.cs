@@ -32,7 +32,7 @@ namespace Orion.Game.Simulation.Tasks
         public FollowTask(Entity follower, Entity target)
             : base(follower)
         {
-            if (!follower.Components.Has<Move>())
+            if (!follower.Components.Has<Mobile>())
                 throw new ArgumentException("Cannot follow without the move skill.", "follower");
             Argument.EnsureNotNull(target, "target");
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");

@@ -134,7 +134,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Move>())
+            if (unitType.Components.Has<Mobile>())
             {
                 actions[0, 3] = new ActionDescriptor()
                 {
@@ -159,7 +159,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Attacker>() && unitType.Components.Has<Move>())
+            if (unitType.Components.Has<Attacker>() && unitType.Components.Has<Mobile>())
             {
                 actions[3, 3] = new ActionDescriptor()
                 {
@@ -198,9 +198,9 @@ namespace Orion.Game.Presentation.Actions
             {
                 Point point = FindUnusedButton();
 
-                int aladdiumCost = userInputManager.LocalFaction.GetStat(traineePrototype, BasicSkill.AladdiumCostStat);
-                int alageneCost = userInputManager.LocalFaction.GetStat(traineePrototype, BasicSkill.AlageneCostStat);
-                int foodCost = userInputManager.LocalFaction.GetStat(traineePrototype, BasicSkill.FoodCostStat);
+                int aladdiumCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Identity.AladdiumCostStat);
+                int alageneCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Identity.AlageneCostStat);
+                int foodCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, FactionMembership.FoodCostStat);
 
                 Unit traineeTypeForClosure = traineePrototype;
                 actions[point.X, point.Y] = new ActionDescriptor()
@@ -218,11 +218,11 @@ namespace Orion.Game.Presentation.Actions
             Researcher researcher = unitType.Components.TryGet<Researcher>();
             if (researcher == null) return;
 
-            var technologies = userInputManager.Match.TechnologyTree.Technologies
-                .Where(tech => userInputManager.LocalFaction.IsResearchable(tech) && researcher.Supports(tech));
-
-            foreach (Technology technology in technologies)
+            foreach (Technology technology in userInputManager.Match.TechnologyTree.Technologies)
             {
+                if (!userInputManager.LocalFaction.IsResearchable(technology) || !researcher.Supports(technology))
+                    continue;
+
                 Point point = FindUnusedButton();
                 Technology technologyForClosure = technology;
                 actions[point.X, point.Y] = new ActionDescriptor()

@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(target, "target");
             
             this.target = target;
-            if (attacker.Components.Has<Move>()) this.follow = new FollowTask(attacker, (Unit)target);
+            if (attacker.Components.Has<Mobile>()) this.follow = new FollowTask(attacker, (Unit)target);
         }
         #endregion
 

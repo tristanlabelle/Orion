@@ -44,7 +44,7 @@ namespace Orion.Game.Simulation.Tasks
             : base(entity)
         {
             Argument.EnsureNotNull(entity, "unit");
-            if (!entity.Components.Has<Move>())
+            if (!entity.Components.Has<Mobile>())
                 throw new ArgumentException("Cannot move without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
@@ -86,7 +86,7 @@ namespace Orion.Game.Simulation.Tasks
         protected override void DoUpdate(SimulationStep step)
         {
             Spatial spatial = Entity.Spatial;
-            if (spatial == null || !Entity.Components.Has<Move>())
+            if (spatial == null || !Entity.Components.Has<Mobile>())
             {
                 MarkAsEnded();
                 return;
@@ -105,7 +105,7 @@ namespace Orion.Game.Simulation.Tasks
             bool needsNewPath = (path == null || targetPathPointIndex == path.PointCount);
             if (needsNewPath && !Repath(spatial)) return;
 
-            float distance = (float)Entity.GetStatValue(Move.SpeedStat) * step.TimeDeltaInSeconds;
+            float distance = (float)Entity.GetStatValue(Mobile.SpeedStat) * step.TimeDeltaInSeconds;
 
             Vector2 targetPathPoint = path.Points[targetPathPointIndex];
             spatial.LookAt(targetPathPoint + (Vector2)spatial.Size * 0.5f);

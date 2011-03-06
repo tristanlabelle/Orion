@@ -81,8 +81,9 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public override StatValue GetStatBonus(Stat stat)
         {
-#warning TODO: Add stat bonuses from faction technologies here
-            return base.GetStatBonus(stat);
+            return faction == null
+                ? StatValue.CreateZero(stat.Type)
+                : faction.GetTechnologyBonuses(Entity, stat);
         }
 
         /// <summary>

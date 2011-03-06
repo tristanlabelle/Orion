@@ -414,13 +414,13 @@ namespace Orion.Game.Presentation
             OverrideIfNecessary();
             // Those who can attack do so, the others simply move to the target's position
             commander.LaunchAttack(selection.Where(entity => entity.Components.Has<Attacker>()), target);
-            commander.LaunchMove(selection.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Move>()), target.Position);
+            commander.LaunchMove(selection.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Mobile>()), target.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
             IEnumerable<Entity> movableEntities = Selection.UnitEntities
-                .Where(entity => IsControllable(entity) && entity.Components.Has<Move>())
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>())
                 .Cast<Entity>();
 
             // Those who can attack do so, the others simply move to the destination
@@ -434,7 +434,7 @@ namespace Orion.Game.Presentation
             Debug.Assert(node.Components.Has<Harvestable>(), "Node is not a resource node!");
 
             IEnumerable<Entity> movableEntities = Selection.UnitEntities
-                .Where(entity => IsControllable(entity) && entity.Components.Has<Move>())
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>())
                 .Cast<Entity>();
 
             // Those who can harvest do so, the others simply move to the resource's position
@@ -446,7 +446,7 @@ namespace Orion.Game.Presentation
         public void LaunchMove(Vector2 destination)
         {
             IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => IsControllable(entity) && entity.Components.Has<Move>())
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>())
                 .Cast<Entity>();
 
             OverrideIfNecessary();
@@ -552,7 +552,7 @@ namespace Orion.Game.Presentation
         public void LaunchStandGuard()
         {
             IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Move>())
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Mobile>())
                 .Cast<Entity>();
 
             OverrideIfNecessary();

@@ -62,7 +62,7 @@ namespace Orion.Game.Simulation
             Components.Add(vision);
 
             Health health = new Health(this);
-            health.MaximumValue = type.BasicSkill.MaxHealth;
+            health.MaxValue = type.BasicSkill.MaxHealth;
             health.Constitution = InternalHasSkill<MoveSkill>() ? Constitution.Biological : Constitution.Mechanical;
             health.Armor = type.BasicSkill.Armor;
             health.ArmorType = type.BasicSkill.ArmorType;
@@ -84,9 +84,9 @@ namespace Orion.Game.Simulation
             if (InternalHasSkill<MoveSkill>())
             {
                 MoveSkill moveSkill = InternalTryGetSkill<MoveSkill>();
-                Move move = new Move(this);
-                move.Speed = moveSkill.Speed;
-                Components.Add(move);
+                Mobile mobile = new Mobile(this);
+                mobile.Speed = moveSkill.Speed;
+                Components.Add(mobile);
             }
 
             if (InternalHasSkill<AttackSkill>())
@@ -135,7 +135,7 @@ namespace Orion.Game.Simulation
             {
                 ResearchSkill researchSkill = InternalTryGetSkill<ResearchSkill>();
                 Researcher researcher = new Researcher(this);
-                researcher.Technologies.AddRange(researcher.Technologies);
+                researcher.Technologies.AddRange(researchSkill.Targets);
                 Components.Add(researcher);
             }
 
@@ -243,7 +243,7 @@ namespace Orion.Game.Simulation
 
         public bool IsBuilding
         {
-            get { return !Components.Has<Move>(); }
+            get { return !Components.Has<Mobile>(); }
         }
 
         public ICollection<UnitTypeUpgrade> Upgrades
@@ -269,7 +269,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public int MaxHealth
         {
-            get { return (int)GetStatValue(HealthComponent.MaximumValueStat); }
+            get { return (int)GetStatValue(HealthComponent.MaxValueStat); }
         }
 
         /// <summary>
@@ -310,16 +310,6 @@ namespace Orion.Game.Simulation
             UnitSkill skill;
             skills.TryGetValue(typeof(TSkill), out skill);
             return skill as TSkill;
-        }
-
-        [Obsolete("Skills are being obsoleted, use components instead.")]
-        public int GetBaseStat(UnitStat stat)
-        {
-            Argument.EnsureNotNull(stat, "stat");
-
-            UnitSkill skill;
-            // As skills are being phased out, return 0 instead of throwing an exception
-            return skills.TryGetValue(stat.SkillType, out skill) ? skill.GetStat(stat) : 0;
         }
 
         internal void OnHitting(Unit target, float damage)

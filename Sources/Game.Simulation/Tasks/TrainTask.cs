@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Fields
         private readonly Unit traineePrototype;
-        private float healthPointsTrained;
+        private float elapsedTime;
         private bool attemptingToPlaceEntity;
         private bool waitingForEnoughFood;
         #endregion
@@ -50,8 +50,9 @@ namespace Orion.Game.Simulation.Tasks
         {
             get
             {
-                int maxHealth = FactionMembership.GetFaction(Entity).GetStat(traineePrototype, BasicSkill.MaxHealthStat);
-                return Math.Min(healthPointsTrained / maxHealth, 1);
+                float requiredTime = (float)FactionMembership.GetFaction(Entity)
+                    .GetStat(traineePrototype, Identity.SpawnTimeStat);
+                return Math.Min(elapsedTime / requiredTime, 1);
             }
         }
         #endregion
@@ -68,7 +69,8 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             Faction faction = FactionMembership.GetFaction(Entity);
-            if (faction != null && faction.RemainingFoodAmount < faction.GetStat(traineePrototype, BasicSkill.FoodCostStat))
+            int foodCost = (int)faction.GetStat(traineePrototype, FactionMembership.FoodCostStat);
+            if (faction != null && faction.RemainingFoodAmount < foodCost)
             {
                 if (!waitingForEnoughFood)
                 {
@@ -82,13 +84,11 @@ namespace Orion.Game.Simulation.Tasks
             }
             waitingForEnoughFood = false;
 
-            int maxHealth = faction.GetStat(traineePrototype, BasicSkill.MaxHealthStat);
-            if (healthPointsTrained < maxHealth)
-            {
-                float trainingSpeed = (float)Entity.GetStatValue(Trainer.SpeedStat);
-                healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
-                return;
-            }
+            float trainingSpeed = (float)Entity.GetStatValue(Trainer.SpeedStat);
+            elapsedTime += step.TimeDeltaInSeconds * trainingSpeed;
+
+            float requiredTime = (float)faction.GetStat(traineePrototype, Identity.SpawnTimeStat);
+            if (elapsedTime < requiredTime) return;
 
             Entity trainee = TrySpawn(traineePrototype);
             if (trainee == null)

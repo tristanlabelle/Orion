@@ -66,7 +66,7 @@ namespace Orion.Game.Presentation.Gui
                 {
                     Health health = unit.Components.TryGet<Health>();
                     if (health != null)
-                        healthFraction = health.Value / health.MaximumValue;
+                        healthFraction = health.Value / (float)unit.GetStatValue(Health.MaxValueStat);
                 }
                 imageBox.Tint = HealthBarRenderer.GetColor(healthFraction);
             }

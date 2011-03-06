@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
+using System.Text;
 
 namespace Orion.Game.Simulation.Technologies
 {
@@ -12,50 +13,53 @@ namespace Orion.Game.Simulation.Technologies
     public struct TechnologyEffect
     {
         #region Fields
-        private readonly UnitStat stat;
-        private readonly int change;
+        private readonly Stat stat;
+        private readonly StatValue delta;
         #endregion
 
         #region Constructors
-        public TechnologyEffect(UnitStat stat, int change)
+        public TechnologyEffect(Stat stat, StatValue delta)
         {
             Argument.EnsureNotNull(stat, "stat");
 
             this.stat = stat;
-            this.change = change;
+            this.delta = delta;
 
-            Debug.Assert(change != 0, "Technology effect has a change of zero and will have no effect.");
-            Debug.Assert(stat != BasicSkill.SightRangeStat
-                && stat != ProvideFoodSkill.AmountStat
-                && stat != BasicSkill.FoodCostStat,
+            Debug.Assert((float)delta != 0, "Technology effect has a change of zero and will have no effect.");
+            Debug.Assert(stat != Vision.RangeStat
+                && stat != FactionMembership.ProvidedFoodStat
+                && stat != FactionMembership.FoodCostStat,
                 "Technology effects changing stat {0} are not supported, they would cause bugs.".FormatInvariant(stat));
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets the stat affected by this effect.
+        /// Gets the <see cref="Stat"/> affected by this effect.
         /// </summary>
-        public UnitStat Stat
+        public Stat Stat
         {
             get { return stat; }
         }
 
         /// <summary>
-        /// Gets the change this effect makes to the stat.
+        /// Gets the amount of change this effect has on the stat.
         /// </summary>
-        public int Change
+        public StatValue Delta
         {
-            get { return change; }
+            get { return delta; }
         }
         #endregion
 
         #region Methods
         public override string ToString()
         {
-            return "{0} {1}".FormatInvariant(
-                change >= 0 ? "+" + change.ToStringInvariant() : change.ToStringInvariant(),
-                stat);
+            StringBuilder stringBuilder = new StringBuilder();
+            if ((float)delta >= 0) stringBuilder.Append('+');
+            stringBuilder.Append((float)delta);
+            stringBuilder.Append(' ');
+            stringBuilder.Append(stat.FullName);
+            return stringBuilder.ToString();
         }
         #endregion
     }

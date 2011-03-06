@@ -40,8 +40,8 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             {
                 if (!minLocation.HasValue) return false;
 
-                int aladdiumCost = LocalFaction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
-                int alageneCost = LocalFaction.GetStat(buildingType, BasicSkill.AlageneCostStat);
+                int aladdiumCost = (int)LocalFaction.GetStat(buildingType, Identity.AladdiumCostStat);
+                int alageneCost = (int)LocalFaction.GetStat(buildingType, Identity.AlageneCostStat);
                 if (aladdiumCost > LocalFaction.AladdiumAmount
                     || alageneCost > LocalFaction.AlageneAmount)
                     return false;

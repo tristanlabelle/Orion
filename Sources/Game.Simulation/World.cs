@@ -365,7 +365,7 @@ namespace Orion.Game.Simulation
             ruins.Components.Add(identity);
 
             TimedExistence timeout = new TimedExistence(ruins);
-            timeout.LifeSpan = entity.Components.Has<Move>() ? 30 : 120;
+            timeout.LifeSpan = entity.Components.Has<Mobile>() ? 30 : 120;
             ruins.Components.Add(timeout);
 
             Spatial spatial = new Spatial(ruins);

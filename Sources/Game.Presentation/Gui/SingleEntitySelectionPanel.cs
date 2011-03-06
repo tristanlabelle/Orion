@@ -25,7 +25,7 @@ namespace Orion.Game.Presentation.Gui
         {
             Attacker.PowerStat, Attacker.RangeStat,
             Health.ArmorStat,
-            Move.SpeedStat, Vision.RangeStat
+            Mobile.SpeedStat, Vision.RangeStat
         };
 
         private readonly GameGraphics graphics;
@@ -204,10 +204,10 @@ namespace Orion.Game.Presentation.Gui
             todoButtonStack.Children.Clear();
         }
 
-        private void UpdateHealth(Entity unit)
+        private void UpdateHealth(Entity entity)
         {
-            Health health = unit.Components.Get<Health>();
-            healthLabel.Text = (int)Math.Ceiling(health.Value) + "/" + health.MaximumValue;
+            Health health = entity.Components.Get<Health>();
+            healthLabel.Text = (int)Math.Ceiling(health.Value) + "/" + (int)entity.GetStatValue(Health.MaxValueStat);
         }
 
         private void UpdateTodoList(TaskQueue taskQueue)

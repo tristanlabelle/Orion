@@ -85,9 +85,9 @@ namespace Orion.Game.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
 
             Unit traineeType = match.UnitTypes.FromHandle(traineeTypeHandle);
-            int foodCost = faction.GetStat(traineeType, BasicSkill.FoodCostStat);
-            int aladdiumCost = faction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
-            int alageneCost = faction.GetStat(traineeType, BasicSkill.AlageneCostStat);
+            int foodCost = (int)faction.GetStat(traineeType, FactionMembership.FoodCostStat);
+            int aladdiumCost = (int)faction.GetStat(traineeType, Identity.AladdiumCostStat);
+            int alageneCost = (int)faction.GetStat(traineeType, Identity.AlageneCostStat);
 
             for (int i = 0; i < traineeCount; ++i)
             {

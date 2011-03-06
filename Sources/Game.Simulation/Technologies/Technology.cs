@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Technologies
 {
@@ -83,20 +83,24 @@ namespace Orion.Game.Simulation.Technologies
         #endregion
 
         #region Methods
-        public bool AppliesTo(Unit unitType)
+        public bool AppliesTo(Entity entity)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
-            return targets.Contains(unitType.Identity.Name);
+            Argument.EnsureNotNull(entity, "entity");
+            return targets.Contains(entity.Identity.Name);
         }
 
-        public int GetEffect(Unit unitType, UnitStat stat)
+        public StatValue GetEffect(Entity entity, Stat stat)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
-            if (!AppliesTo(unitType)) return 0;
+            Argument.EnsureNotNull(entity, "entity");
+            
+            StatValue sum = StatValue.CreateZero(stat.Type);
+            if (!AppliesTo(entity)) return sum;
 
-            return effects
-                .Where(effect => effect.Stat == stat)
-                .Sum(effect => effect.Change);
+            foreach (TechnologyEffect effect in effects)
+                if (effect.Stat == stat)
+                    sum += effect.Delta;
+
+            return sum;
         }
 
         public override string ToString()

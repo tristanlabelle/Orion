@@ -15,7 +15,7 @@ namespace Orion.Game.Simulation.Components
     public sealed class Health : Component
     {
         #region Static
-        public static readonly Stat MaximumValueStat = new Stat(typeof(Health), StatType.Integer, "MaximumValue");
+        public static readonly Stat MaxValueStat = new Stat(typeof(Health), StatType.Integer, "MaxValue");
         public static readonly Stat RegenerationRateStat = new Stat(typeof(Health), StatType.Real, "RegenerationRate");
         public static readonly Stat DamageReductionStat = new Stat(typeof(Health), StatType.Integer, "DamageReduction");
         public static readonly Stat ValueStat = new Stat(typeof(Health), StatType.Integer, "Value");
@@ -23,7 +23,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Fields
-        private int maximumValue = 1;
+        private int maxValue = 1;
         private Constitution constitution;
         private ArmorType armorType;
         private int threatLevel;
@@ -50,13 +50,13 @@ namespace Orion.Game.Simulation.Components
         /// Accesses the maximum number of health points that can be had by the host <see cref="Entity"/>.
         /// </summary>
         [Mandatory]
-        public int MaximumValue
+        public int MaxValue
         {
-            get { return maximumValue; }
+            get { return maxValue; }
             set
             {
-                Argument.EnsureStrictlyPositive(value, "MaximumValue");
-                maximumValue = value;
+                Argument.EnsureStrictlyPositive(value, "MaxValue");
+                maxValue = value;
             }
         }
 
@@ -100,7 +100,7 @@ namespace Orion.Game.Simulation.Components
         /// </summary>
         public float Value
         {
-            get { return (float)Entity.GetStatValue(MaximumValueStat) - damage; }
+            get { return (float)Entity.GetStatValue(MaxValueStat) - damage; }
         }
 
         [Persistent]
@@ -150,12 +150,12 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public void SetValue(float value)
         {
-            Damage = (int)Entity.GetStatValue(MaximumValueStat) - value;
+            Damage = (int)Entity.GetStatValue(MaxValueStat) - value;
         }
 
         public override void Update(SimulationStep step)
         {
-            if (damage >= (int)Entity.GetStatValue(MaximumValueStat))
+            if (damage >= (int)Entity.GetStatValue(MaxValueStat))
             {
                 Entity.Die();
                 return;

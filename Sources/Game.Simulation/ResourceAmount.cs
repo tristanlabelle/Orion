@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using Orion.Engine;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -115,9 +116,9 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(unitType, "unitType");
             Argument.EnsureNotNull(faction, "faction");
 
-            int aladdiumCost = faction.GetStat(unitType, BasicSkill.AladdiumCostStat);
-            int alageneCost = faction.GetStat(unitType, BasicSkill.AlageneCostStat);
-            int foodCost = faction.GetStat(unitType, BasicSkill.FoodCostStat);
+            int aladdiumCost = (int)faction.GetStat(unitType, Identity.AladdiumCostStat);
+            int alageneCost = (int)faction.GetStat(unitType, Identity.AlageneCostStat);
+            int foodCost = (int)faction.GetStat(unitType, FactionMembership.FoodCostStat);
 
             return new ResourceAmount(aladdiumCost, alageneCost, foodCost);
         }

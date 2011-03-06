@@ -84,7 +84,7 @@
     <Compile Include="Components\Stat.cs" />
     <Compile Include="Components\Identity.cs" />
     <Compile Include="Components\Kamikaze.cs" />
-    <Compile Include="Components\Move.cs" />
+    <Compile Include="Components\Mobile.cs" />
     <Compile Include="Components\Spatial.cs" />
     <Compile Include="Components\Harvestable.cs" />
     <Compile Include="Components\Sellable.cs" />

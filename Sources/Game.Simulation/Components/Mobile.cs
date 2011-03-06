@@ -10,16 +10,16 @@ namespace Orion.Game.Simulation.Components
     /// <summary>
     /// Allows an <see cref="Entity"/> to be assigned tasks which imply movement.
     /// </summary>
-    public sealed class Move : Component
+    public sealed class Mobile : Component
     {
         #region Fields
-        public static readonly Stat SpeedStat = new Stat(typeof(Move), StatType.Real, "Speed");
+        public static readonly Stat SpeedStat = new Stat(typeof(Mobile), StatType.Real, "Speed");
 
         private float speed = 1;
         #endregion
 
         #region Constructors
-        public Move(Entity entity) : base(entity) { }
+        public Mobile(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties

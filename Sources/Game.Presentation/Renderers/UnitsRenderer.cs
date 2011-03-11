@@ -20,6 +20,13 @@ namespace Orion.Game.Presentation.Renderers
     /// </summary>
     public sealed class UnitsRenderer
     {
+        private struct Laser
+        {
+            public Entity Shooter;
+            public Entity Target;
+            public float Time;
+        }
+
         #region Fields
         #region Constants
         private static readonly float fireSize = 2;
@@ -47,9 +54,9 @@ namespace Orion.Game.Presentation.Renderers
         private readonly SpriteAnimation fireAnimation;
         private readonly BuildingMemoryRenderer buildingMemoryRenderer;
         private readonly RuinsRenderer ruinsRenderer;
+        private readonly List<Laser> lasers = new List<Laser>();
         private float simulationTimeInSeconds;
         private bool drawHealthBars;
-        private List<HitEventArgs> hitEvents;
         #endregion
 
         #region Constructors
@@ -63,10 +70,9 @@ namespace Orion.Game.Presentation.Renderers
             this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
             this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, gameGraphics);
             this.ruinsRenderer = new RuinsRenderer(faction, gameGraphics);
-            this.hitEvents = new List<HitEventArgs>();
 
             World.Updated += OnWorldUpdated;
-            World.UnitHitting += OnUnitHitting;
+            World.HitOccured += OnUnitHitting;
         }
         #endregion
 
@@ -98,7 +104,13 @@ namespace Orion.Game.Presentation.Renderers
         {
             if (!args.Hitter.Components.Get<Attacker>().IsRanged) return;
 
-            hitEvents.Add(args);
+            Laser laser = new Laser
+            {
+                Shooter = args.Hitter,
+                Target = args.Target,
+                Time = sender.LastSimulationStep.TimeInSeconds
+            };
+            lasers.Add(laser);
         }
 
         public void Draw(GraphicsContext graphicsContext, Rectangle viewBounds)
@@ -141,7 +153,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             return World.Entities
                 .Intersecting(clippingBounds)
-                .Where(entity => entity is Unit && faction.CanSee(entity));
+                .Where(entity => !entity.Components.Has<Harvestable>() && faction.CanSee(entity));
         }
 
         private void DrawGroundUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
@@ -245,45 +257,45 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawLasers(GraphicsContext graphics, Rectangle bounds, CollisionLayer layer)
         {
-            for (int i = hitEvents.Count() - 1; i >= 0; i--)
+            for (int i = lasers.Count() - 1; i >= 0; i--)
             {
-                HitEventArgs hit = hitEvents[i];
-                Entity hitter = hit.Hitter;
-                Debug.Assert(hitter.Components.Has<Spatial>(), "Hitter has no Spatial component!");
-                if (hitter.Spatial.CollisionLayer != layer)
+                Laser laser = lasers[i];
+                Entity shooter = laser.Shooter;
+                Debug.Assert(shooter.Spatial == null, "Hitter has no Spatial component!");
+                if (shooter.Spatial.CollisionLayer != layer)
                     continue;
 
-                Attacker attacker = hit.Hitter.Components.Get<Attacker>();
+                Attacker attacker = shooter.Components.Get<Attacker>();
                 if (attacker.TimeElapsedSinceLastHit > rangedShootTimeInSeconds)
                     continue;
 
-                float laserProgress = (World.LastSimulationStep.TimeInSeconds - hit.TimeHitOccurred) / meleeHitSpinTimeInSeconds;
+                float laserProgress = (World.LastSimulationStep.TimeInSeconds - laser.Time) / meleeHitSpinTimeInSeconds;
 
-                Vector2 delta = hit.Target.Center - hit.Hitter.Center;
+                Vector2 delta = laser.Target.Center - shooter.Center;
                 if (laserProgress > 1)
                 {
-                    hitEvents.RemoveAt(i);
+                    lasers.RemoveAt(i);
                     continue;
                 }
 
-                if (!Rectangle.Intersects(hit.Hitter.BoundingRectangle, bounds)
-                    && !Rectangle.Intersects(hit.Target.BoundingRectangle, bounds))
+                if (!Rectangle.Intersects(shooter.BoundingRectangle, bounds)
+                    && !Rectangle.Intersects(laser.Target.BoundingRectangle, bounds))
                     continue;
 
                 Vector2 normalizedDelta = Vector2.Normalize(delta);
                 float distance = delta.LengthFast;
 
-                Vector2 laserCenter = hit.Hitter.Center + normalizedDelta * laserProgress * distance;
+                Vector2 laserCenter = shooter.Center + normalizedDelta * laserProgress * distance;
                 if (!faction.CanSee(new Region((int)laserCenter.X, (int)laserCenter.Y, 1, 1)))
                     continue;
 
-                Vector2 laserStart = hit.Hitter.Center + (normalizedDelta
+                Vector2 laserStart = shooter.Center + (normalizedDelta
                     * Math.Max(0, laserProgress * distance - laserLength * 0.5f));
-                Vector2 laserEnd = hit.Hitter.Center + (normalizedDelta
+                Vector2 laserEnd = shooter.Center + (normalizedDelta
                     * Math.Min(distance, laserProgress * distance + laserLength * 0.5f));
 
                 LineSegment lineSegment = new LineSegment(laserStart, laserEnd);
-                Faction hitterFaction = FactionMembership.GetFaction(hit.Hitter);
+                Faction hitterFaction = FactionMembership.GetFaction(shooter);
                 graphics.Stroke(lineSegment, hitterFaction == null ? Colors.White : hitterFaction.Color);
             }
         }

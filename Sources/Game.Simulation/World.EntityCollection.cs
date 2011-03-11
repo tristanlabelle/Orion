@@ -77,7 +77,7 @@ namespace Orion.Game.Simulation
             #region Fields
             private readonly World world;
             private readonly Func<Handle> handleGenerator = Handle.CreateGenerator();
-            private readonly SortedList<Handle, Entity> entities = new SortedList<Handle, Entity>();
+            private readonly SortedDictionary<Handle, Entity> entities = new SortedDictionary<Handle, Entity>();
             private readonly EntityGrid groundGrid;
             private readonly EntityGrid airGrid;
             private readonly EntityZoneManager zoneManager;

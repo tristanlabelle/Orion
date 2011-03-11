@@ -7,6 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation
 {
@@ -17,12 +18,9 @@ namespace Orion.Game.Presentation
     {
         #region Fields
         public static readonly int SelectionLimit = int.MaxValue;
-        public static readonly int GroupCount = 10;
-
-        private readonly Faction faction;
+        
         private readonly Selection selection;
-        private readonly HashSet<Unit>[] groups;
-        private Unit focusedUnitType;
+        private Entity focusedPrototype;
         #endregion
 
         #region Constructors
@@ -35,34 +33,19 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(faction, "faction");
 
-            this.faction = faction;
-            this.faction.World.EntityRemoved += OnEntityRemoved;
-
-            this.selection = new Selection(faction, SelectionLimit);
+            this.selection = new Selection(faction.World, faction, SelectionLimit);
             this.selection.Changed += OnSelectionChanged;
-
-            this.groups = new HashSet<Unit>[GroupCount];
-            for (int i = 0; i < this.groups.Length; ++i)
-                this.groups[i] = new HashSet<Unit>();
         }
         #endregion
 
         #region Events
         /// <summary>
-        /// Raised when the unit type that is currently focused has changed.
+        /// Raised when the prototype that is currently focused has changed.
         /// </summary>
-        public event Action<SelectionManager> FocusedUnitTypeChanged;
+        public event Action<SelectionManager> FocusedPrototypeChanged;
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the faction towards which this <see cref="SelectionManager"/> has a bias.
-        /// </summary>
-        public Faction Faction
-        {
-            get { return faction; }
-        }
-
         /// <summary>
         /// Gets the selection.
         /// </summary>
@@ -72,156 +55,74 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets the type of unit which currently has the focus.
+        /// Gets the prototype of <see cref="Entity"/> which currently has the focus.
         /// </summary>
-        public Unit FocusedUnitType
+        public Entity FocusedPrototype
         {
-            get { return focusedUnitType; }
+            get { return focusedPrototype; }
             set
             {
-                if (value == focusedUnitType) return;
+                if (value == focusedPrototype) return;
 
                 if (value == null)
                 {
-                    if (selection.Type == SelectionType.Units)
-                        throw new ArgumentException("Cannot set the focused unit type to null when the selection contains units.");
-                    Debug.Assert(focusedUnitType == value);
+                    Debug.Assert(focusedPrototype == value);
                     return;
                 }
 
-                if (selection.Type != SelectionType.Units)
-                    throw new ArgumentException("Cannot change the focused unit type when the selection contains no units.");
-
-#warning Unit type comparision
-                if (selection.Units.None(unit => unit.Type == value))
+                if (selection.None(entity => Identity.GetPrototype(entity) == value))
                     throw new ArgumentException("The focused unit type must be of a type present in the selection.");
 
-                focusedUnitType = value;
+                focusedPrototype = value;
             }
         }
 
         /// <summary>
-        /// Gets the unit that has the focus.
+        /// Gets the <see cref="Entity"/> that has the focus.
         /// </summary>
-        public Unit FocusedUnit
+        public Entity FocusedEntity
         {
-            get
-            {
-#warning Unit type comparision
-                return selection.Units.FirstOrDefault(unit => unit.Type == focusedUnitType);
-            }
-        }
-
-        private World World
-        {
-            get { return faction.World; }
+            get { return selection.FirstOrDefault(entity => Identity.GetPrototype(entity) == focusedPrototype); }
         }
         #endregion
 
         #region Methods
         #region Selected Unit Type
         /// <summary>
-        /// Resets the focused unit type to its default value according to the current selection.
+        /// Resets the focused prototype to its default value according to the current selection.
         /// </summary>
-        public void ResetFocusedUnitType()
+        public void ResetFocusedPrototype()
         {
-#warning Unit type comparision
-            Unit newSelectedUnitType = selection.Units
-                .Select(unit => unit.Type)
+            Entity newSelectedPrototype = selection
+                .Select(entity => Identity.GetPrototype(entity))
                 .FirstOrDefault();
-            if (newSelectedUnitType == focusedUnitType) return;
+            if (newSelectedPrototype == focusedPrototype) return;
 
-            focusedUnitType = newSelectedUnitType;
-            FocusedUnitTypeChanged.Raise(this);
+            focusedPrototype = newSelectedPrototype;
+            FocusedPrototypeChanged.Raise(this);
         }
 
-        private void UpdateFocusedUnitType()
+        private void UpdateFocusedPrototype()
         {
-#warning Unit type comparision
-            bool isStillValid = selection.Units.Any(u => u.Type == focusedUnitType);
+            bool isStillValid = focusedPrototype != null && selection.Any(e => Identity.GetPrototype(e) == focusedPrototype);
             if (isStillValid) return;
 
-            if (selection.Type == SelectionType.Units)
-            {
-#warning Unit type comparision
-                focusedUnitType = selection.Units.GroupBy(u => u.Type).WithMax(group => group.Count()).Key;
-            }
-            else
-                focusedUnitType = null;
+            var maxGroup = selection
+                .GroupBy(e => Identity.GetPrototype(e))
+                .WithMaxOrDefault(group => group.Count());
 
-            FocusedUnitTypeChanged.Raise(this);
+            Entity newFocusedPrototype = maxGroup == null ? null : maxGroup.Key;
+            if (newFocusedPrototype == focusedPrototype) return;
+
+            focusedPrototype = newFocusedPrototype;
+            FocusedPrototypeChanged.Raise(this);
         }
 
         private void OnSelectionChanged(Selection sender)
         {
-            UpdateFocusedUnitType();
+            UpdateFocusedPrototype();
         }
         #endregion
-
-        #region Groups
-        /// <summary>
-        /// Copies the current selection to a selection group.
-        /// </summary>
-        /// <param name="index">The index of the selection group to be filled.</param>
-        public void SaveSelectionGroup(int index)
-        {
-            ValidateGroupIndex(index);
-
-            if (Selection.Type != SelectionType.Units) return;
-
-            var group = groups[index];
-            group.Clear();
-            group.UnionWith(Selection.Units);
-        }
-
-        /// <summary>
-        /// Loads a selection group if it isn't empty.
-        /// </summary>
-        /// <param name="index">The index of the selection group to be loaded.</param>
-        /// <returns>True is the selection group was loaded, false if it was empty.</returns>
-        public bool TryLoadSelectionGroup(int index)
-        {
-            ValidateGroupIndex(index);
-
-            var group = groups[index];
-            if (group.Count == 0) return false;
-
-            group.RemoveWhere(unit => !faction.CanSee(unit));
-
-            Selection.Set(group);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Gets a value indicating if a selection group contains a unit.
-        /// </summary>
-        /// <param name="unit">The unit to be found.</param>
-        /// <param name="index">The index of the selection group in which to look.</param>
-        /// <returns>True if the unit is in that selection group, false if not.</returns>
-        public bool IsInSelectionGroup(Unit unit, int index)
-        {
-            Argument.EnsureNotNull(unit, "unit");
-            ValidateGroupIndex(index);
-
-            return groups[index].Contains(unit);
-        }
-
-        private void ValidateGroupIndex(int index)
-        {
-            if (index < 0 || index >= groups.Length)
-                throw new ArgumentOutOfRangeException("Selection group index out of range.");
-        }
-        #endregion
-
-        private void OnEntityRemoved(World sender, Entity entity)
-        {
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-
-            foreach (var group in groups)
-                group.Remove(unit);
-        }
         #endregion
     }
 }

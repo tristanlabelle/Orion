@@ -14,23 +14,23 @@ namespace Orion.Game.Presentation.Actions
         private readonly ActionPanel actionPanel;
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
-        private readonly Unit unitType;
+        private readonly Entity prototype;
         private readonly ActionDescriptor[,] buttons = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
         public UpgradeActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
-            GameGraphics graphics, Unit unitType)
+            GameGraphics graphics, Entity prototype)
         {
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(graphics, "graphics");
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(prototype, "prototype");
 
             this.actionPanel = actionPanel;
             this.inputManager = inputManager;
             this.graphics = graphics;
-            this.unitType = unitType;
+            this.prototype = prototype;
 
             CreateButtons();
         }
@@ -58,7 +58,7 @@ namespace Orion.Game.Presentation.Actions
             int x = 0;
             int y = 3;
 
-            foreach (UnitTypeUpgrade upgrade in unitType.Identity.Upgrades.Where(u => !u.IsFree))
+            foreach (UnitTypeUpgrade upgrade in prototype.Identity.Upgrades.Where(u => !u.IsFree))
             {
                 Unit targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
                 if (targetType == null) continue;

@@ -6,26 +6,42 @@ using Orion.Engine;
 
 namespace Orion.Game.Simulation
 {
+    /// <summary>
+    /// Describes an event raised when an <see cref="Entity"/> hits another one.
+    /// </summary>
     public struct HitEventArgs
     {
         #region Fields
-        public readonly Unit Hitter;
-        public readonly Unit Target;
-        public readonly float Damage;
-        public readonly float TimeHitOccurred;
+        private readonly Entity hitter;
+        private readonly Entity target;
         #endregion
 
         #region Constructors
-        public HitEventArgs(Unit hitter, Unit target, float damage, float TimeHitOccurred)
+        public HitEventArgs(Entity hitter, Entity target)
         {
             Argument.EnsureNotNull(hitter, "hitter");
             Argument.EnsureNotNull(target, "target");
-            Argument.EnsurePositive(damage, "damage");
 
-            this.Hitter = hitter;
-            this.Target = target;
-            this.Damage = damage;
-            this.TimeHitOccurred = TimeHitOccurred;
+            this.hitter = hitter;
+            this.target = target;
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets the <see cref="Entity"/> which inflicted the damage.
+        /// </summary>
+        public Entity Hitter
+        {
+            get { return hitter; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Entity"/> to which the damage was inflicted.
+        /// </summary>
+        public Entity Target
+        {
+            get { return target; }
         }
         #endregion
     }

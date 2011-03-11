@@ -69,20 +69,22 @@ namespace Orion.Game.Simulation
         public event Action<World, SimulationStep> Updated;
 
         /// <summary>
-        /// Raised when a unit hits another unit.
+        /// Raised when an <see cref="Entity"/> hits another one.
         /// </summary>
-        /// <remarks>
-        /// Convenience aggregator of the <see cref="Unit.Hitting"/> event.
-        /// </remarks>
-        public event Action<World, HitEventArgs> UnitHitting;
+        public event Action<World, HitEventArgs> HitOccured;
 
         /// <summary>
-        /// Raised when an entity has died.
+        /// Raised when an <see cref="Entity"/> has died.
         /// </summary>
         /// <remarks>
         /// Convenience aggregator of the <see cref="Entity.Died"/> event.
         /// </remarks>
         public event Action<World, Entity> EntityDied;
+
+        /// <summary>
+        /// Raised when a building <see cref="Entity"/>'s construction completes.
+        /// </summary>
+        public event Action<World, Entity> BuildingConstructed;
 
         /// <summary>
         /// Raised when an explosion occurs.
@@ -354,6 +356,13 @@ namespace Orion.Game.Simulation
             }
         }
 
+        internal void RaiseBuildingConstructed(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            BuildingConstructed.Raise(this, entity);
+        }
+
         private void CreateRuinsForEntity(Entity entity)
         {
             Entity ruins = entities.CreateEntity();
@@ -383,19 +392,19 @@ namespace Orion.Game.Simulation
             entities.Add(ruins);
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitHitting(HitEventArgs args)
+        /// <remarks>Invoked by <see cref="Attacker"/>.</remarks>
+        internal void RaiseHitOccured(HitEventArgs args)
         {
-            UnitHitting.Raise(this, args);
+            HitOccured.Raise(this, args);
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
+        /// <remarks>Invoked by <see cref="Kamikaze"/>.</remarks>
         internal void OnExplosionOccured(Circle circle)
         {
             if (ExplosionOccured != null) ExplosionOccured(this, circle);
         }
 
-        /// <remarks>Invoked by Faction.</remarks>
+        /// <remarks>Invoked by <see cref="Faction"/>.</remarks>
         internal void OnFactionDefeated(Faction faction)
         {
             FactionDefeated.Raise(this, faction);

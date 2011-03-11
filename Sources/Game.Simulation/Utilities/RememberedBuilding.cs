@@ -19,7 +19,7 @@ namespace Orion.Game.Simulation.Utilities
         #region Instance
         #region Fields
         private readonly Point location;
-        private readonly Unit type;
+        private readonly Entity prototype;
         private readonly Faction faction;
         #endregion
 
@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation.Utilities
             Debug.Assert(building.Identity.IsBuilding);
 
             this.location = building.GridRegion.Min;
-            this.type = ((Unit)building).Type;
+            this.prototype = Identity.GetPrototype(building);
             this.faction = FactionMembership.GetFaction(building);
         }
         #endregion
@@ -43,12 +43,12 @@ namespace Orion.Game.Simulation.Utilities
 
         public Region GridRegion
         {
-            get { return Entity.GetGridRegion(location, type.Size); }
+            get { return Entity.GetGridRegion(location, prototype.Size); }
         }
 
-        public Unit Type
+        public Entity Prototype
         {
-            get { return type; }
+            get { return prototype; }
         }
 
         public Faction Faction
@@ -72,9 +72,8 @@ namespace Orion.Game.Simulation.Utilities
 
         public bool Equals(RememberedBuilding other)
         {
-#warning Unit type comparision
             return location == other.location
-                && type == other.type
+                && prototype == other.prototype
                 && faction == other.faction;
         }
 
@@ -90,7 +89,7 @@ namespace Orion.Game.Simulation.Utilities
 
         public override string ToString()
         {
-            return "{0} {1} at {2}".FormatInvariant(faction, type, location);
+            return "{0} {1} at {2}".FormatInvariant(faction, prototype, location);
         }
         #endregion
         #endregion

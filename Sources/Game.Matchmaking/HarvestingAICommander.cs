@@ -408,7 +408,7 @@ namespace Orion.Game.Matchmaking
         #region Helpers
         private ResourceAmount GetCost(Unit unitType)
         {
-            return ResourceAmount.FromUnitCost(unitType, Faction);
+            return ResourceAmount.FromEntityCost(unitType, Faction);
         }
 
         private Unit GetNearbyUnit(Func<Unit, bool> predicate, Vector2 location)

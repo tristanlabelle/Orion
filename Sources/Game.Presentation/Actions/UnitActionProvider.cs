@@ -21,26 +21,26 @@ namespace Orion.Game.Presentation.Actions
         private readonly UserInputManager userInputManager;
         private readonly GameGraphics graphics;
         private readonly Localizer localizer;
-        private readonly Unit unitType;
+        private readonly Entity prototype;
         private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
         public UnitActionProvider(ActionPanel actionPanel, UserInputManager userInputManager,
-            GameGraphics graphics, Localizer localizer, Unit unitType)
+            GameGraphics graphics, Localizer localizer, Entity prototype)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(prototype, "unitType");
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(userInputManager, "userInputManager");
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(localizer, "localizer");
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(prototype, "prototype");
             
             this.actionPanel = actionPanel;
             this.userInputManager = userInputManager;
             this.graphics = graphics;
             this.localizer = localizer;
-            this.unitType = unitType;
+            this.prototype = prototype;
 
             CreateButtons();
         }
@@ -65,7 +65,7 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            if (unitType.Components.Has<Attacker>())
+            if (prototype.Components.Has<Attacker>())
             {
                 actions[2, 3] = new ActionDescriptor()
                 {
@@ -80,9 +80,9 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Builder>())
+            if (prototype.Components.Has<Builder>())
             {
-                var buildActionProvider = new BuildActionProvider(actionPanel, userInputManager, graphics, localizer, unitType);
+                var buildActionProvider = new BuildActionProvider(actionPanel, userInputManager, graphics, localizer, prototype);
                 actions[0, 0] = new ActionDescriptor()
                 {
                     Name = localizer.GetNoun("Build"),
@@ -104,7 +104,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Harvester>())
+            if (prototype.Components.Has<Harvester>())
             {
                 actions[1, 2] = new ActionDescriptor()
                 {
@@ -119,7 +119,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Healer>())
+            if (prototype.Components.Has<Healer>())
             {
                 actions[3, 2] = new ActionDescriptor()
                 {
@@ -134,7 +134,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Mobile>())
+            if (prototype.Components.Has<Mobile>())
             {
                 actions[0, 3] = new ActionDescriptor()
                 {
@@ -149,7 +149,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Sellable>())
+            if (prototype.Components.Has<Sellable>())
             {
                 actions[3, 0] = new ActionDescriptor()
                 {
@@ -159,7 +159,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Components.Has<Attacker>() && unitType.Components.Has<Mobile>())
+            if (prototype.Components.Has<Attacker>() && prototype.Components.Has<Mobile>())
             {
                 actions[3, 3] = new ActionDescriptor()
                 {
@@ -170,13 +170,13 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Identity.Upgrades.Any(u => !u.IsFree))
+            if (prototype.Identity.Upgrades.Any(u => !u.IsFree))
             {
                 actions[2, 0] = new ActionDescriptor()
                 {
                     Name = localizer.GetNoun("Upgrade"),
                     Texture = graphics.GetActionTexture("Upgrade"),
-                    Action = () => actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, unitType))
+                    Action = () => actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, prototype))
                 };
             }
 
@@ -186,7 +186,7 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateTrainButtons()
         {
-            Trainer trainer = unitType.Components.TryGet<Trainer>();
+            Trainer trainer = prototype.Components.TryGet<Trainer>();
             if (trainer == null) return;
 
             var traineePrototypes = userInputManager.Match.UnitTypes
@@ -215,7 +215,7 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateResearchButtons()
         {
-            Researcher researcher = unitType.Components.TryGet<Researcher>();
+            Researcher researcher = prototype.Components.TryGet<Researcher>();
             if (researcher == null) return;
 
             foreach (Technology technology in userInputManager.Match.TechnologyTree.Technologies)

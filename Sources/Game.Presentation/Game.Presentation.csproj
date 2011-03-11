@@ -122,8 +122,8 @@
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="Selection.cs" />
+    <Compile Include="SelectionGroupManager.cs" />
     <Compile Include="SelectionManager.cs" />
-    <Compile Include="SelectionType.cs" />
     <Compile Include="SpriteAnimation.cs" />
     <Compile Include="Gui\MainMenuUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -17,7 +17,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Fields
         private const float repairSpeedRatio = 0.25f;
 
-        private readonly Unit target;
+        private readonly Entity target;
         private readonly MoveTask move;
         
         /// <summary>
@@ -44,13 +44,13 @@ namespace Orion.Game.Simulation.Tasks
             if (targetHealth.Constitution != Constitution.Mechanical)
                 throw new ArgumentException("Cannot repair a non-mechanical entity.", "target");
 
-            this.target = (Unit)target;
+            this.target = target;
             this.move = MoveTask.ToNearRegion(entity, target.GridRegion);
         }
         #endregion
 
         #region Properties
-        public Unit Target
+        public Entity Target
         {
             get { return target; }
         }

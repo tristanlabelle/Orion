@@ -49,7 +49,7 @@ namespace Orion.Game.Simulation.Utilities
             Argument.EnsureNotNull(faction, "faction");
 
             this.faction = faction;
-            this.faction.World.UnitHitting += OnWorldUnitHit;
+            this.faction.World.HitOccured += OnWorldUnitHit;
             this.faction.World.Updated += OnWorldUpdated;
         }
         #endregion

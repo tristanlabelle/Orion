@@ -79,12 +79,6 @@ namespace Orion.Game.Simulation.Skills
             };
         }
 
-        public bool IsExplodingTarget(Unit target)
-        {
-            Argument.EnsureNotNull(target, "target");
-            return targets.Contains(target.Identity.Name);
-        }
-
         public override int GetStat(UnitStat stat)
         {
             if (stat == RadiusStat) return radius;

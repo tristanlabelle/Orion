@@ -31,8 +31,6 @@ namespace Orion.Game.Presentation.Audio
         /// </summary>
         private readonly HashSet<Entity> previousSelection = new HashSet<Entity>();
 
-        private readonly Action<Unit> buildingConstructionCompletedEventHandler;
-
         private bool isGameStarted;
         private bool hasExplosionOccuredInFrame;
         #endregion
@@ -45,16 +43,15 @@ namespace Orion.Game.Presentation.Audio
 
             this.audio = audio;
             this.userInputManager = userInputManager;
-            this.buildingConstructionCompletedEventHandler = OnBuildingConstructionCompleted;
 
             this.userInputManager.UnderAttackMonitor.Warning += OnUnderAttackWarning;
             this.World.EntityAdded += OnEntityAdded;
-            this.World.EntityRemoved += OnEntityRemoved;
             this.World.EntityDied += OnEntityDied;
-            this.World.UnitHitting += OnUnitHitting;
+            this.World.HitOccured += OnUnitHitting;
+            this.World.BuildingConstructed += OnBuildingConstructed;
+            this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.World.Updated += OnWorldUpdated;
             this.World.ExplosionOccured += OnExplosionOccured;
-            this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.userInputManager.LocalCommander.CommandIssued += OnCommandIssued;
         }
         #endregion
@@ -122,7 +119,6 @@ namespace Orion.Game.Presentation.Audio
 
             if (entity.Identity.IsBuilding && entity.Components.Has<BuildProgress>())
             {
-                ((Unit)entity).ConstructionCompleted += OnBuildingConstructionCompleted;
                 audio.PlaySfx("UnderConstruction", entity.Center);
                 return;
             }
@@ -142,22 +138,6 @@ namespace Orion.Game.Presentation.Audio
             }
         }
 
-        private void OnEntityRemoved(World sender, Entity entity)
-        {
-            Unit unit = entity as Unit;
-            Faction faction = FactionMembership.GetFaction(entity);
-            if (unit != null && faction == LocalFaction && unit.Components.Has<BuildProgress>())
-                unit.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
-        }
-
-        private void OnBuildingConstructionCompleted(Unit building)
-        {
-            building.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
-
-            string soundName = audio.GetUnitSoundName(building, "Select");
-            audio.PlaySfx(soundName, building.Center);
-        }
-
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
             hasExplosionOccuredInFrame = false;
@@ -173,27 +153,19 @@ namespace Orion.Game.Presentation.Audio
 
         private void OnSelectionChanged(Selection sender)
         {
-            if (sender.Type != SelectionType.Units)
-            {
-                previousSelection.Clear();
-                return;
-            }
-
-            // Find the most frequent unit type in the newly selected units.
-#warning Unit type comparision
-            var unitTypeGroup = sender.Except(previousSelection)
-                .Cast<Unit>()
-                .GroupBy(unit => unit.Type)
+            // Find the most frequent entity prototype in the newly selected entities.
+            var prototypeGroup = sender.Except(previousSelection)
+                .GroupBy(entity => Identity.GetPrototype(entity))
                 .WithMaxOrDefault(group => group.Count());
 
-            Unit unitType = unitTypeGroup == null ? null : unitTypeGroup.Key;
+            Entity prototype = prototypeGroup == null ? null : prototypeGroup.Key;
 
             previousSelection.Clear();
             previousSelection.UnionWith(sender);
 
-            if (unitType == null) return;
+            if (prototype == null) return;
 
-            string soundName = audio.GetUnitSoundName(unitType, "Select");
+            string soundName = audio.GetUnitSoundName(prototype, "Select");
             audio.PlayUISound(soundName);
         }
 
@@ -201,11 +173,11 @@ namespace Orion.Game.Presentation.Audio
         {
             Debug.Assert(args != null);
 
-            Unit unitType = userInputManager.SelectionManager.FocusedUnitType;
-            if (unitType == null) return;
+            Entity prototype = userInputManager.SelectionManager.FocusedPrototype;
+            if (prototype == null) return;
 
             string commandName = args.GetType().Name.Replace("Command", string.Empty);
-            string soundName = audio.GetUnitSoundName(unitType, commandName);
+            string soundName = audio.GetUnitSoundName(prototype, commandName);
             audio.PlayUISound(soundName);
         }
 
@@ -218,6 +190,14 @@ namespace Orion.Game.Presentation.Audio
             string soundName = isMelee ? "MeleeAttack" : "RangeAttack";
 
             audio.PlaySfx(soundName, args.Hitter.Center);
+        }
+
+        private void OnBuildingConstructed(World world, Entity building)
+        {
+            if (FactionMembership.GetFaction(building) != LocalFaction) return;
+
+            string soundName = audio.GetUnitSoundName(building, "Select");
+            audio.PlaySfx(soundName, building.Center);
         }
 
         private void OnUnderAttackWarning(UnderAttackMonitor sender, Vector2 position)

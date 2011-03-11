@@ -137,5 +137,50 @@ namespace Orion.Game.Simulation.Components
             set { prototype = value; }
         }
         #endregion
+
+        #region Methods
+        /// <summary>
+        /// Gets a value indicating if a given <see cref="Entity"/> is a building.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> to be tested.</param>
+        /// <returns>A value indicating if it is a building.</returns>
+        /// <remarks>
+        /// This would have been called <c>IsBuilding</c>, but the name would clash with the property.
+        /// </remarks>
+        public static bool IsEntityBuilding(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            return entity.Identity != null && entity.Identity.IsBuilding;
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the prototype of a given <see cref="Entity"/>.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> for which the prototype is to be found.</param>
+        /// <returns>The prototype <see cref="Entity"/>, or <c>null</c> if it has none.</returns>
+        public static Entity GetPrototype(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            return entity.Identity == null ? null : entity.Identity.Prototype;
+        }
+
+        /// <summary>
+        /// Gets a value indicating if two given <see cref="Entity">entities</see> have the same prototype.
+        /// </summary>
+        /// <param name="first">The first <see cref="Entity"/> to be tested.</param>
+        /// <param name="second">The second <see cref="Entity"/> to be tested.</param>
+        /// <returns>A value indicating if they have the same prototype.</returns>
+        public static bool HaveSamePrototype(Entity first, Entity second)
+        {
+            Argument.EnsureNotNull(first, "first");
+            Argument.EnsureNotNull(second, "second");
+
+            return first.Identity != null
+                && second.Identity != null
+                && first.Identity.Prototype == second.Identity.Prototype;
+        }
+        #endregion
     }
 }

@@ -91,7 +91,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets the <see cref="Identity"/> component of this <see cref="Entity"/>.
+        /// Gets the <see cref="T:Identity"/> component of this <see cref="Entity"/>.
         /// If there is none, returns <c>null</c>.
         /// </summary>
         /// <remarks>
@@ -103,7 +103,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets the <see cref="Spatial"/> component of this <see cref="Entity"/>.
+        /// Gets the <see cref="T:Spatial"/> component of this <see cref="Entity"/>.
         /// If there is none, returns <c>null</c>.
         /// </summary>
         /// <remarks>

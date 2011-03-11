@@ -15,21 +15,21 @@ namespace Orion.Game.Presentation.Actions.UserCommands
     public sealed class BuildUserCommand : UserInputCommand, IRenderableUserCommand
     {
         #region Fields
-        private readonly Unit buildingType;
+        private readonly Entity prototype;
         private readonly Texture texture;
         private Point? minLocation;
         #endregion
 
         #region Constructors
         public BuildUserCommand(UserInputManager inputManager, GameGraphics gameGraphics,
-            Unit buildingType)
+            Entity prototype)
             : base(inputManager)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
-            Argument.EnsureNotNull(buildingType, "buildingType");
+            Argument.EnsureNotNull(prototype, "prototype");
 
-            this.buildingType = buildingType;
-            this.texture = gameGraphics.GetEntityTexture(buildingType);
+            this.prototype = prototype;
+            this.texture = gameGraphics.GetEntityTexture(prototype);
         }
         #endregion
 
@@ -40,20 +40,20 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             {
                 if (!minLocation.HasValue) return false;
 
-                int aladdiumCost = (int)LocalFaction.GetStat(buildingType, Identity.AladdiumCostStat);
-                int alageneCost = (int)LocalFaction.GetStat(buildingType, Identity.AlageneCostStat);
+                int aladdiumCost = (int)LocalFaction.GetStat(prototype, Identity.AladdiumCostStat);
+                int alageneCost = (int)LocalFaction.GetStat(prototype, Identity.AlageneCostStat);
                 if (aladdiumCost > LocalFaction.AladdiumAmount
                     || alageneCost > LocalFaction.AlageneAmount)
                     return false;
 
-                Region region = new Region(minLocation.Value, buildingType.Size);
+                Region region = new Region(minLocation.Value, prototype.Size);
                 if (!Match.CanBuild(region))
                     return false;
 
                 if (!LocalFaction.HasFullySeen(region))
                     return false;
 
-                if (!buildingType.Components.Has<AlageneExtractor>())
+                if (!prototype.Components.Has<AlageneExtractor>())
                     return true;
 
                 // Special case for alagene extractors:
@@ -85,23 +85,23 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             OnMouseMoved(location);
             if (!IsLocationValid) return;
 
-            InputManager.LaunchBuild(minLocation.Value, buildingType);
+            InputManager.LaunchBuild(minLocation.Value, prototype);
         }
 
         private Point GetMinLocation(Vector2 location)
         {
-            int minX = (int)Math.Round(location.X - buildingType.Size.Width * 0.5f);
-            int minY = (int)Math.Round(location.Y - buildingType.Size.Height * 0.5f);
+            int minX = (int)Math.Round(location.X - prototype.Size.Width * 0.5f);
+            int minY = (int)Math.Round(location.Y - prototype.Size.Height * 0.5f);
 
             if (minX < 0)
                 minX = 0;
-            else if (minX >= World.Width - buildingType.Size.Width)
-                minX = World.Width - buildingType.Size.Width;
+            else if (minX >= World.Width - prototype.Size.Width)
+                minX = World.Width - prototype.Size.Width;
 
             if (minY < 0)
                 minY = 0;
-            else if (minY >= World.Height - buildingType.Size.Height)
-                minY = World.Height - buildingType.Size.Height;
+            else if (minY >= World.Height - prototype.Size.Height)
+                minY = World.Height - prototype.Size.Height;
 
             return new Point(minX, minY);
         }
@@ -113,7 +113,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             ColorRgb tint = IsLocationValid ? Colors.LightBlue : Colors.Red;
             Rectangle rectangle = new Rectangle(
                 minLocation.Value.X, minLocation.Value.Y,
-                buildingType.Size.Width, buildingType.Size.Height);
+                prototype.Size.Width, prototype.Size.Height);
             context.Fill(rectangle, tint.ToRgba(0.4f));
             context.Fill(rectangle, texture, tint);
         }

@@ -18,24 +18,56 @@ namespace Orion.Game.Presentation
     public sealed class Selection : ICollection<Entity>
     {
         #region Fields
-        public static readonly float NearbyRadius = 10;
+        public const float nearbyRadius = 10;
 
+        private readonly World world;
         private readonly Faction localFaction;
         private readonly int limit;
         private readonly HashSet<Entity> entities = new HashSet<Entity>();
+        private readonly List<Predicate<Entity>> priorityFilters = new List<Predicate<Entity>>();
         #endregion
 
         #region Constructors
-        public Selection(Faction localFaction, int limit)
+        /// <summary>
+        /// Initializes a new <see cref="Selection"/> from the world it refers to.
+        /// </summary>
+        /// <param name="world">The world of the <see cref="Entity">entities</see> that will be in this <see cref="Selection"/>.</param>
+        /// <param name="localFaction">The local <see cref="Faction"/> which influances selection priorities.</param>
+        /// <param name="limit">The selection limit, in number of <see cref="Entity">entities</see>.</param>
+        public Selection(World world, Faction localFaction, int limit)
         {
-            Argument.EnsureNotNull(localFaction, "localFaction");
-            Argument.EnsureStrictlyPositive(limit, "limit");
+            Argument.EnsureNotNull(world, "world");
+            Argument.EnsurePositive(limit, "limit");
 
+            this.world = world;
             this.localFaction = localFaction;
             this.limit = limit;
+            
+            world.Updated += OnWorldUpdated;
 
-            localFaction.World.EntityRemoved += OnEntityRemoved;
-            localFaction.World.Updated += OnWorldUpdated;
+            // Setup priority filters
+            if (localFaction == null)
+            {
+                // For spectators
+                // - Units
+                priorityFilters.Add(entity => FactionMembership.GetFaction(entity) != null && !Identity.IsEntityBuilding(entity));
+                // - Buildings
+                priorityFilters.Add(entity => FactionMembership.GetFaction(entity) != null);
+            }
+            else
+            {
+                // - Controlled units
+                priorityFilters.Add(entity => FactionMembership.GetFaction(entity) == localFaction && !Identity.IsEntityBuilding(entity));
+                // - Controlled buildings
+                priorityFilters.Add(entity => FactionMembership.GetFaction(entity) == localFaction);
+                // - Other faction units
+                priorityFilters.Add(entity => FactionMembership.GetFaction(entity) != null && !Identity.IsEntityBuilding(entity));
+                // - Other faction buildings
+                priorityFilters.Add(entity => FactionMembership.GetFaction(entity) != null);
+            }
+            // - Fauna
+            priorityFilters.Add(entity => !entity.Components.Has<Harvestable>());
+            // - Resources (no filter needed)
         }
         #endregion
 
@@ -62,79 +94,15 @@ namespace Orion.Game.Presentation
         {
             get { return entities.Count; }
         }
-
-        /// <summary>
-        /// Gets the maximum number of entities that can be selected at once.
-        /// </summary>
-        public int Limit
-        {
-            get { return limit; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating if this selection is empty.
-        /// </summary>
-        public bool IsEmpty
-        {
-            get { return entities.Count == 0; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating if this selection is full.
-        /// </summary>
-        public bool IsFull
-        {
-            get
-            {
-                return entities.Count == limit
-                    || Type == SelectionType.ResourceNode;
-            }
-        }
-
-        /// <summary>
-        /// Gets the type of contents this selection currently has.
-        /// </summary>
-        public SelectionType Type
-        {
-            get
-            {
-                if (entities.Count == 0) return SelectionType.Empty;
-                return entities.FirstOrDefault() is Unit ? SelectionType.Units : SelectionType.ResourceNode;
-            }
-        }
-
-        /// <summary>
-        /// Gets the resource node in this selection, if any.
-        /// </summary>
-        public Entity ResourceNode
-        {
-            get { return entities.FirstOrDefault(e => e.Components.Has<Harvestable>()); }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Unit"/>s in this selection, if any.
-        /// </summary>
-        public IEnumerable<Unit> Units
-        {
-            get { return entities.OfType<Unit>(); }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Unit"/>s in this selection as <see cref="Entity">entities</see>, if any.
-        /// </summary>
-        public IEnumerable<Entity> UnitEntities
-        {
-            get { return entities.Where(entity => entity is Unit); }
-        }
         #endregion
 
         #region Methods
         #region Queries
         /// <summary>
-        /// Gets a value indicating if this selection contains a given entity.
+        /// Gets a value indicating if this selection contains a given <see cref="Entity"/>.
         /// </summary>
-        /// <param name="entity">The entity to be found.</param>
-        /// <returns><c>True</c> if the entity is in this collection, <c>false</c> if not.</returns>
+        /// <param name="entity">The <see cref="Entity"/> to be found.</param>
+        /// <returns><c>True</c> if the <see cref="Entity"/> is in this collection, <c>false</c> if not.</returns>
         public bool Contains(Entity entity)
         {
             return entities.Contains(entity);
@@ -152,9 +120,9 @@ namespace Orion.Game.Presentation
 
         #region Adding
         /// <summary>
-        /// Attempts to add an entity to this selection.
+        /// Attempts to add an <see cref="Entity"/> to this selection.
         /// </summary>
-        /// <param name="entity">The entity to be added.</param>
+        /// <param name="entity">The <see cref="Entity"/> to be added.</param>
         /// <returns><c>True</c> if it was added, <c>false</c> if not.</returns>
         public bool Add(Entity entity)
         {
@@ -168,39 +136,36 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Adds multiple units to the selection.
+        /// Adds multiple <see cref="Entity">entities</see> to the selection.
         /// </summary>
-        /// <param name="units">The units to be added.</param>
-        public void Add(IEnumerable<Unit> units)
+        /// <param name="entities">The <see cref="Entity">entities</see> to be added.</param>
+        public void Add(IEnumerable<Entity> entities)
         {
-            Argument.EnsureNotNull(units, "units");
+            Argument.EnsureNotNull(entities, "entities");
 
-            if (Type == SelectionType.ResourceNode) return;
-
-            bool wasUnitAdded = false;
-            foreach (Unit unit in units)
+            bool wasAnyEntityAdded = false;
+            foreach (Entity entity in entities)
             {
-                if (CanBeAdded(unit))
+                if (CanBeAdded(entity))
                 {
-                    entities.Add(unit);
-                    wasUnitAdded = true;
+                    this.entities.Add(entity);
+                    wasAnyEntityAdded = true;
                 }
             }
 
-            if (wasUnitAdded) Changed.Raise(this);
+            if (wasAnyEntityAdded) Changed.Raise(this);
         }
 
         /// <summary>
-        /// Adds the units which are in a rectangle to the selection.
+        /// Adds the <see cref="Entity">entities</see> which are in a rectangle to the selection.
         /// </summary>
         /// <param name="firstPoint">
-        /// The first point of the rectangles. Units nearest to this will be selected first.
+        /// The first point of the rectangles. <see cref="Entity">Entities</see> nearest to this will be selected first.
         /// </param>
         /// <param name="secondPoint">The second point of the rectangle.</param>
-        public void AddUnitsInRectangle(Vector2 firstPoint, Vector2 secondPoint)
+        public void AddFromRectangle(Vector2 firstPoint, Vector2 secondPoint)
         {
-            if (Type == SelectionType.ResourceNode) return;
-            SelectUnitsInRectangle(firstPoint, secondPoint, true);
+            FromRectangle(firstPoint, secondPoint, true);
         }
         #endregion
 
@@ -226,59 +191,60 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Sets the contents of this selection to a sequence of units.
+        /// Sets the contents of this selection to a sequence of <see cref="Entity">entities</see>.
         /// </summary>
-        /// <param name="units">The units to be selected.</param>
-        public void Set(IEnumerable<Unit> units)
+        /// <param name="entities">The <see cref="Entity">entities</see> to be selected.</param>
+        public void Set(IEnumerable<Entity> entities)
         {
-            Argument.EnsureNotNull(units, "units");
+            Argument.EnsureNotNull(entities, "entities");
 
-            entities.Clear();
-            foreach (Unit unit in units)
-                if (CanBeAdded(unit))
-                    entities.Add(unit);
+            this.entities.Clear();
+            foreach (Entity entity in entities)
+                if (CanBeAdded(entity))
+                    this.entities.Add(entity);
 
-            // This might make false positives but I assume it doesn't matter.
+            // This might make false positives, but it shouldn't matter.
+            // (if the new selection is the same as the old one, it hasn't really changed)
             Changed.Raise(this);
         }
 
         /// <summary>
-        /// Sets the selection to the units which are in a rectangle.
+        /// Sets the selection to the <see cref="Entity">entities</see> which are in a rectangle.
         /// </summary>
         /// <param name="firstPoint">
-        /// The first point of the rectangles. Units nearest to this will be selected first.
+        /// The first point of the rectangles. <see cref="Entity">Entities</see> nearest to this will be selected first.
         /// </param>
         /// <param name="secondPoint">The second point of the rectangle.</param>
-        public void SetToRectangle(Vector2 firstPoint, Vector2 secondPoint)
+        public void SetFromRectangle(Vector2 firstPoint, Vector2 secondPoint)
         {
-            SelectUnitsInRectangle(firstPoint, secondPoint, false);
+            FromRectangle(firstPoint, secondPoint, false);
         }
 
         /// <summary>
-        /// Sets the selection to units similar to a given entity in a given radius.
+        /// Sets the selection to <see cref="Entity">entities</see> similar to a given <see cref="Entity"/>.
         /// </summary>
-        /// <param name="entity">The entity for which similar units are to be found.</param>
+        /// <param name="entity">The <see cref="Entity"/> for which similar ones are to be found.</param>
         public void SetToNearbySimilar(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            if (entity.Components.Has<Harvestable>())
+            // An identity component is needed to determine of other entities
+            // have the same type.
+            if (entity.Identity == null)
             {
                 Set(entity);
                 return;
             }
 
-            Unit unit = (Unit)entity;
-            Faction unitFaction = FactionMembership.GetFaction(unit);
-            Circle circle = new Circle(entity.Center, NearbyRadius);
+            Faction faction = FactionMembership.GetFaction(entity);
+            Circle circle = new Circle(entity.Center, nearbyRadius);
 
-#warning Unit type comparision
-            var units = localFaction.World.Entities
+            var entities = world.Entities
                 .Intersecting(circle)
-                .OfType<Unit>()
-                .Where(u => u.Type == unit.Type && FactionMembership.GetFaction(u) == unitFaction);
+                .Where(e => Identity.HaveSamePrototype(e, entity)
+                    && FactionMembership.GetFaction(e) == faction);
 
-            Set(units);
+            Set(entities);
         }
         #endregion
 
@@ -326,62 +292,50 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Private Implementation Stuff
-        private void SelectUnitsInRectangle(Vector2 rectangleStart, Vector2 rectangleEnd, bool add)
+        private void FromRectangle(Vector2 rectangleStart, Vector2 rectangleEnd, bool add)
         {
             Rectangle rectangle = Rectangle.FromPoints(rectangleStart, rectangleEnd);
 
-            List<Unit> units = localFaction.World.Entities
+            List<Entity> entities = world.Entities
                 .Intersecting(rectangle)
-                .OfType<Unit>()
-                .OrderBy(unit => (unit.Center - rectangleStart).LengthSquared)
                 .ToList();
 
-            // Filter out factions
-            bool containsControllableUnits = units.Any(unit =>
-            {
-                Faction unitFaction = FactionMembership.GetFaction(unit);
-                return unitFaction != null && unitFaction.GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl);
-            });
+            if (add) entities.RemoveAll(entity => Contains(entity));
 
-            if (containsControllableUnits)
+            // Sort from nearest to selection rectangle start to farthest
+            entities.Sort((a,b) => (a.Center - rectangleStart).LengthSquared.CompareTo((b.Center - rectangleStart).LengthSquared));
+
+            // Apply priority rules (so that units are selected before buildings, for example)
+            foreach (var entityPredicate in priorityFilters)
             {
-                units.RemoveAll(unit => !FactionMembership.GetFaction(unit).GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl));
+                if (entities.Any(entity => entityPredicate(entity)))
+                {
+                    entities.RemoveAll(entity => !entityPredicate(entity));
+                    break;
+                }
             }
-            else if (units.Count > 1)
-            {
-                units.RemoveRange(1, units.Count - 1);
-            }
 
-            // Filter out buildings
-            bool containsNonBuildingUnits = units.Any(unit => !unit.Identity.IsBuilding);
-            if (containsNonBuildingUnits) units.RemoveAll(unit => unit.Identity.IsBuilding);
-
-            if (add) Add(units);
-            else Set(units);
+            if (add) Add(entities);
+            else Set(entities);
         }
 
         private bool CanBeAdded(Entity entity)
         {
-            return !IsFull
+            return Count < limit
                 && !Contains(entity)
-                && entity.IsAliveInWorld
-                && (localFaction == null || localFaction.CanSee(entity))
-                && !(Type == SelectionType.Units && entity.Components.Has<Harvestable>());
+                && IsValid(entity);
         }
 
-        private void OnEntityRemoved(World sender, Entity entity)
+        private bool IsValid(Entity entity)
         {
-            Remove(entity);
+            return entity.IsAlive
+                && entity.Spatial != null
+                && (localFaction == null || localFaction.CanSee(entity));
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
-            RemoveHiddenEntitiesFromSelection();
-        }
-
-        private void RemoveHiddenEntitiesFromSelection()
-        {
-            int removedCount = entities.RemoveWhere(entity => !localFaction.CanSee(entity));
+            int removedCount = entities.RemoveWhere(entity => !IsValid(entity));
             if (removedCount == 0) return;
 
             Changed.Raise(this);

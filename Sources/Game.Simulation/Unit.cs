@@ -36,6 +36,7 @@ namespace Orion.Game.Simulation
             identity.Name = type.Name;
             identity.VisualIdentity = type.GraphicsTemplate ?? type.Name;
             identity.SoundIdentity = type.VoicesTemplate ?? type.Name;
+            identity.IsBuilding = !InternalHasSkill<MoveSkill>();
             identity.LeavesRemains = true;
             identity.IsSelectable = true;
             identity.Prototype = this;
@@ -201,13 +202,6 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Events
-        /// <summary>
-        /// Raised when the construction of this <see cref="Entity"/> is completed.
-        /// </summary>
-        public event Action<Unit> ConstructionCompleted;
-        #endregion
-
         #region Properties
         /// <summary>
         /// Temporary measure until we broadly use the identity component.
@@ -252,21 +246,6 @@ namespace Orion.Game.Simulation
             UnitSkill skill;
             skills.TryGetValue(typeof(TSkill), out skill);
             return skill as TSkill;
-        }
-
-        internal void OnHitting(Unit target, float damage)
-        {
-            HitEventArgs args = new HitEventArgs(this, target, damage, World.LastSimulationStep.TimeInSeconds);
-
-            World.OnUnitHitting(args);
-        }
-
-        internal void OnConstructionCompleted()
-        {
-            ConstructionCompleted.Raise(this);
-
-            Faction faction = FactionMembership.GetFaction(this);
-            if (faction != null) faction.OnBuildingConstructionCompleted(this);
         }
         #endregion
     }

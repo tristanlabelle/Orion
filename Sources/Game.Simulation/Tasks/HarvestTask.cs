@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation.Tasks
         private float amountAccumulator;
         private float secondsGivingResource;
         private MoveTask move;
-        private Unit depot;
+        private Entity depot;
         private Mode mode = Mode.Extracting;
         #endregion
 
@@ -192,10 +192,10 @@ namespace Orion.Game.Simulation.Tasks
             mode = Mode.Extracting;
         }
 
-        private Unit FindClosestDepot()
+        private Entity FindClosestDepot()
         {
 #warning The resource depot component should not be present while the build is in progress
-            return FactionMembership.GetFaction(Entity).Units
+            return FactionMembership.GetFaction(Entity).Entities
                 .Where(other => !other.Components.Has<BuildProgress>() && other.Components.Has<ResourceDepot>())
                 .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Entity.Spatial.GridRegion));
         }

@@ -41,7 +41,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             foreach (RememberedBuilding building in memory.Buildings)
             {
-                Texture texture = gameGraphics.GetEntityTexture(building.Type);
+                Texture texture = gameGraphics.GetEntityTexture(building.Prototype);
                 graphics.Fill(building.GridRegion.ToRectangle(), texture, building.Faction.Color);
             }
         }

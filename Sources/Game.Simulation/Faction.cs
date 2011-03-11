@@ -179,7 +179,7 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Gets the collection of <see cref="Entity"/>s in this <see cref="Faction"/>.
         /// </summary>
-        public IEnumerable<Entity> UnitEntities
+        public IEnumerable<Entity> Entities
         {
             get
             {
@@ -392,13 +392,13 @@ namespace Orion.Game.Simulation
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
-        /// <remarks>Invoked by <see cref="Unit"/>.</remarks>
-        internal void OnUnitDied(Unit unit)
+        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
+        internal void OnUnitDied(Entity entity)
         {
-            Debug.Assert(unit != null);
-            Debug.Assert(FactionMembership.GetFaction(unit) == this);
+            Debug.Assert(entity != null);
+            Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
-            UsedFoodAmount -= (int)GetStat(unit, FactionMembership.FoodCostStat);
+            UsedFoodAmount -= (int)GetStat(entity, FactionMembership.FoodCostStat);
         }
 
         /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
@@ -477,7 +477,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public void MassSuicide()
         {
-            UnitEntities.Select(entity => entity.Components.TryGet<Health>())
+            Entities.Select(entity => entity.Components.TryGet<Health>())
                 .Where(health => health != null)
                 .NonDeferred()
                 .ForEach(entity => entity.Suicide());

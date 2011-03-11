@@ -24,11 +24,13 @@ namespace Orion.Game.Presentation
     public sealed class UserInputManager
     {
         #region Fields
-        private static readonly float SingleClickMaxRectangleArea = 0.1f;
+        private const int selectionGroupCount = 10;
+        private const float singleClickMaxRectangleArea = 0.1f;
 
         private readonly Match match;
         private readonly SlaveCommander commander;
         private readonly UnderAttackMonitor underAttackMonitor;
+        private readonly SelectionGroupManager selectionGroupManager;
         private readonly SelectionManager selectionManager;
         private Unit hoveredUnit;
         private UserInputCommand mouseCommand;
@@ -47,6 +49,7 @@ namespace Orion.Game.Presentation
             this.match = match;
             this.commander = commander;
             this.underAttackMonitor = new UnderAttackMonitor(commander.Faction);
+            this.selectionGroupManager = new SelectionGroupManager(match.World, 10);
             this.selectionManager = new SelectionManager(commander.Faction);
             this.commander.Faction.World.EntityRemoved += OnEntityRemoved;
         }
@@ -153,16 +156,16 @@ namespace Orion.Game.Presentation
             this.selectionStart = null;
             this.selectionEnd = null;
 
-            if (selectionRectangle.Area < SingleClickMaxRectangleArea)
+            if (selectionRectangle.Area < singleClickMaxRectangleArea)
             {
                 HandleMouseClick(selectionRectangleStart);
             }
             else
             {
                 if (shiftKeyPressed)
-                    Selection.AddUnitsInRectangle(selectionRectangleStart, selectionRectangleEnd);
+                    Selection.AddFromRectangle(selectionRectangleStart, selectionRectangleEnd);
                 else
-                    Selection.SetToRectangle(selectionRectangleStart, selectionRectangleEnd);
+                    Selection.SetFromRectangle(selectionRectangleStart, selectionRectangleEnd);
             }
         }
 
@@ -245,9 +248,9 @@ namespace Orion.Game.Presentation
             {
                 int groupNumber = args.Key - Keys.D0;
                 if (args.IsControlModifierDown)
-                    selectionManager.SaveSelectionGroup(groupNumber);
+                    selectionGroupManager.Set(groupNumber, Selection);
                 else
-                    selectionManager.TryLoadSelectionGroup(groupNumber);
+                    Selection.Set(selectionGroupManager[groupNumber]);
             }
         }
 
@@ -282,8 +285,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchDefaultCommand(Vector2 target)
         {
-            if (Selection.Type != SelectionType.Units) return;
-            if (!Selection.Units.Any(unit => IsControllable(unit))) return;
+            if (!Selection.Any(entity => IsControllable(entity))) return;
 
             Point point = (Point)target;
             if (!World.IsWithinBounds(point))
@@ -291,10 +293,11 @@ namespace Orion.Game.Presentation
                 LaunchMove(target);
                 return;
             }
-            
+
+            bool areAllBuildings = Selection.All(entity => Identity.IsEntityBuilding(entity));
             if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
             {
-                if (Selection.Units.All(unit => unit.Identity.IsBuilding))
+                if (areAllBuildings)
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -304,7 +307,7 @@ namespace Orion.Game.Presentation
             Entity targetEntity = World.Entities.GetTopmostEntityAt(point);
             if (targetEntity == null)
             {
-                if (Selection.Units.All(unit => unit.Identity.IsBuilding))
+                if (areAllBuildings)
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -317,8 +320,6 @@ namespace Orion.Game.Presentation
 
         private void LaunchDefaultCommand(Entity target)
         {
-            if (Selection.Type != SelectionType.Units) return;
-
             if (target.Components.Has<Harvestable>())
             {
                 if (LocalFaction.CanHarvest(target))
@@ -336,7 +337,7 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (Selection.Units.All(unit => unit.Identity.IsBuilding))
+            if (Selection.All(entity => Identity.IsEntityBuilding(entity)))
             {
                 LaunchChangeRallyPoint(target.Center);
                 return;
@@ -389,18 +390,16 @@ namespace Orion.Game.Presentation
         {
             if (!shiftKeyPressed)
             {
-                IEnumerable<Entity> units = Selection.Units
-                    .Where(unit => IsControllable(unit) && !unit.Identity.IsBuilding)
-                    .Cast<Entity>();
-                commander.LaunchCancelAllTasks(units);
+                IEnumerable<Entity> entities = Selection
+                    .Where(entity => IsControllable(entity) && !Identity.IsEntityBuilding(entity));
+                commander.LaunchCancelAllTasks(entities);
             }
         }
 
         public void LaunchBuild(Point location, Entity buildingPrototype)
         {
-            IEnumerable<Entity> builders = Selection.UnitEntities
-                .Where(unit => IsControllable(unit) && Builder.Supports(unit, buildingPrototype))
-                .Cast<Entity>();
+            IEnumerable<Entity> builders = Selection
+                .Where(entity => IsControllable(entity) && Builder.Supports(entity, buildingPrototype));
 
             OverrideIfNecessary();
             commander.LaunchBuild(builders, buildingPrototype, location);
@@ -408,8 +407,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchAttack(Entity target)
         {
-            IEnumerable<Entity> selection = Selection.UnitEntities.Where(entity => IsControllable(entity))
-                .Cast<Entity>();
+            IEnumerable<Entity> selection = Selection.Where(entity => IsControllable(entity));
 
             OverrideIfNecessary();
             // Those who can attack do so, the others simply move to the target's position
@@ -419,9 +417,8 @@ namespace Orion.Game.Presentation
 
         public void LaunchZoneAttack(Vector2 destination)
         {
-            IEnumerable<Entity> movableEntities = Selection.UnitEntities
-                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>())
-                .Cast<Entity>();
+            IEnumerable<Entity> movableEntities = Selection
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
             // Those who can attack do so, the others simply move to the destination
             OverrideIfNecessary();
@@ -433,9 +430,8 @@ namespace Orion.Game.Presentation
         {
             Debug.Assert(node.Components.Has<Harvestable>(), "Node is not a resource node!");
 
-            IEnumerable<Entity> movableEntities = Selection.UnitEntities
-                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>())
-                .Cast<Entity>();
+            IEnumerable<Entity> movableEntities = Selection
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
             // Those who can harvest do so, the others simply move to the resource's position
             OverrideIfNecessary();
@@ -445,9 +441,8 @@ namespace Orion.Game.Presentation
 
         public void LaunchMove(Vector2 destination)
         {
-            IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>())
-                .Cast<Entity>();
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
             OverrideIfNecessary();
             commander.LaunchMove(entities, destination);
@@ -455,11 +450,10 @@ namespace Orion.Game.Presentation
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
-            IEnumerable<Entity> entities = Selection.Units
+            IEnumerable<Entity> entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
                     && entity.Identity.IsBuilding
-                    && entity.Components.Has<Trainer>())
-                 .Cast<Entity>();
+                    && entity.Components.Has<Trainer>());
 
             OverrideIfNecessary();
             commander.LaunchChangeRallyPoint(entities, at);
@@ -471,10 +465,9 @@ namespace Orion.Game.Presentation
 
             Health targetHealth = target.Components.TryGet<Health>();
             if (targetHealth == null || targetHealth.Constitution != Constitution.Mechanical) return;
-           
-            IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Builder>())
-                 .Cast<Entity>();
+
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Builder>());
 
             OverrideIfNecessary();
             commander.LaunchRepair(entities, target);
@@ -487,9 +480,8 @@ namespace Orion.Game.Presentation
             Health targetHealth = target.Components.TryGet<Health>();
             if (targetHealth.Constitution != Constitution.Biological) return;
 
-            IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Healer>())
-                 .Cast<Entity>();
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Healer>());
 
             Faction targetFaction = FactionMembership.GetFaction(target);
             if (entities.Any(entity => FactionMembership.GetFaction(entity) != targetFaction)) return;
@@ -500,7 +492,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchTrain(Entity prototype)
         {
-            IEnumerable<Entity> entities = Selection.UnitEntities
+            IEnumerable<Entity> entities = Selection
                 .Where(entity =>
                 {
                     Trainer trainer = entity.Components.TryGet<Trainer>();
@@ -508,8 +500,7 @@ namespace Orion.Game.Presentation
                         && entity.Components.Has<TaskQueue>()
                         && trainer != null
                         && trainer.Supports(prototype);
-                })
-                .Cast<Entity>();
+                });
 
             OverrideIfNecessary();
             commander.LaunchTrain(entities, prototype);
@@ -517,7 +508,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchResearch(Technology technology)
         {
-            foreach (Entity entity in Selection.UnitEntities)
+            foreach (Entity entity in Selection)
             {
                 Researcher researcher = entity.Components.TryGet<Researcher>();
                 if (FactionMembership.GetFaction(entity) != LocalFaction
@@ -535,15 +526,14 @@ namespace Orion.Game.Presentation
 
         public void LaunchSuicide()
         {
-            IEnumerable<Entity> entities = Selection.UnitEntities
+            IEnumerable<Entity> entities = Selection
                 .Where(entity =>
                 {
                     Health health = entity.Components.TryGet<Health>();
                     return FactionMembership.GetFaction(entity) == LocalFaction
                         && health != null
                         && health.CanSuicide;
-                })
-                .Cast<Entity>();
+                });
 
             OverrideIfNecessary();
             commander.LaunchSuicide(entities);
@@ -551,9 +541,8 @@ namespace Orion.Game.Presentation
 
         public void LaunchStandGuard()
         {
-            IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Mobile>())
-                .Cast<Entity>();
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Mobile>());
 
             OverrideIfNecessary();
             commander.LaunchStandGuard(entities);
@@ -561,18 +550,16 @@ namespace Orion.Game.Presentation
 
         public void LaunchSell()
         {
-            IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Sellable>())
-                .Cast<Entity>();
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Sellable>());
 
             commander.LaunchSuicide(entities);
         }
 
         public void LaunchCancelAllTasks()
         {
-            IEnumerable<Entity> entities = Selection.UnitEntities
-                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction)
-                .Cast<Entity>();
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction);
 
             commander.LaunchCancelAllTasks(entities);
         }
@@ -611,10 +598,9 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(targetType, "targetType");
 
-            var entities = Selection.Units
+            var entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
-                    && entity.Identity.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name))
-                .Cast<Entity>();
+                    && entity.Identity.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name));
 
             commander.LaunchUpgrade(entities, targetType);
         }

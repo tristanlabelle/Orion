@@ -20,25 +20,25 @@ namespace Orion.Game.Presentation.Actions
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
         private readonly Localizer localizer;
-        private readonly Unit unitType;
+        private readonly Entity prototype;
         private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
         public BuildActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
-            GameGraphics graphics,  Localizer localizer, Unit unitType)
+            GameGraphics graphics,  Localizer localizer, Entity prototype)
         {
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(localizer, "localizer");
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(prototype, "prototype");
 
             this.actionPanel = actionPanel;
             this.inputManager = inputManager;
             this.graphics = graphics;
             this.localizer = localizer;
-            this.unitType = unitType;
+            this.prototype = prototype;
 
             CreateButtons();
         }
@@ -63,7 +63,7 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            Builder builder = unitType.Components.TryGet<Builder>();
+            Builder builder = prototype.Components.TryGet<Builder>();
             Debug.Assert(builder != null);
 
             int x = 0;

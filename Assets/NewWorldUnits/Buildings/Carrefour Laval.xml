@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Pyramide</Name>
+		<AladdiumCost>140</AladdiumCost>
+	</Identity>
+	<Train>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>Gabraël Martien</Item>
+		</TrainableTypes>
+	</Train>
+	<Health>
+		<MaxHealth>300</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>4</Armor>
+	</Health>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>4</Width>
+			<Height>4</Height>
+		</Size>
+		<SightRange>10</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

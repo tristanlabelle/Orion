@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>PapaSmurf</Name>
+		<Upgrades>
+			<Item>ChuckNorris</Item>
+		</Upgrades>
+		<VoicesTemplate>Smurf</VoicesTemplate>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>1</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>8</Power>
+		<Range>0</Range>
+		<Delay>4</Delay>
+	</Attack>
+	
+	<Build>
+		<Speed>100</Speed>
+		<BuildableTypes>
+			<Item>Pyramide</Item>
+			<Item>Temple de 2012</Item>
+			<Item>Portail démoniaque</Item>
+			<Item>Centre de propagande</Item>
+			<Item>Maison de Tristan</Item>
+			<Item>Jean-Marc</Item>
+			<Item>Œil de Sauron</Item>
+			<Item>Extracteur d'Alagène</Item>
+			<Item>Réserve</Item>
+			<Item>Costco des Hells</Item>
+			<Item>Carrefour Laval</Item>
+		</BuildableTypes>
+	</Build>
+	
+	<Health>
+		<MaxHealth>60</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	
+	<Harvest>
+		<Speed>5</Speed>
+		<MaxCarryingAmount>20</MaxCarryingAmount>
+	</Harvest>
+	
+	<Move>
+		<Speed>8</Speed>
+		<Acceleration>8</Acceleration>
+	</Move>
+	
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>7</SightRange>
+	</Position>
+	
+	<Tags>
+		<Tags>
+			<Item>worker</Item>
+		</Tags>
+	</Tags>
+</Entity>

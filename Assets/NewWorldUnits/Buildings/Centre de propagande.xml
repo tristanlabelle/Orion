@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Centre de propagande</Name>
+		<AladdiumCost>125</AladdiumCost>
+		<AlageneCost>200</AlageneCost>
+	</Identity>
+	<Train>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>Jedihad</Item>
+			<Item>Jésus</Item>
+			<Item>Flying Spaghetti Monster</Item>
+			<Item>Hélicoptère TVA</Item>
+		</TrainableTypes>
+	</Train>
+	<Health>
+		<MaxHealth>200</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

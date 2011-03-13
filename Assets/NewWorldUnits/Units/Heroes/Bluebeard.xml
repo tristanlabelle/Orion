@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Bluebeard</Name>
+		<Upgrades>
+			<Item>ChuckNorris</Item>
+		</Upgrades>
+		<VoicesTemplate>Pirate</VoicesTemplate>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>1</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>16</Power>
+		<Range>0</Range>
+		<Delay>3</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Heavy</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Heavy armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>120</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	<Move>
+		<Speed>8</Speed>
+		<Acceleration>8</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

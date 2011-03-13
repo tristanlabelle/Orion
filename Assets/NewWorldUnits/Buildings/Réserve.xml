@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Réserve</Name>
+		<AladdiumCost>50</AladdiumCost>
+	</Identity>
+	<FactionMembership>
+		<ProvideFood>10</ProvideFood>
+	</FactionMembership>
+	<Health>
+		<MaxHealth>80</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+		<SightRange>4</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

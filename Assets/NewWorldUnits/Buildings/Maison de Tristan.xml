@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Maison de Tristan</Name>
+		<AladdiumCost>150</AladdiumCost>
+		<AlageneCost>50</AlageneCost>
+	</Identity>
+	<Research>
+		<ResearchableTypes>
+			<Item>Schtroumpf véloce</Item>
+			<Item>Import Jean-Marc</Item>
+			<Item>Sainte Trinité</Item>
+			<Item>Schtroumpf costaud</Item>
+			<Item>Spaghetti Alfredo</Item>
+			<Item>Force islamique</Item>
+			<Item>Pandémie</Item>
+		</ResearchableTypes>
+	</Train>
+	<Health>
+		<MaxHealth>200</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+		<SightRange>4</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

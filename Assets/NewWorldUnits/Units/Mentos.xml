@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Mentos</Name>
+		<AladdiumCost>2000</AladdiumCost>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>5</FoodRequirement>
+	</FactionMembership>
+	<SuicideBomb>
+		<Radius>10</Radius>
+		<Damage>400</Damage>
+		<Target>Coke diète</Target>
+	</SuicideBomb>
+	<Health>
+		<MaxHealth>160</MaxHealth>
+		<ArmorType>Supernatural</ArmorType>
+		<Armor>4</Armor>
+	</Health>
+	<Move>
+		<Speed>3</Speed>
+		<Acceleration>3</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>3</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>BlueCollarSmurf</Name>
+		<AladdiumCost>50</AladdiumCost>
+		<VoicesTemplate>Smurf</VoicesTemplate>
+	</Identity>
+	
+	<FactionMembership>
+		<FoodRequirement>5</FoodRequirement>
+	</FactionMembership>
+	
+	<Unsuicidable/>
+	
+	<Attack>
+		<Power>1</Power>
+		<Range>0</Range>
+		<Delay>10</Delay>
+	</Attack>
+	
+	<Build>
+		<Speed>2</Speed>
+		<BuildableTypes>
+			<Item>Pyramide</Item>
+			<Item>Temple de 2012</Item>
+			<Item>Portail démoniaque</Item>
+			<Item>Centre de propagande</Item>
+			<Item>Maison de Tristan</Item>
+			<Item>Jean-Marc</Item>
+			<Item>Œil de Sauron</Item>
+			<Item>Extracteur d'Alagène</Item>
+			<Item>Réserve</Item>
+			<Item>Costco des Hells</Item>
+			<Item>Carrefour Laval</Item>
+		</BuildableTypes>
+	</Build>
+	
+	<Health>
+		<MaxHealth>50</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>0</Armor>
+	</Health>
+	
+	<Move>
+		<Speed>2</Speed>
+		<Acceleration>2</Acceleration>
+	</Move>
+	
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>3</SightRange>
+	</Position>
+	
+	<Tags>
+		<Tags>
+			<Item>worker</Item>
+		</Tags>
+	</Tags>
+</Entity>

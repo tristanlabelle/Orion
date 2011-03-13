@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UnitType Name="Lance-nain" Width="2" Height="2">
+	<Skills>
+		<Basic AladdiumCost="100" SightRange="7"/>
+		<Attack Power="8" Range="4" Delay="1"/>
+		<Sellable AladdiumValue="50" />
+	</Skills>
+</UnitType>

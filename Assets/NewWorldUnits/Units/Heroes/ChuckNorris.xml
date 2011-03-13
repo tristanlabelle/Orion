@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- No one messes with Chuck Norris.xml! -->
+<Entity>
+	<Identity>
+		<Name>ChuckNorris</Name>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>10</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>75</Power>
+		<Range>0</Range>
+		<Delay>1</Delay>
+		<SplashRadius>15</SplashRadius>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Light</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Light armor</Description>
+			</Item>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Heavy</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Heavy armor</Description>
+			</Item>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Supernatural</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Supernatural armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>500</MaxHealth>
+		<ArmorType>Divine</ArmorType>
+		<Armor>5</Armor>
+	</Health>
+	<Move>
+		<Speed>20</Speed>
+		<Acceleration>20</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>4</Width>
+			<Height>4</Height>
+		</Size>
+		<SightRange>20</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

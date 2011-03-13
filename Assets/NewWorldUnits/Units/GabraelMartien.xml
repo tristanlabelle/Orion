@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>GabraelMartien</Name>
+		<AladdiumCost>30</AladdiumCost>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>1</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>1</Power>
+		<Range>0</Range>
+		<Delay>1</Delay>
+	</Attack>
+	<Health>
+		<MaxHealth>30</MaxHealth>
+		<ArmorType>Supernatural</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	<Move>
+		<Speed>8</Speed>
+		<Acceleration>8</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>5</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

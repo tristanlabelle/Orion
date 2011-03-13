@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Mothership</Name>
+		<Upgrades>
+			<Item>ChuckNorris</Item>
+		</Upgrades>
+		<VoicesTemplate>FlyingSpaghettiMonster</VoicesTemplate>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>2</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>30</Power>
+		<Range>8</Range>
+		<Delay>3</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Light</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Light armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>250</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>8</Armor>
+	</Health>
+	<Move>
+		<Speed>6</Speed>
+		<Acceleration>6</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+		<SightRange>10</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

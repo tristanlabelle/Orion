@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Anthrax</Name>
+		<Upgrades>
+			<Item>ChuckNorris</Item>
+		</Upgrades>
+		<VoicesTemplate>SwineFlu</VoicesTemplate>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>2</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>5</Power>
+		<Range>9</Range>
+		<Delay>1</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Light</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Light armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>100</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	<Move>
+		<Speed>15</Speed>
+		<Acceleration>15</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>9</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

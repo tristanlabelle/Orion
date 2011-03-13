@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Smurf</Name>
+		<AladdiumCost>50</AladdiumCost>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<Upgrades>
+			<Item>PapaSmurf</Item>
+			<Item>BlueCollarSmurf</Item>
+			<Item>Smurfette</Item>
+		</Upgrades>
+	</Identity>
+	
+	<FactionMembership>
+		<FoodRequirement>1</FoodRequirement>
+	</FactionMembership>
+	
+	<Attack>
+		<Power>8</Power>
+		<Range>0</Range>
+		<Delay>5</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Light</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Light armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	
+	<Build>
+		<Speed>1</Speed>
+		<BuildableTypes>
+			<Item>Pyramide</Item>
+			<Item>Temple de 2012</Item>
+			<Item>Portail démoniaque</Item>
+			<Item>Centre de propagande</Item>
+			<Item>Maison de Tristan</Item>
+			<Item>Jean-Marc</Item>
+			<Item>Œil de Sauron</Item>
+			<Item>Extracteur d'Alagène</Item>
+			<Item>Réserve</Item>
+			<Item>Costco des Hells</Item>
+			<Item>Carrefour Laval</Item>
+		</BuildableTypes>
+	</Build>
+	
+	<Health>
+		<MaxHealth>20</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>1</Armor>
+		<ThreatLevel>1</ThreatLevel>
+	</Health>
+	
+	<Harvest>
+		<Speed>1</Speed>
+		<MaxCarryingAmount>5</MaxCarryingAmount>
+	</Harvest>
+	
+	<Move>
+		<Speed>8</Speed>
+		<Acceleration>8</Acceleration>
+	</Move>
+	
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<SightRange>5</SightRange>
+	</Position>
+	
+	<Tags>
+		<List>
+			<Item>worker</Item>
+		</List>
+	</Tags>
+</Entity>

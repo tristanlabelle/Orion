@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>British Jean-Marc</Name>
+		<Name>2012Temple</Name>
+		<AladdiumCost>150</AladdiumCost>
 	</Identity>
-	<Attack>
-		<Power>12</Power>
-		<Range>8</Range>
-		<Delay>1</Delay>
-	</Attack>
+	<Train>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>Pirate</Item>
+			<Item>Ninja</Item>
+			<Item>Viking</Item>
+		</TrainableTypes>
+	</Train>
 	<Health>
-		<MaxHealth>220</MaxHealth>
+		<MaxHealth>200</MaxHealth>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
@@ -19,7 +23,7 @@
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>9</SightRange>
+		<SightRange>8</SightRange>
 	</Position>
 	<Tags/>
 </Entity>

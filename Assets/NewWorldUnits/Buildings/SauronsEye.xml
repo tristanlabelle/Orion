@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Oeil de Sauron</Name>
+		<Name>SauronsEye</Name>
 		<AladdiumCost>100</AladdiumCost>
 		<AlageneCost>25</AlageneCost>
 	</Identity>
 	<Health>
 		<MaxHealth>100</MaxHealth>
-		<ArmorType>Surnatural</ArmorType>
+		<ArmorType>Supernatural</ArmorType>
 		<Armor>1</Armor>
 	</Health>
 	<Position>

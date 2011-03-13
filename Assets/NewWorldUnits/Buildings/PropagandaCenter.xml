@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Portail démoniaque</Name>
-		<AladdiumCost>180</AladdiumCost>
-		<AlageneCost>70</AlageneCost>
+		<Name>PropagandaCenter</Name>
+		<AladdiumCost>125</AladdiumCost>
+		<AlageneCost>200</AlageneCost>
 	</Identity>
 	<Train>
 		<Speed>10</Speed>
 		<TrainableTypes>
-			<Item>Grippe A(H1N1)</Item>
-			<Item>OVNI</Item>
-			<Item>Tapis volant</Item>
+			<Item>Jedihad</Item>
+			<Item>Jesus</Item>
+			<Item>FlyingSpaghettiMonster</Item>
+			<Item>TvaHelicopter</Item>
 		</TrainableTypes>
 	</Train>
 	<Health>
-		<MaxHealth>300</MaxHealth>
+		<MaxHealth>200</MaxHealth>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>

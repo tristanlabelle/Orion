@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Jean-Marc</Name>
+		<Name>JeanMarc</Name>
 		<AladdiumCost>120</AladdiumCost>
 		<AlageneCost>40</AlageneCost>
 		<Upgrades>
 			<Item>
-				<Name>British Jean-Marc</Name>
+				<Name>BritishJeanMarc</Name>
 				<AladdiumCost>220</AladdiumCost>
 				<AlageneCost>140</AlageneCost>
 			</Item>

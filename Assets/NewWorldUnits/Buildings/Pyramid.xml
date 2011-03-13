@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Pyramide</Name>
+		<Name>Pyramid</Name>
 		<AladdiumCost>250</AladdiumCost>
 	</Identity>
 	<FactionMembership>
@@ -10,7 +10,7 @@
 	<Train>
 		<Speed>10</Speed>
 		<TrainableTypes>
-			<Item>Schtroumpf</Item>
+			<Item>Smurf</Item>
 		</TrainableTypes>
 	</Train>
 	<StoreResources/>

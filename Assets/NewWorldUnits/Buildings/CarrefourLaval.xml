@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Pyramide</Name>
+		<Name>CarrefourLaval</Name>
 		<AladdiumCost>140</AladdiumCost>
 	</Identity>
 	<Train>
 		<Speed>10</Speed>
 		<TrainableTypes>
-			<Item>Gabraël Martien</Item>
+			<Item>GabraelMartien</Item>
 		</TrainableTypes>
 	</Train>
 	<Health>

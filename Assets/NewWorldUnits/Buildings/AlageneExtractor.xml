@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Costco des Hells</Name>
-		<AladdiumCost>80</AladdiumCost>
+		<Name>AlageneExtractor</Name>
+		<AladdiumCost>75</AladdiumCost>
 	</Identity>
-	<StoreResources/>
+	<ExtractAlagene/>
 	<Health>
-		<MaxHealth>100</MaxHealth>
+		<MaxHealth>75</MaxHealth>
 		<ArmorType>Heavy</ArmorType>
-		<Armor>2</Armor>
+		<Armor>1</Armor>
 	</Health>
 	<Position>
 		<CollisionLayer>Ground</CollisionLayer>

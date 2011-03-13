@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Extracteur d'alagène</Name>
-		<AladdiumCost>75</AladdiumCost>
+		<Name>HellsCostco</Name>
+		<AladdiumCost>80</AladdiumCost>
 	</Identity>
-	<ExtractAlagene/>
+	<StoreResources/>
 	<Health>
-		<MaxHealth>75</MaxHealth>
+		<MaxHealth>100</MaxHealth>
 		<ArmorType>Heavy</ArmorType>
-		<Armor>1</Armor>
+		<Armor>2</Armor>
 	</Health>
 	<Position>
 		<CollisionLayer>Ground</CollisionLayer>

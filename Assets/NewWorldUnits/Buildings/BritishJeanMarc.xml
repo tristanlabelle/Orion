@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Temple de 2012</Name>
-		<AladdiumCost>150</AladdiumCost>
+		<Name>BritishJeanMarc</Name>
 	</Identity>
-	<Train>
-		<Speed>10</Speed>
-		<TrainableTypes>
-			<Item>Pirate</Item>
-			<Item>Ninja</Item>
-			<Item>Viking</Item>
-		</TrainableTypes>
-	</Train>
+	<Attack>
+		<Power>12</Power>
+		<Range>8</Range>
+		<Delay>1</Delay>
+	</Attack>
 	<Health>
-		<MaxHealth>200</MaxHealth>
+		<MaxHealth>220</MaxHealth>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
@@ -23,7 +19,7 @@
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>8</SightRange>
+		<SightRange>9</SightRange>
 	</Position>
 	<Tags/>
 </Entity>

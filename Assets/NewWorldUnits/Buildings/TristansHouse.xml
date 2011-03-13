@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Maison de Tristan</Name>
+		<Name>TristansHouse</Name>
 		<AladdiumCost>150</AladdiumCost>
 		<AlageneCost>50</AlageneCost>
 	</Identity>
 	<Research>
 		<ResearchableTypes>
-			<Item>Schtroumpf véloce</Item>
-			<Item>Import Jean-Marc</Item>
-			<Item>Sainte Trinité</Item>
-			<Item>Schtroumpf costaud</Item>
-			<Item>Spaghetti Alfredo</Item>
-			<Item>Force islamique</Item>
-			<Item>Pandémie</Item>
+			<Item>SwiftSmurf</Item>
+			<Item>ImportJeanMarc</Item>
+			<Item>HolyTrinity</Item>
+			<Item>HeftySmurf</Item>
+			<Item>SpaghettiAlfredo</Item>
+			<Item>IslamForce</Item>
+			<Item>Pandemic</Item>
 		</ResearchableTypes>
 	</Train>
 	<Health>

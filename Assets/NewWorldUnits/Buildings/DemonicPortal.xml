@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Entity>
 	<Identity>
-		<Name>Centre de propagande</Name>
-		<AladdiumCost>125</AladdiumCost>
-		<AlageneCost>200</AlageneCost>
+		<Name>DemonicPortal</Name>
+		<AladdiumCost>180</AladdiumCost>
+		<AlageneCost>70</AlageneCost>
 	</Identity>
 	<Train>
 		<Speed>10</Speed>
 		<TrainableTypes>
-			<Item>Jedihad</Item>
-			<Item>Jésus</Item>
-			<Item>Flying Spaghetti Monster</Item>
-			<Item>Hélicoptère TVA</Item>
+			<Item>SwineFlu</Item>
+			<Item>Ufo</Item>
+			<Item>FlyingCarpet</Item>
 		</TrainableTypes>
 	</Train>
 	<Health>
-		<MaxHealth>200</MaxHealth>
+		<MaxHealth>300</MaxHealth>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>

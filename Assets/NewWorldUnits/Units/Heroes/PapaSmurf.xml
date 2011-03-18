@@ -8,7 +8,7 @@
 		<VoicesTemplate>Smurf</VoicesTemplate>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>1</FoodRequirement>
+		<FoodCost>1</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>8</Power>
@@ -34,7 +34,7 @@
 	</Build>
 	
 	<Health>
-		<MaxHealth>60</MaxHealth>
+		<MaxValue>60</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>2</Armor>
 	</Health>
@@ -44,19 +44,19 @@
 		<MaxCarryingAmount>20</MaxCarryingAmount>
 	</Harvest>
 	
-	<Move>
+	<Mobile>
 		<Speed>8</Speed>
-		<Acceleration>8</Acceleration>
-	</Move>
+		
+	</Mobile>
 	
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
 		<SightRange>7</SightRange>
-	</Position>
+	</Spatial>
 	
 	<Tags>
 		<Tags>

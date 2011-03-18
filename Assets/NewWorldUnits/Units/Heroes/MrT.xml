@@ -5,7 +5,7 @@
 		<Name>MrT</Name>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>10</FoodRequirement>
+		<FoodCost>10</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>50</Power>
@@ -36,21 +36,21 @@
 		</DamageFilters>
 	</Attack>
 	<Health>
-		<MaxHealth>1000</MaxHealth>
+		<MaxValue>1000</MaxValue>
 		<ArmorType>Divine</ArmorType>
 		<Armor>10</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>15</Speed>
-		<Acceleration>15</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
 			<Width>4</Width>
 			<Height>4</Height>
 		</Size>
 		<SightRange>20</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

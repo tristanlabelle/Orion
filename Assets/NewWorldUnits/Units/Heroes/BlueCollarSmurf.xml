@@ -7,7 +7,7 @@
 	</Identity>
 	
 	<FactionMembership>
-		<FoodRequirement>5</FoodRequirement>
+		<FoodCost>5</FoodCost>
 	</FactionMembership>
 	
 	<Unsuicidable/>
@@ -36,24 +36,24 @@
 	</Build>
 	
 	<Health>
-		<MaxHealth>50</MaxHealth>
+		<MaxValue>50</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>0</Armor>
 	</Health>
 	
-	<Move>
+	<Mobile>
 		<Speed>2</Speed>
-		<Acceleration>2</Acceleration>
-	</Move>
+		
+	</Mobile>
 	
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
 		<SightRange>3</SightRange>
-	</Position>
+	</Spatial>
 	
 	<Tags>
 		<Tags>

@@ -5,29 +5,31 @@
 		<AladdiumCost>2000</AladdiumCost>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>5</FoodRequirement>
+		<FoodCost>5</FoodCost>
 	</FactionMembership>
 	<SuicideBomb>
 		<Radius>10</Radius>
 		<Damage>400</Damage>
-		<Target>Coke diète</Target>
+		<Targets>
+			<Target>DietCoke</Target>
+		</Targets>
 	</SuicideBomb>
 	<Health>
-		<MaxHealth>160</MaxHealth>
+		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>4</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>3</Speed>
-		<Acceleration>3</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
 		<SightRange>3</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

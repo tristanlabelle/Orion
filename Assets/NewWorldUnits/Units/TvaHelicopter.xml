@@ -6,24 +6,24 @@
 		<AlageneCost>25</AlageneCost>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>1</FoodRequirement>
+		<FoodCost>1</FoodCost>
 	</FactionMembership>
 	<Health>
-		<MaxHealth>75</MaxHealth>
+		<MaxValue>75</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>1</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>15</Speed>
-		<Acceleration>15</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
 			<Width>2</Width>
 			<Height>2</Height>
 		</Size>
 		<SightRange>12</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

@@ -8,7 +8,7 @@
 		<VoicesTemplate>FlyingSpaghettiMonster</VoicesTemplate>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>3</FoodRequirement>
+		<FoodCost>3</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>50</Power>
@@ -26,21 +26,21 @@
 		</DamageFilters>
 	</Attack>
 	<Health>
-		<MaxHealth>300</MaxHealth>
+		<MaxValue>300</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>5</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>3</Speed>
-		<Acceleration>3</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
 		<SightRange>10</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

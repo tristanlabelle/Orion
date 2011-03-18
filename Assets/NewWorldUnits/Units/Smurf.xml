@@ -15,7 +15,7 @@
 	</Identity>
 	
 	<FactionMembership>
-		<FoodRequirement>1</FoodRequirement>
+		<FoodCost>1</FoodCost>
 	</FactionMembership>
 	
 	<Attack>
@@ -51,7 +51,7 @@
 	</Build>
 	
 	<Health>
-		<MaxHealth>20</MaxHealth>
+		<MaxValue>20</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>1</Armor>
 		<ThreatLevel>1</ThreatLevel>
@@ -62,15 +62,15 @@
 		<MaxCarryingAmount>5</MaxCarryingAmount>
 	</Harvest>
 	
-	<Move>
+	<Mobile>
 		<Speed>8</Speed>
-		<Acceleration>8</Acceleration>
-	</Move>
+		
+	</Mobile>
 	
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<SightRange>5</SightRange>
-	</Position>
+	</Spatial>
 	
 	<Tags>
 		<List>

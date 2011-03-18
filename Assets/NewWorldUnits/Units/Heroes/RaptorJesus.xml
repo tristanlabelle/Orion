@@ -8,7 +8,7 @@
 		<VoicesTemplate>Jesus</VoicesTemplate>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>2</FoodRequirement>
+		<FoodCost>2</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>14</Power>
@@ -20,21 +20,21 @@
 		<Range>6</Range>
 	</Heal>
 	<Health>
-		<MaxHealth>160</MaxHealth>
+		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>2</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>14</Speed>
-		<Acceleration>14</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
 			<Width>2</Width>
 			<Height>2</Height>
 		</Size>
 		<SightRange>8</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

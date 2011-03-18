@@ -8,7 +8,7 @@
 		<VoicesTemplate>Viking</VoicesTemplate>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>3</FoodRequirement>
+		<FoodCost>3</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>50</Power>
@@ -25,21 +25,21 @@
 		</DamageFilters>
 	</Attack>
 	<Health>
-		<MaxHealth>200</MaxHealth>
+		<MaxValue>200</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>6</Speed>
-		<Acceleration>6</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
 		<SightRange>8</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

@@ -8,7 +8,7 @@
 		<VoicesTemplate>Obelix</VoicesTemplate>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>4</FoodRequirement>
+		<FoodCost>4</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>25</Power>
@@ -25,21 +25,21 @@
 		</DamageFilters>
 	</Attack>
 	<Health>
-		<MaxHealth>200</MaxHealth>
+		<MaxValue>200</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>8</Speed>
-		<Acceleration>8</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
 		<SightRange>8</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

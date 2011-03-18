@@ -5,7 +5,7 @@
 		<AladdiumCost>30</AladdiumCost>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>1</FoodRequirement>
+		<FoodCost>1</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>1</Power>
@@ -13,21 +13,21 @@
 		<Delay>1</Delay>
 	</Attack>
 	<Health>
-		<MaxHealth>30</MaxHealth>
+		<MaxValue>30</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>1</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>8</Speed>
-		<Acceleration>8</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
 		<SightRange>5</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

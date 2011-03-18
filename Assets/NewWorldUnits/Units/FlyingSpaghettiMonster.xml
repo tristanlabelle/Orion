@@ -9,7 +9,7 @@
 		</Upgrades>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>3</FoodRequirement>
+		<FoodCost>3</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>24</Power>
@@ -27,21 +27,21 @@
 		</DamageFilters>
 	</Attack>
 	<Health>
-		<MaxHealth>150</MaxHealth>
+		<MaxValue>150</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>4</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>2</Speed>
-		<Acceleration>2</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
 		<SightRange>10</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

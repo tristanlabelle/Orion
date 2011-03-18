@@ -8,7 +8,7 @@
 		<VoicesTemplate>Jedihad</VoicesTemplate>
 	</Identity>
 	<FactionMembership>
-		<FoodRequirement>2</FoodRequirement>
+		<FoodCost>2</FoodCost>
 	</FactionMembership>
 	<Attack>
 		<Power>14</Power>
@@ -32,21 +32,21 @@
 		</DamageFilters>
 	</Attack>
 	<Health>
-		<MaxHealth>160</MaxHealth>
+		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>5</Armor>
 	</Health>
-	<Move>
+	<Mobile>
 		<Speed>9</Speed>
-		<Acceleration>9</Acceleration>
-	</Move>
-	<Position>
+		
+	</Mobile>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
 		<SightRange>8</SightRange>
-	</Position>
+	</Spatial>
 	<Tags/>
 </Entity>

@@ -29,8 +29,9 @@ namespace Orion.Game.Simulation.Components
         private float delay = 1;
         private float splashRadius;
         private float timeElapsedSinceLastHit = float.PositiveInfinity;
-        private readonly ICollection<ArmorType> superEffectiveTargets = new HashSet<ArmorType>();
-        private readonly ICollection<ArmorType> ineffectiveTargets = new HashSet<ArmorType>();
+        private readonly HashSet<ArmorType> superEffectiveTargets = new HashSet<ArmorType>();
+        private readonly HashSet<ArmorType> ineffectiveTargets = new HashSet<ArmorType>();
+        private readonly List<DamageFilter> damageFilters = new List<DamageFilter>();
         #endregion
 
         #region Constructors
@@ -123,6 +124,12 @@ namespace Orion.Game.Simulation.Components
             get { return ineffectiveTargets; }
         }
 
+        [Persistent]
+        public ICollection<DamageFilter> DamageFilters
+        {
+            get { return damageFilters; }
+        }
+
         public float TimeElapsedSinceLastHit
         {
             get { return timeElapsedSinceLastHit; }
@@ -131,6 +138,17 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public float ApplyDamageFilters(float initalDamage, Entity target)
+        {
+            float finalDamage = initalDamage;
+            foreach (DamageFilter filter in damageFilters)
+            {
+                if (filter.Applies(target))
+                    finalDamage += filter.AdditionalDamage;
+            }
+            return finalDamage;
+        }
+
         /// <summary>
         /// Tests if a given <see cref="Entity"/> is within this <see cref="Entity"/>'s attack range.
         /// </summary>

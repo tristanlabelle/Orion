@@ -5,12 +5,12 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>FlyingSpaghettiMonster</VoicesTemplate>
+		<SoundIdentity>FlyingSpaghettiMonster</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>3</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>50</Power>
 		<Range>8</Range>
 		<Delay>4</Delay>
@@ -24,7 +24,7 @@
 				<Description>Supernatural armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>300</MaxValue>
 		<ArmorType>Heavy</ArmorType>
@@ -40,7 +40,9 @@
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>10</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>10</Range>
+	</Vision>
 	<Tags/>
 </Entity>

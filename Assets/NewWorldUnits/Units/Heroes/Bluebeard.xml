@@ -5,12 +5,12 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>Pirate</VoicesTemplate>
+		<SoundIdentity>Pirate</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>1</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>16</Power>
 		<Range>0</Range>
 		<Delay>3</Delay>
@@ -23,7 +23,7 @@
 				<Description>Heavy armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>120</MaxValue>
 		<ArmorType>Light</ArmorType>
@@ -39,7 +39,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

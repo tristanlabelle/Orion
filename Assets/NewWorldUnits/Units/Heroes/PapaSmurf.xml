@@ -5,18 +5,18 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>Smurf</VoicesTemplate>
+		<SoundIdentity>Smurf</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>1</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>8</Power>
 		<Range>0</Range>
 		<Delay>4</Delay>
-	</Attack>
+	</Attacker>
 	
-	<Build>
+	<Builder>
 		<Speed>100</Speed>
 		<BuildableTypes>
 			<Item>Pyramide</Item>
@@ -31,7 +31,7 @@
 			<Item>Costco des Hells</Item>
 			<Item>Carrefour Laval</Item>
 		</BuildableTypes>
-	</Build>
+	</Builder>
 	
 	<Health>
 		<MaxValue>60</MaxValue>
@@ -39,10 +39,10 @@
 		<Armor>2</Armor>
 	</Health>
 	
-	<Harvest>
+	<Harvester>
 		<Speed>5</Speed>
 		<MaxCarryingAmount>20</MaxCarryingAmount>
-	</Harvest>
+	</Harvester>
 	
 	<Mobile>
 		<Speed>8</Speed>
@@ -55,12 +55,14 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>7</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>7</Range>
+	</Vision>
 	
 	<Tags>
-		<Tags>
+		<List>
 			<Item>worker</Item>
-		</Tags>
+		</List>
 	</Tags>
 </Entity>

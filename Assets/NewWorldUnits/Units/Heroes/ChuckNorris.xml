@@ -7,7 +7,7 @@
 	<FactionMembership>
 		<FoodCost>10</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>75</Power>
 		<Range>0</Range>
 		<Delay>1</Delay>
@@ -35,7 +35,7 @@
 				<Description>Supernatural armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>500</MaxValue>
 		<ArmorType>Divine</ArmorType>
@@ -51,7 +51,9 @@
 			<Width>4</Width>
 			<Height>4</Height>
 		</Size>
-		<SightRange>20</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>20</Range>
+	</Vision>
 	<Tags/>
 </Entity>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Diagnostics;
 using Orion.Engine;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation
 {
@@ -21,12 +22,14 @@ namespace Orion.Game.Simulation
         #region Constructors
         public UnitTypeRegistry(AssetsDirectory assets)
         {
-            foreach (string filePath in assets.EnumerateFiles("Units", "*.xml", SearchOption.AllDirectories))
+            uint handle = 0;
+            XmlDeserializer deserializer = new XmlDeserializer(() => new Handle(handle++));
+            foreach (string filePath in assets.EnumerateFiles("NewWorldUnits", "*.xml", SearchOption.AllDirectories))
             {
                 try
                 {
-                    UnitTypeBuilder builder = UnitTypeReader.Read(filePath);
-                    Register(builder);
+                    Unit template = deserializer.DeserializeEntity(filePath, true);
+                    Register(template);
                 }
                 catch (IOException e)
                 {
@@ -39,12 +42,11 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        public Unit Register(UnitTypeBuilder builder)
+        public Unit Register(Unit template)
         {
-            Argument.EnsureNotNull(builder, "builder");
-            Unit unitType = builder.Build(new Handle((uint)types.Count));
-            types.Add(unitType.Identity.Name, unitType);
-            return unitType;
+            Argument.EnsureNotNull(template, "template");
+            types.Add(template.Identity.Name, template);
+            return template;
         }
 
         public Unit FromHandle(Handle handle)

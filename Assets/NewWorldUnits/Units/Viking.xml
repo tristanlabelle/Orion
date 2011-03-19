@@ -11,7 +11,7 @@
 	<FactionMembership>
 		<FoodCost>3</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>13</Power>
 		<Range>0</Range>
 		<Delay>4</Delay>
@@ -24,7 +24,7 @@
 				<Description>Heavy armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>70</MaxValue>
 		<ArmorType>Heavy</ArmorType>
@@ -40,7 +40,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

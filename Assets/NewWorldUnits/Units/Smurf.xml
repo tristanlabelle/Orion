@@ -3,10 +3,6 @@
 	<Identity>
 		<Name>Smurf</Name>
 		<AladdiumCost>50</AladdiumCost>
-		<Size>
-			<Width>1</Width>
-			<Height>1</Height>
-		</Size>
 		<Upgrades>
 			<Item>PapaSmurf</Item>
 			<Item>BlueCollarSmurf</Item>
@@ -18,7 +14,7 @@
 		<FoodCost>1</FoodCost>
 	</FactionMembership>
 	
-	<Attack>
+	<Attacker>
 		<Power>8</Power>
 		<Range>0</Range>
 		<Delay>5</Delay>
@@ -31,9 +27,9 @@
 				<Description>Light armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	
-	<Build>
+	<Builder>
 		<Speed>1</Speed>
 		<BuildableTypes>
 			<Item>Pyramide</Item>
@@ -48,7 +44,7 @@
 			<Item>Costco des Hells</Item>
 			<Item>Carrefour Laval</Item>
 		</BuildableTypes>
-	</Build>
+	</Builder>
 	
 	<Health>
 		<MaxValue>20</MaxValue>
@@ -57,10 +53,10 @@
 		<ThreatLevel>1</ThreatLevel>
 	</Health>
 	
-	<Harvest>
+	<Harvester>
 		<Speed>1</Speed>
 		<MaxCarryingAmount>5</MaxCarryingAmount>
-	</Harvest>
+	</Harvester>
 	
 	<Mobile>
 		<Speed>8</Speed>
@@ -69,8 +65,15 @@
 	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
-		<SightRange>5</SightRange>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
 	</Spatial>
+	
+	<Vision>
+		<Range>5</Range>
+	</Vision>
 	
 	<Tags>
 		<List>

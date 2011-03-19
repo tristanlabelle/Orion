@@ -5,12 +5,12 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>Viking</VoicesTemplate>
+		<SoundIdentity>Viking</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>3</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>50</Power>
 		<Range>0</Range>
 		<Delay>4</Delay>
@@ -23,7 +23,7 @@
 				<Description>Light armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>200</MaxValue>
 		<ArmorType>Heavy</ArmorType>
@@ -39,7 +39,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

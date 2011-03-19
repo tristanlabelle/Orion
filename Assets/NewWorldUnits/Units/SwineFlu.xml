@@ -10,7 +10,7 @@
 	<FactionMembership>
 		<FoodCost>1</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>2</Power>
 		<Range>7</Range>
 		<Delay>1</Delay>
@@ -23,7 +23,7 @@
 				<Description>Light armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>70</MaxValue>
 		<ArmorType>Light</ArmorType>
@@ -39,7 +39,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>7</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>7</Range>
+	</Vision>
 	<Tags/>
 </Entity>

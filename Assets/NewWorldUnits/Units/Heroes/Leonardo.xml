@@ -5,12 +5,12 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>Ninja</VoicesTemplate>
+		<SoundIdentity>Ninja</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>2</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>10</Power>
 		<Range>5</Range>
 		<Delay>2</Delay>
@@ -30,7 +30,7 @@
 				<Description>Supernatural armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>120</MaxValue>
 		<ArmorType>Light</ArmorType>
@@ -46,7 +46,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

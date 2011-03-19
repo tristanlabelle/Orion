@@ -5,20 +5,20 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>Jesus</VoicesTemplate>
+		<SoundIdentity>Jesus</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>2</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>14</Power>
 		<Range>0</Range>
 		<Delay>3</Delay>
-	</Attack>
-	<Heal>
+	</Attacker>
+	<Healer>
 		<Speed>6</Speed>
 		<Range>6</Range>
-	</Heal>
+	</Healer>
 	<Health>
 		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
@@ -34,7 +34,9 @@
 			<Width>2</Width>
 			<Height>2</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

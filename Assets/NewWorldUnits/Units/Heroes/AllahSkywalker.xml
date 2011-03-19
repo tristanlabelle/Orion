@@ -5,12 +5,12 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>Jedihad</VoicesTemplate>
+		<SoundIdentity>Jedihad</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>2</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>14</Power>
 		<Range>3</Range>
 		<Delay>3</Delay>
@@ -30,7 +30,7 @@
 				<Description>Supernatural armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
@@ -46,7 +46,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

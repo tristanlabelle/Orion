@@ -7,13 +7,13 @@
 	<FactionMembership>
 		<FoodCost>5</FoodCost>
 	</FactionMembership>
-	<SuicideBomb>
+	<Kamikaze>
 		<Radius>10</Radius>
 		<Damage>400</Damage>
 		<Targets>
 			<Target>DietCoke</Target>
 		</Targets>
-	</SuicideBomb>
+	</Kamikaze>
 	<Health>
 		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
@@ -29,7 +29,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>3</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>3</Range>
+	</Vision>
 	<Tags/>
 </Entity>

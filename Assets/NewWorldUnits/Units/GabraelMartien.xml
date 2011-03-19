@@ -7,11 +7,11 @@
 	<FactionMembership>
 		<FoodCost>1</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>1</Power>
 		<Range>0</Range>
 		<Delay>1</Delay>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>30</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
@@ -27,7 +27,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>5</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>5</Range>
+	</Vision>
 	<Tags/>
 </Entity>

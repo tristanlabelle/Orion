@@ -3,22 +3,20 @@
 	<Identity>
 		<Name>BlueCollarSmurf</Name>
 		<AladdiumCost>50</AladdiumCost>
-		<VoicesTemplate>Smurf</VoicesTemplate>
+		<SoundIdentity>Smurf</SoundIdentity>
 	</Identity>
 	
 	<FactionMembership>
 		<FoodCost>5</FoodCost>
 	</FactionMembership>
 	
-	<Unsuicidable/>
-	
-	<Attack>
+	<Attacker>
 		<Power>1</Power>
 		<Range>0</Range>
 		<Delay>10</Delay>
-	</Attack>
+	</Attacker>
 	
-	<Build>
+	<Builder>
 		<Speed>2</Speed>
 		<BuildableTypes>
 			<Item>Pyramide</Item>
@@ -33,7 +31,7 @@
 			<Item>Costco des Hells</Item>
 			<Item>Carrefour Laval</Item>
 		</BuildableTypes>
-	</Build>
+	</Builder>
 	
 	<Health>
 		<MaxValue>50</MaxValue>
@@ -52,12 +50,14 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>3</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>3</Range>
+	</Vision>
 	
 	<Tags>
-		<Tags>
+		<List>
 			<Item>worker</Item>
-		</Tags>
+		</List>
 	</Tags>
 </Entity>

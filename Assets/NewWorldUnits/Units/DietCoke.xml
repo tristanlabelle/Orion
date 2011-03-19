@@ -29,7 +29,9 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>3</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>3</Range>
+	</Vision>
 	<Tags/>
 </Entity>

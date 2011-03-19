@@ -11,10 +11,10 @@
 	<FactionMembership>
 		<FoodCost>2</FoodCost>
 	</FactionMembership>
-	<Heal>
+	<Healer>
 		<Speed>2</Speed>
 		<Range>3</Range>
-	</Heal>
+	</Healer>
 	<Health>
 		<MaxValue>80</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
@@ -30,7 +30,9 @@
 			<Width>2</Width>
 			<Height>2</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

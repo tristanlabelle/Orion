@@ -5,12 +5,12 @@
 		<Upgrades>
 			<Item>ChuckNorris</Item>
 		</Upgrades>
-		<VoicesTemplate>FlyingSpaghettiMonster</VoicesTemplate>
+		<SoundIdentity>FlyingSpaghettiMonster</SoundIdentity>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>2</FoodCost>
 	</FactionMembership>
-	<Attack>
+	<Attacker>
 		<Power>30</Power>
 		<Range>8</Range>
 		<Delay>3</Delay>
@@ -23,7 +23,7 @@
 				<Description>Light armor</Description>
 			</Item>
 		</DamageFilters>
-	</Attack>
+	</Attacker>
 	<Health>
 		<MaxValue>250</MaxValue>
 		<ArmorType>Heavy</ArmorType>
@@ -39,7 +39,9 @@
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>10</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>10</Range>
+	</Vision>
 	<Tags/>
 </Entity>

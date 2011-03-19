@@ -22,14 +22,12 @@ namespace Orion.Game.Simulation.Components.Serialization
 
         #region Instance
         #region Fields
-        private World world;
         private Func<Handle> handleGenerator;
         #endregion
 
         #region Constructors
-        public XmlDeserializer(World world, Func<Handle> generator)
+        public XmlDeserializer(Func<Handle> generator)
         {
-            this.world = world;
             this.handleGenerator = generator;
         }
         #endregion
@@ -41,7 +39,7 @@ namespace Orion.Game.Simulation.Components.Serialization
         /// <param name="filePath">The path of the XML document</param>
         /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded</param>
         /// <returns>An Entity object with the specs from the XML file</returns>
-        public Entity DeserializeEntity(string filePath, bool persistentOnly)
+        public Unit DeserializeEntity(string filePath, bool persistentOnly)
         {
             XmlDocument document = new XmlDocument();
             document.Load(filePath);
@@ -55,34 +53,35 @@ namespace Orion.Game.Simulation.Components.Serialization
         /// <param name="filePath">The path of the XML document</param>
         /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded</param>
         /// <returns>An Entity object with the specs from the XML file</returns>
-        public Entity DeserializeEntity(XmlElement entityElement, bool persistentOnly)
+        public Unit DeserializeEntity(XmlElement entityElement, bool persistentOnly)
         {
             Debug.Assert(entityElement.Name == "Entity");
 
-            Entity entity = new Entity(world, handleGenerator());
+            Unit entity = new Unit(handleGenerator());
             Assembly currentAssembly = Assembly.GetExecutingAssembly();
-            Type componentClass = typeof(Component);
+            Type baseComponentType = typeof(Component);
             object[] constructorArguments = new object[] { entity };
             foreach (XmlElement componentElement in entityElement.ChildNodes.OfType<XmlElement>())
             {
                 string name = componentElement.Name;
-                Type componentType = currentAssembly.GetType(name, true, true);
-                if (entity.Components.Has(componentType))
+                string fullName = "Orion.Game.Simulation.Components." + name;
+                Type preciseComponentType = currentAssembly.GetType(fullName, true, true);
+                if (entity.Components.Has(preciseComponentType))
                     throw new InvalidOperationException("Trying to attach multiple components of the same type to an entity ");
 
-                if (!componentClass.IsAssignableFrom(componentType))
+                if (!baseComponentType.IsAssignableFrom(preciseComponentType))
                     throw new InvalidOperationException("Trying to instantiate a class that isn't assignable to Component");
 
-                ConstructorInfo constructor = componentType.GetConstructor(componentConstructorTypeArguments);
+                ConstructorInfo constructor = preciseComponentType.GetConstructor(componentConstructorTypeArguments);
                 Component component = (Component)constructor.Invoke(constructorArguments);
-                HashSet<PropertyInfo> mandatoryProperties = new HashSet<PropertyInfo>(componentClass
+                HashSet<PropertyInfo> mandatoryProperties = new HashSet<PropertyInfo>(baseComponentType
                     .GetProperties()
                     .Where(p => p.GetCustomAttributes(typeof(MandatoryAttribute), true).Length == 1));
                 foreach (XmlElement propertyElement in componentElement.ChildNodes.OfType<XmlElement>())
                 {
-                    PropertyInfo property = componentClass.GetProperty(propertyElement.Name);
+                    PropertyInfo property = preciseComponentType.GetProperty(propertyElement.Name);
                     if (property == null)
-                        throw new InvalidOperationException("Couldn't find a field associated to the {0} tag".FormatInvariant(propertyElement.Name));
+                        throw new InvalidOperationException("Couldn't find a field associated to the {0} XML tag".FormatInvariant(propertyElement.Name));
 
                     DeserializeField(component, property, propertyElement, persistentOnly);
                     mandatoryProperties.Remove(property);
@@ -115,14 +114,14 @@ namespace Orion.Game.Simulation.Components.Serialization
                 throw new InvalidOperationException("Trying to deserialize a transient field in a persistent-only deserialization");
 
             Type propertyType = property.PropertyType;
-            if (typeof(ICollection).IsAssignableFrom(propertyType))
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
             {
                 // The non-generic ICollection interface doesn't have an Add method; therefore, we need a method that
                 // can use a generic version of ICollection. Because of that, it will need to be generic itself;
                 // and we need to populate the type arguments with Type objects we won't know until runtime.
                 // Therefore, we must use reflection.
-                MethodInfo nongenericDeserializeCollection = typeof(XmlDeserializer).GetMethod("DeserializeCollection");
-                MethodInfo deserializeCollection = nongenericDeserializeCollection.MakeGenericMethod(propertyType);
+                MethodInfo nongenericDeserializeCollection = typeof(XmlDeserializer).GetMethod("DeserializeCollection", BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo deserializeCollection = nongenericDeserializeCollection.MakeGenericMethod(propertyType.GetGenericArguments()[0]);
                 deserializeCollection.Invoke(this, new object[] { component, property, propertyElement });
             }
             else
@@ -219,7 +218,7 @@ namespace Orion.Game.Simulation.Components.Serialization
                 // We need to return an object of the right type; therefore, we have to create a legit, working
                 // delegate with the right return type. But to do so, we need to have some generic arguments
                 // filled with runtime Type objects; so we have to use reflection to call the generating method.
-                MethodInfo genericDeserializeDelegate = typeof(XmlDeserializer).GetMethod("DeserializeDelegate");
+                MethodInfo genericDeserializeDelegate = typeof(XmlDeserializer).GetMethod("DeserializeDelegate", BindingFlags.Instance | BindingFlags.NonPublic);
                 MethodInfo method = genericDeserializeDelegate.MakeGenericMethod(type.GetMethod("Invoke").ReturnType);
                 return method.Invoke(this, new object[] { target, objectElement });
             }
@@ -233,7 +232,7 @@ namespace Orion.Game.Simulation.Components.Serialization
         /// Deserializes an object of a complex type.
         /// </summary>
         /// <remarks>
-        /// Complex types are anything that is not a string, an integer or a real. They are created by
+        /// Complex types are anything that is not a string, an integer, a real or a delegate. They are created by
         /// finding a constructor with arguments that match the elements inside objectElement and
         /// using it. No further treatment is possible on objects created this way.
         /// </remarks>
@@ -246,7 +245,7 @@ namespace Orion.Game.Simulation.Components.Serialization
             if (children.Length == 0)
             {
                 // just text inside the tag: find constructors with just one argument
-                ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public)
+                ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
                     .Where(c => c.GetParameters().Length == 1)
                     .ToArray();
 
@@ -269,7 +268,7 @@ namespace Orion.Game.Simulation.Components.Serialization
             }
             else
             {
-                ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public)
+                ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
                     .Where(c => c.GetParameters().Length == children.Length)
                     .ToArray();
 
@@ -317,13 +316,15 @@ namespace Orion.Game.Simulation.Components.Serialization
             string className = target.Substring(0, target.LastIndexOf('.'));
             string methodName = target.Substring(target.LastIndexOf('.') + 1);
             Type holdingType = Type.GetType(className, true, true);
-            MethodInfo method = holdingType.GetMethod(methodName, BindingFlags.Static);
+            MethodInfo method = holdingType.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public);
+            if (method == null)
+                throw new InvalidOperationException("Type {0} doesn't have a static {1} method".FormatInvariant(holdingType.Name, methodName));
             object[] attributes = method.GetCustomAttributes(typeof(SerializationReferenceableAttribute), false);
-            if (attributes.Length == 0)
+            if (attributes.Length == 0 || attributes.OfType<SerializationReferenceableAttribute>().Count() == 0)
                 throw new InvalidOperationException("Cannot deserialize a delegate that doesn't have the SerializationReferenceable attribute");
 
             ParameterInfo[] parameters = method.GetParameters();
-            Dictionary<string, int> nameToIndex = new Dictionary<string, int>();
+            Dictionary<string, int> nameToIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < parameters.Length; i++)
                 nameToIndex[parameters[i].Name] = i;
 

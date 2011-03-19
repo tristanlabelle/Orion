@@ -11,12 +11,12 @@
 		<FoodCost>1</FoodCost>
 	</FactionMembership>
 	
-	<Heal>
+	<Healer>
 		<Speed>4</Speed>
 		<Range>2</Range>
-	</Heal>
+	</Healer>
 	
-	<Build>
+	<Builder>
 		<Speed>40</Speed>
 		<BuildableTypes>
 			<Item>Pyramide</Item>
@@ -31,7 +31,7 @@
 			<Item>Costco des Hells</Item>
 			<Item>Carrefour Laval</Item>
 		</BuildableTypes>
-	</Build>
+	</Builder>
 	
 	<Health>
 		<MaxValue>60</MaxValue>
@@ -39,10 +39,10 @@
 		<Armor>2</Armor>
 	</Health>
 	
-	<Harvest>
+	<Harvester>
 		<Speed>2</Speed>
 		<MaxCarryingAmount>6</MaxCarryingAmount>
-	</Harvest>
+	</Harvester>
 	
 	<Mobile>
 		<Speed>8</Speed>
@@ -55,12 +55,14 @@
 			<Width>1</Width>
 			<Height>1</Height>
 		</Size>
-		<SightRange>6</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>6</Range>
+	</Vision>
 	
 	<Tags>
-		<Tags>
+		<List>
 			<Item>worker</Item>
-		</Tags>
+		</List>
 	</Tags>
 </Entity>

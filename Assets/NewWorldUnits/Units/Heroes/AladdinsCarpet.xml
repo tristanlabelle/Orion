@@ -9,9 +9,9 @@
 	<FactionMembership>
 		<FoodCost>2</FoodCost>
 	</FactionMembership>
-	<Transport>
+	<Transporter>
 		<Capacity>10</Capacity>
-	</Transport>
+	</Transporter>
 	<Health>
 		<MaxValue>140</MaxValue>
 		<ArmorType>Light</ArmorType>
@@ -27,7 +27,9 @@
 			<Width>2</Width>
 			<Height>2</Height>
 		</Size>
-		<SightRange>8</SightRange>
 	</Spatial>
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

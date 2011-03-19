@@ -21,6 +21,11 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Constructors
+        // Compatibility constructor so it isn't a pain in the ass to use the XmlDeserializer
+        internal Unit(Handle handle)
+            : base(handle)
+        { }
+
         internal Unit(Handle handle, UnitTypeBuilder type)
             : base(handle)
         {

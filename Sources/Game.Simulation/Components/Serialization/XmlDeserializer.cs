@@ -8,6 +8,7 @@ using System.Reflection;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using System.Collections;
+using System.Globalization;
 
 namespace Orion.Game.Simulation.Components.Serialization
 {
@@ -172,31 +173,17 @@ namespace Orion.Game.Simulation.Components.Serialization
         private object DeserializeObject(Type type, XmlElement objectElement)
         {
             // primitive types
-            if (type == typeof(string))
-                return objectElement.InnerText;
-
-            if (type == typeof(int))
+            if (type == typeof(string) || type == typeof(int) || type == typeof(float) || type == typeof(bool))
             {
-                int result;
-                if (!int.TryParse(objectElement.InnerText, out result))
-                    throw new TypeMismatchException(type, objectElement.InnerText);
-                return result;
-            }
+                try
+                {
+                    return Convert.ChangeType(objectElement.InnerText, type, CultureInfo.InvariantCulture);
+                }
+                catch (InvalidCastException) { }
+                catch (FormatException) { }
+                catch (ArgumentException) { }
 
-            if (type == typeof(float))
-            {
-                float result;
-                if (!float.TryParse(objectElement.InnerText, out result))
-                    throw new TypeMismatchException(type, objectElement.InnerText);
-                return result;
-            }
-
-            if (type == typeof(bool))
-            {
-                bool result;
-                if (!bool.TryParse(objectElement.InnerText, out result))
-                    throw new TypeMismatchException(type, objectElement.InnerText);
-                return result;
+                throw new TypeMismatchException(type, objectElement.InnerText);
             }
 
             // enum types

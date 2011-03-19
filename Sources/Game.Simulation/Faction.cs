@@ -371,18 +371,17 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(type, "type");
 
             Entity entity = world.Entities.CreateUnit(type, this, point);
-            entity.Spatial.Moved += (s, oldPos, newPos) => OnUnitMoved(entity, oldPos, newPos);
+            entity.Spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
             UsedFoodAmount += (int)GetStat(type, FactionMembership.FoodCostStat);
 
             return entity;
         }
 
-        #region Notifications invoked by Unit
+        #region Entity notifications
         /// <remarks>Invoked by <see cref="Spatial"/>.</remarks>
-        internal void OnUnitMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
+        internal void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
             Debug.Assert(entity != null);
-            Debug.Assert(!entity.Identity.IsBuilding);
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
             int sightRange = (int)entity.GetStatValue(Vision.RangeStat);
@@ -393,7 +392,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
-        internal void OnUnitDied(Entity entity)
+        internal void OnEntityDied(Entity entity)
         {
             Debug.Assert(entity != null);
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
@@ -437,7 +436,6 @@ namespace Orion.Game.Simulation
         internal void OnBuildingConstructionCompleted(Entity entity)
         {
             Debug.Assert(entity != null);
-            Debug.Assert(entity.Identity.IsBuilding);
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
             localFogOfWar.RemoveRegion(entity.GridRegion);

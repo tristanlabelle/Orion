@@ -50,7 +50,7 @@ namespace Orion.Game.Presentation.Gui
                     if (task == null)
                         imageBox.Texture = null;
                     else if (task is TrainTask)
-                        imageBox.Texture = panel.graphics.GetEntityTexture(((TrainTask)task).TraineePrototype);
+                        imageBox.Texture = panel.graphics.GetEntityTexture(((TrainTask)task).Prototype);
                     else if (task is RepairTask)
                         imageBox.Texture = panel.graphics.GetEntityTexture(((RepairTask)task).Target);
                     else if (task is ResearchTask)

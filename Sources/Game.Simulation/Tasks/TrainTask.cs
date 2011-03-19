@@ -29,7 +29,6 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(trainer, "trainer");
             Argument.EnsureNotNull(prototype, "prototype");
-            Argument.EnsureEqual(prototype.Identity.IsBuilding, false, "prototype.IsBuilding");
 
             this.prototype = prototype;
         }
@@ -41,7 +40,7 @@ namespace Orion.Game.Simulation.Tasks
             get { return "Training"; }
         }
 
-        public Entity TraineePrototype
+        public Entity Prototype
         {
             get { return prototype; }
         }

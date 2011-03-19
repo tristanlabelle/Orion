@@ -294,23 +294,17 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            bool areAllBuildings = Selection.All(entity => Identity.IsEntityBuilding(entity));
-            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
-            {
-                if (areAllBuildings)
-                    LaunchChangeRallyPoint(target);
-                else
-                    LaunchMove(target);
-                return;
-            }
-
+            bool anyCanMove = Selection.Any(entity => entity.Components.Has<Mobile>());
             Entity targetEntity = World.Entities.GetTopmostEntityAt(point);
-            if (targetEntity == null)
+            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered
+                || targetEntity == null)
             {
-                if (areAllBuildings)
-                    LaunchChangeRallyPoint(target);
-                else
+                if (anyCanMove)
                     LaunchMove(target);
+                else
+                    LaunchChangeRallyPoint(target);
+
+                return;
             }
             else
             {
@@ -337,7 +331,7 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (Selection.All(entity => Identity.IsEntityBuilding(entity)))
+            if (Selection.All(entity => entity.Components.Has<Trainer>()))
             {
                 LaunchChangeRallyPoint(target.Center);
                 return;
@@ -386,14 +380,13 @@ namespace Orion.Game.Presentation
             return entityFaction != null && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl);
         }
 
-        private void OverrideIfNecessary()
+        private void ClearTasksIfNecessary()
         {
-            if (!shiftKeyPressed)
-            {
-                IEnumerable<Entity> entities = Selection
-                    .Where(entity => IsControllable(entity) && !Identity.IsEntityBuilding(entity));
-                commander.LaunchCancelAllTasks(entities);
-            }
+            if (shiftKeyPressed) return;
+            
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => IsControllable(entity) && !entity.Components.Has<Trainer>());
+            commander.LaunchCancelAllTasks(entities);
         }
 
         public void LaunchBuild(Point location, Entity buildingPrototype)
@@ -401,7 +394,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> builders = Selection
                 .Where(entity => IsControllable(entity) && Builder.Supports(entity, buildingPrototype));
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchBuild(builders, buildingPrototype, location);
         }
 
@@ -409,7 +402,7 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Entity> selection = Selection.Where(entity => IsControllable(entity));
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             // Those who can attack do so, the others simply move to the target's position
             commander.LaunchAttack(selection.Where(entity => entity.Components.Has<Attacker>()), target);
             commander.LaunchMove(selection.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Mobile>()), target.Position);
@@ -421,7 +414,7 @@ namespace Orion.Game.Presentation
                 .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
             // Those who can attack do so, the others simply move to the destination
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchZoneAttack(movableEntities.Where(entity => entity.Components.Has<Attacker>()), destination);
             commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Attacker>()), destination);
         }
@@ -434,7 +427,7 @@ namespace Orion.Game.Presentation
                 .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
             // Those who can harvest do so, the others simply move to the resource's position
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchHarvest(movableEntities.Where(entity => entity.Components.Has<Harvester>()), node);
             commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Harvester>()), node.Position);
         }
@@ -444,7 +437,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> entities = Selection
                 .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchMove(entities, destination);
         }
 
@@ -452,10 +445,9 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Entity> entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
-                    && entity.Identity.IsBuilding
                     && entity.Components.Has<Trainer>());
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchChangeRallyPoint(entities, at);
         }
 
@@ -469,7 +461,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Builder>());
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchRepair(entities, target);
         }
 
@@ -486,7 +478,7 @@ namespace Orion.Game.Presentation
             Faction targetFaction = FactionMembership.GetFaction(target);
             if (entities.Any(entity => FactionMembership.GetFaction(entity) != targetFaction)) return;
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchHeal(entities, target);
         }
 
@@ -502,7 +494,7 @@ namespace Orion.Game.Presentation
                         && trainer.Supports(prototype);
                 });
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchTrain(entities, prototype);
         }
 
@@ -519,7 +511,7 @@ namespace Orion.Game.Presentation
                     return;
                 }
 
-                OverrideIfNecessary();
+                ClearTasksIfNecessary();
                 commander.LaunchResearch(entity, technology);
             }
         }
@@ -535,7 +527,7 @@ namespace Orion.Game.Presentation
                         && health.CanSuicide;
                 });
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchSuicide(entities);
         }
 
@@ -544,7 +536,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Mobile>());
 
-            OverrideIfNecessary();
+            ClearTasksIfNecessary();
             commander.LaunchStandGuard(entities);
         }
 

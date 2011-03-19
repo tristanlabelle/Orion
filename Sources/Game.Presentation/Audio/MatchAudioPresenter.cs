@@ -31,6 +31,8 @@ namespace Orion.Game.Presentation.Audio
         /// </summary>
         private readonly HashSet<Entity> previousSelection = new HashSet<Entity>();
 
+        private readonly HashCountedSet<string> tempTemplateCounts = new HashCountedSet<string>();
+
         private bool isGameStarted;
         private bool hasExplosionOccuredInFrame;
         #endregion
@@ -117,7 +119,7 @@ namespace Orion.Game.Presentation.Audio
             Faction faction = FactionMembership.GetFaction(entity);
             if (faction != LocalFaction) return;
 
-            if (entity.Identity.IsBuilding && entity.Components.Has<BuildProgress>())
+            if (entity.Components.Has<BuildProgress>())
             {
                 audio.PlaySfx("UnderConstruction", entity.Center);
                 return;
@@ -151,22 +153,37 @@ namespace Orion.Game.Presentation.Audio
             }
         }
 
-        private void OnSelectionChanged(Selection sender)
+        private string GetLeadingTemplate(IEnumerable<Entity> entities)
         {
             // Find the most frequent entity prototype in the newly selected entities.
-            var prototypeGroup = sender.Except(previousSelection)
-                .GroupBy(entity => Identity.GetPrototype(entity))
-                .WithMaxOrDefault(group => group.Count());
+            tempTemplateCounts.Clear();
+            foreach (Entity entity in entities)
+            {
+                if (previousSelection.Contains(entity)) continue;
 
-            Entity prototype = prototypeGroup == null ? null : prototypeGroup.Key;
+                Identity identity = entity.Identity;
+                if (identity == null || identity.SoundIdentity == null) continue;
+
+                tempTemplateCounts.Add(identity.SoundIdentity);
+            }
+            if (tempTemplateCounts.Count == 0) return null;
+
+            var maxEntry = tempTemplateCounts.Entries
+                .WithMaxOrDefault(entry => entry.Count);
+
+            return maxEntry.Item;
+        }
+
+        private void OnSelectionChanged(Selection sender)
+        {
+            string template = GetLeadingTemplate(sender);
 
             previousSelection.Clear();
             previousSelection.UnionWith(sender);
 
-            if (prototype == null) return;
+            if (template == null) return;
 
-            string soundName = audio.GetUnitSoundName(prototype, "Select");
-            audio.PlayUISound(soundName);
+            audio.PlayUISound(template + ".Select");
         }
 
         private void OnCommandIssued(Commander sender, Command args)

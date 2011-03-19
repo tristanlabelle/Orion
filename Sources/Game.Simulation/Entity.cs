@@ -244,7 +244,7 @@ namespace Orion.Game.Simulation
             Died.Raise(this);
 
             Faction faction = FactionMembership.GetFaction(this);
-            if (faction != null) faction.OnUnitDied((Unit)this);
+            if (faction != null) faction.OnEntityDied((Unit)this);
 
             World.OnEntityDied(this);
         }

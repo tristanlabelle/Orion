@@ -27,7 +27,6 @@ namespace Orion.Game.Simulation.Utilities
         public RememberedBuilding(Entity building)
         {
             Argument.EnsureNotNull(building, "building");
-            Debug.Assert(building.Identity.IsBuilding);
 
             this.location = building.GridRegion.Min;
             this.prototype = Identity.GetPrototype(building);

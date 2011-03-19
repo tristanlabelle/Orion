@@ -16,10 +16,6 @@ namespace Orion.Game.Simulation
     [Serializable]
     public sealed class Unit : Entity
     {
-        #region Fields
-        private Dictionary<Type, UnitSkill> skills;
-        #endregion
-
         #region Constructors
         // Compatibility constructor so it isn't a pain in the ass to use the XmlDeserializer
         internal Unit(Handle handle)
@@ -46,16 +42,13 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(prototype, "meta");
             Argument.EnsureNotNull(faction, "faction");
 
-            skills = prototype.skills;
-
             // components stuff
             foreach (Component component in prototype.Components)
                 Components.Add(component.Clone(this));
 
+            if (Identity.Prototype == null) Identity.Prototype = prototype;
             Components.Get<Spatial>().Position = position;
             Components.Get<FactionMembership>().Faction = faction;
-            Trainer trainer = Components.TryGet<Trainer>();
-            if (trainer != null) trainer.RallyPoint = Center;
         }
         #endregion
 
@@ -77,32 +70,10 @@ namespace Orion.Game.Simulation
                 identity.VisualIdentity = newTypeIdentity.VisualIdentity;
                 identity.SoundIdentity = newTypeIdentity.SoundIdentity;
 
-                skills = value.skills;
-
                 identity.Upgrades.Clear();
                 foreach (UnitTypeUpgrade upgrade in value.Identity.Upgrades)
                     identity.Upgrades.Add(upgrade);
             }
-        }
-        #endregion
-
-        #region Methods
-        /// <remarks>
-        /// Same as <see cref="HasSkill"/>, but not obsoleted so internal usages do not cause warnings.
-        /// </remarks>
-        private bool InternalHasSkill<TSkill>() where TSkill : UnitSkill
-        {
-            return skills.ContainsKey(typeof(TSkill));
-        }
-
-        /// <remarks>
-        /// Same as <see cref="TryGetSkill"/>, but not obsoleted so internal usages do not cause warnings.
-        /// </remarks>
-        private TSkill InternalTryGetSkill<TSkill>() where TSkill : UnitSkill
-        {
-            UnitSkill skill;
-            skills.TryGetValue(typeof(TSkill), out skill);
-            return skill as TSkill;
         }
         #endregion
     }

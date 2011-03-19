@@ -5,20 +5,23 @@
 		<AladdiumCost>50</AladdiumCost>
 	</Identity>
 	<FactionMembership>
-		<ProvideFood>10</ProvideFood>
+		<ProvidedFood>10</ProvidedFood>
 	</FactionMembership>
 	<Health>
-		<MaxHealth>80</MaxHealth>
+		<MaxValue>80</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>2</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>2</Width>
 			<Height>2</Height>
 		</Size>
-		<SightRange>4</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
 	<Tags/>
 </Entity>

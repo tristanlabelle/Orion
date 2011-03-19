@@ -4,26 +4,29 @@
 		<Name>2012Temple</Name>
 		<AladdiumCost>150</AladdiumCost>
 	</Identity>
-	<Train>
+	<Trainer>
 		<Speed>10</Speed>
 		<TrainableTypes>
 			<Item>Pirate</Item>
 			<Item>Ninja</Item>
 			<Item>Viking</Item>
 		</TrainableTypes>
-	</Train>
+	</Trainer>
 	<Health>
-		<MaxHealth>200</MaxHealth>
+		<MaxValue>200</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>8</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

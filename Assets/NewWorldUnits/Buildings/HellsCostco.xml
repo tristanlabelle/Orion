@@ -4,19 +4,22 @@
 		<Name>HellsCostco</Name>
 		<AladdiumCost>80</AladdiumCost>
 	</Identity>
-	<StoreResources/>
+	<ResourceDepot/>
 	<Health>
-		<MaxHealth>100</MaxHealth>
+		<MaxValue>100</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>2</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>2</Width>
 			<Height>2</Height>
 		</Size>
-		<SightRange>4</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
 	<Tags/>
 </Entity>

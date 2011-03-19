@@ -463,7 +463,9 @@ namespace Orion.Game.Matchmaking
         {
             if (FactionMembership.GetFaction(entity) != Faction) return;
 
-            Unit unit = (Unit)entity;
+            Unit unit = entity as Unit;
+            if (unit == null) return;
+
 #warning Unit type comparision
             createdUnitTypes.Add(unit.Type);
             

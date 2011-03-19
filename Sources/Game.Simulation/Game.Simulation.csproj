@@ -130,7 +130,6 @@
     <Compile Include="Skills\UnitSkill.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="TrainType.cs" />
-    <Compile Include="UnitTypeReader.cs" />
     <Compile Include="UnitTypeUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />
     <Compile Include="Utilities\RememberedBuilding.cs" />
@@ -177,7 +176,6 @@
     <Compile Include="Unit.cs" />
     <Compile Include="World.EntityCollection.cs" />
     <Compile Include="Skills\UnitStat.cs" />
-    <Compile Include="UnitTypeBuilder.cs" />
     <Compile Include="UnitTypeRegistry.cs" />
     <Compile Include="Utilities\WorkerActivityMonitor.cs" />
     <Compile Include="Utilities\WorldFoodSampler.cs" />

@@ -5,26 +5,29 @@
 		<AladdiumCost>180</AladdiumCost>
 		<AlageneCost>70</AlageneCost>
 	</Identity>
-	<Train>
+	<Trainer>
 		<Speed>10</Speed>
 		<TrainableTypes>
 			<Item>SwineFlu</Item>
 			<Item>Ufo</Item>
 			<Item>FlyingCarpet</Item>
 		</TrainableTypes>
-	</Train>
+	</Trainer>
 	<Health>
-		<MaxHealth>300</MaxHealth>
+		<MaxValue>300</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>8</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

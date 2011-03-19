@@ -5,8 +5,8 @@
 		<AladdiumCost>150</AladdiumCost>
 		<AlageneCost>50</AlageneCost>
 	</Identity>
-	<Research>
-		<ResearchableTypes>
+	<Researcher>
+		<Technologies>
 			<Item>SwiftSmurf</Item>
 			<Item>ImportJeanMarc</Item>
 			<Item>HolyTrinity</Item>
@@ -14,20 +14,23 @@
 			<Item>SpaghettiAlfredo</Item>
 			<Item>IslamForce</Item>
 			<Item>Pandemic</Item>
-		</ResearchableTypes>
-	</Train>
+		</Technologies>
+	</Researcher>
 	<Health>
-		<MaxHealth>200</MaxHealth>
+		<MaxValue>200</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>4</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
 	<Tags/>
 </Entity>

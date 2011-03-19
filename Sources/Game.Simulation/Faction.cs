@@ -468,7 +468,7 @@ namespace Orion.Game.Simulation
 
             if (entity.Components.Has<BuildProgress>())
                 localFogOfWar.AddRegion(entity.Spatial.GridRegion);
-            else
+            else if (entity.Components.Has<Vision>())
                 localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
         }
 

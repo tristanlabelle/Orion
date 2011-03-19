@@ -4,24 +4,28 @@
 		<Name>CarrefourLaval</Name>
 		<AladdiumCost>140</AladdiumCost>
 	</Identity>
-	<Train>
+	<Trainer>
 		<Speed>10</Speed>
 		<TrainableTypes>
 			<Item>GabraelMartien</Item>
 		</TrainableTypes>
-	</Train>
+	</Trainer>
 	<Health>
-		<MaxHealth>300</MaxHealth>
+		<MaxValue>300</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>4</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>4</Width>
 			<Height>4</Height>
 		</Size>
-		<SightRange>10</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>10</Range>
+	</Vision>
+	
 	<Tags/>
 </Entity>

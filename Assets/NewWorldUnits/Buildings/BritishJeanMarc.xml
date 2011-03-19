@@ -3,23 +3,26 @@
 	<Identity>
 		<Name>BritishJeanMarc</Name>
 	</Identity>
-	<Attack>
+	<Attacker>
 		<Power>12</Power>
 		<Range>8</Range>
 		<Delay>1</Delay>
-	</Attack>
+	</Attacker>
 	<Health>
-		<MaxHealth>220</MaxHealth>
+		<MaxValue>220</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>9</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>9</Range>
+	</Vision>
 	<Tags/>
 </Entity>

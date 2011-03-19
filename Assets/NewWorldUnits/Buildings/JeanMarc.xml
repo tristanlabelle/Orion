@@ -6,29 +6,32 @@
 		<AlageneCost>40</AlageneCost>
 		<Upgrades>
 			<Item>
-				<Name>BritishJeanMarc</Name>
+				<Target>BritishJeanMarc</Target>
 				<AladdiumCost>220</AladdiumCost>
 				<AlageneCost>140</AlageneCost>
 			</Item>
 		</Upgrades>
 	</Identity>
-	<Attack>
+	<Attacker>
 		<Power>8</Power>
 		<Range>7</Range>
 		<Delay>2</Delay>
-	</Attack>
+	</Attacker>
 	<Health>
-		<MaxHealth>120</MaxHealth>
+		<MaxValue>120</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>1</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>7</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>7</Range>
+	</Vision>
 	<Tags/>
 </Entity>

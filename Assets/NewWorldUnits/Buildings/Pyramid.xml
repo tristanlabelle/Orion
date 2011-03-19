@@ -5,27 +5,30 @@
 		<AladdiumCost>250</AladdiumCost>
 	</Identity>
 	<FactionMembership>
-		<ProvideFood>10</ProvideFood>
+		<ProvidedFood>10</ProvidedFood>
 	</FactionMembership>
-	<Train>
+	<Trainer>
 		<Speed>10</Speed>
 		<TrainableTypes>
 			<Item>Smurf</Item>
 		</TrainableTypes>
-	</Train>
-	<StoreResources/>
+	</Trainer>
+	<ResourceDepot/>
 	<Health>
-		<MaxHealth>400</MaxHealth>
+		<MaxValue>400</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>4</Armor>
 	</Health>
-	<Position>
+	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
 			<Width>3</Width>
 			<Height>3</Height>
 		</Size>
-		<SightRange>8</SightRange>
-	</Position>
+	</Spatial>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
 	<Tags/>
 </Entity>

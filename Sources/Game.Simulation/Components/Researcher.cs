@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation.Technologies;
 using Orion.Engine;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -26,6 +27,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Gets the collection of technologies this <see cref="Entity"/> can research.
         /// </summary>
+        [Mandatory]
         public ICollection<string> Technologies
         {
             get { return technologies; }

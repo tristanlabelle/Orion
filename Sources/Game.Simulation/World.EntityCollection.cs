@@ -123,14 +123,14 @@ namespace Orion.Game.Simulation
             /// Used by <see cref="Faction"/> to create new <see cref="Entity"/>
             /// from its <see cref="Entity"/> and <see cref="Faction"/>.
             /// </summary>
-            /// <param name="type">The <see cref="Entity"/> of the <see cref="Entity"/> to be created.</param>
+            /// <param name="prototype">The prototype of the <see cref="Entity"/> to be created.</param>
             /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Entity"/>.</param>
             /// <param name="point">The initial position of the <see cref="Entity"/> to be created.</param>
             /// <returns>The newly created <see cref="Entity"/>.</returns>
-            internal Unit CreateUnit(Unit type, Faction faction, Point point)
+            internal Unit CreateUnit(Entity prototype, Faction faction, Point point)
             {
                 Handle handle = handleGenerator();
-                Unit unit = new Unit(handle, type, faction, point);
+                Unit unit = new Unit(handle, prototype, faction, point);
                 Add(unit);
 
                 return unit;

@@ -79,7 +79,7 @@ namespace Orion.Game.Simulation.Utilities
             {
                 if (!faction.CanSee(rememberedBuilding.GridRegion)) return false;
 
-                Unit building = faction.World.Entities.GetEntityAt(rememberedBuilding.Location, CollisionLayer.Ground) as Unit;
+                Entity building = faction.World.Entities.GetEntityAt(rememberedBuilding.Location, CollisionLayer.Ground);
                 return building == null || !rememberedBuilding.Matches(building);
             });
         }

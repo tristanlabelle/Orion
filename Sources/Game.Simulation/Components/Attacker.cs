@@ -235,7 +235,7 @@ namespace Orion.Game.Simulation.Components
             float damage = GetDamage(targetHealth);
             targetHealth.Damage += damage;
 
-            HitEventArgs args = new HitEventArgs((Unit)Entity, (Unit)target);
+            HitEventArgs args = new HitEventArgs(Entity, target);
             World.RaiseHitOccured(args);
 
             if (Splashes)

@@ -15,27 +15,27 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Fields
         private readonly Faction faction;
-        private readonly Unit buildingType;
+        private readonly Entity buildingPrototype;
         private readonly Point location;
         private Entity building;
         #endregion
 
         #region Constructors
-        public BuildingPlan(Faction faction, Unit buildingType, Point location)
+        public BuildingPlan(Faction faction, Entity buildingPrototype, Point location)
         {
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(buildingType, "buildingType");
+            Argument.EnsureNotNull(buildingPrototype, "buildingPrototype");
 
             this.faction = faction;
-            this.buildingType = buildingType;
+            this.buildingPrototype = buildingPrototype;
             this.location = location;
         }
         #endregion
 
         #region Proprieties
-        public Unit BuildingType
+        public Entity BuildingType
         {
-            get { return buildingType; }
+            get { return buildingPrototype; }
         }
 
         public Point Location
@@ -45,7 +45,7 @@ namespace Orion.Game.Simulation.Tasks
 
         public Region GridRegion
         {
-            get { return new Region(Location, buildingType.Size); }
+            get { return new Region(Location, buildingPrototype.Size); }
         }
 
         public bool IsBuildingCreated
@@ -69,7 +69,7 @@ namespace Orion.Game.Simulation.Tasks
             if (IsBuildingCreated)
                 throw new InvalidOperationException("Cannot create more than one building from a plan.");
 
-            building = faction.CreateUnit(buildingType, location);
+            building = faction.CreateUnit(buildingPrototype, location);
 
             // Set the building to an "under construction" state
             building.Components.Remove<TaskQueue>();

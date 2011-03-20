@@ -118,7 +118,7 @@ namespace Orion.Game.Matchmaking
                 return;
             }
 
-            faction.CreateUnit((Unit)prototype, (Point)match.World.Bounds.Center);
+            faction.CreateUnit(prototype, (Point)match.World.Bounds.Center);
         }
 
         private static void InstantVictory(Match match, Faction faction)
@@ -154,8 +154,8 @@ namespace Orion.Game.Matchmaking
 
         private static void SpawnMisterT(Match match, Faction faction)
         {
-            Unit heroUnitType = match.UnitTypes.FromName("MrT");
-            faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
+            Entity heroPrototype = match.UnitTypes.FromName("MrT");
+            faction.CreateUnit(heroPrototype, (Point)match.World.Bounds.Center);
         }
 
         private static void MasterCheat(Match match, Faction faction)

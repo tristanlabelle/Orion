@@ -31,7 +31,7 @@ namespace Orion.Game.Presentation.Audio
         /// </summary>
         private readonly HashSet<Entity> previousSelection = new HashSet<Entity>();
 
-        private readonly HashCountedSet<string> tempTemplateCounts = new HashCountedSet<string>();
+        private readonly Dictionary<string, int> tempTemplateCounts = new Dictionary<string, int>();
 
         private bool isGameStarted;
         private bool hasExplosionOccuredInFrame;
@@ -164,14 +164,18 @@ namespace Orion.Game.Presentation.Audio
                 Identity identity = entity.Identity;
                 if (identity == null || identity.SoundIdentity == null) continue;
 
-                tempTemplateCounts.Add(identity.SoundIdentity);
+                int count = 0;
+                tempTemplateCounts.TryGetValue(identity.SoundIdentity, out count);
+                tempTemplateCounts[identity.SoundIdentity] = count + 1;
             }
             if (tempTemplateCounts.Count == 0) return null;
 
-            var maxEntry = tempTemplateCounts.Entries
-                .WithMaxOrDefault(entry => entry.Count);
+            var maxEntry = tempTemplateCounts
+                .WithMaxOrDefault(entry => entry.Value);
 
-            return maxEntry.Item;
+            tempTemplateCounts.Clear();
+
+            return maxEntry.Key;
         }
 
         private void OnSelectionChanged(Selection sender)

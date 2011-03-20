@@ -59,9 +59,9 @@ namespace Orion.Game.Simulation.IO
             foreach (Faction faction in world.Factions)
             {
                 List<UnitTemplate> units = new List<UnitTemplate>();
-                foreach (Unit unit in faction.Units)
+                foreach (Entity entity in faction.Entities)
                 {
-                    UnitTemplate template = new UnitTemplate(Point.Truncate(unit.Position), unit.Identity.Name);
+                    UnitTemplate template = new UnitTemplate(Point.Truncate(entity.Position), entity.Identity.Name);
                     units.Add(template);
                 }
                 unitsByFaction.Add(units);

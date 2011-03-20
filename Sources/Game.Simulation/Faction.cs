@@ -363,16 +363,16 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Creates new <see cref="Entity"/> part of this <see cref="Faction"/>.
         /// </summary>
-        /// <param name="type">The <see cref="Entity"/> of the <see cref="Entity"/> to be created.</param>
+        /// <param name="prototype">The prototype of the <see cref="Entity"/> to be created.</param>
         /// <param name="point">The initial position of the <see cref="Entity"/>.</param>
         /// <returns>The newly created <see cref="Entity"/>.</returns>
-        public Entity CreateUnit(Unit type, Point point)
+        public Entity CreateUnit(Entity prototype, Point point)
         {
-            Argument.EnsureNotNull(type, "type");
+            Argument.EnsureNotNull(prototype, "prototype");
 
-            Entity entity = world.Entities.CreateUnit(type, this, point);
+            Entity entity = world.Entities.CreateUnit(prototype, this, point);
             entity.Spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
-            UsedFoodAmount += (int)GetStat(type, FactionMembership.FoodCostStat);
+            UsedFoodAmount += (int)GetStat(prototype, FactionMembership.FoodCostStat);
 
             return entity;
         }

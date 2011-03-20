@@ -32,7 +32,7 @@ namespace Orion.Game.Presentation
         private readonly UnderAttackMonitor underAttackMonitor;
         private readonly SelectionGroupManager selectionGroupManager;
         private readonly SelectionManager selectionManager;
-        private Unit hoveredUnit;
+        private Entity hoveredEntity;
         private UserInputCommand mouseCommand;
         private Vector2? selectionStart;
         private Vector2? selectionEnd;
@@ -91,10 +91,9 @@ namespace Orion.Game.Presentation
             get { return selectionManager.Selection; }
         }
 
-        public Unit HoveredUnit
+        public Entity HoveredEntity
         {
-            get { return hoveredUnit; }
-            set { hoveredUnit = value; }
+            get { return hoveredEntity; }
         }
 
         public Rectangle? SelectionRectangle
@@ -227,7 +226,7 @@ namespace Orion.Game.Presentation
             else
             {
                 Point point = (Point)args.Position;
-                hoveredUnit = World.IsWithinBounds(point) ? World.Entities.GetTopmostUnitAt(point) : null;
+                hoveredEntity = World.IsWithinBounds(point) ? World.Entities.GetTopmostUnitAt(point) : null;
             }
         }
 
@@ -269,7 +268,7 @@ namespace Orion.Game.Presentation
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            if (entity == hoveredUnit) hoveredUnit = null;
+            if (entity == hoveredEntity) hoveredEntity = null;
         }
         #endregion
 

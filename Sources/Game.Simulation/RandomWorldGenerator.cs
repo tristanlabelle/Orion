@@ -166,22 +166,22 @@ namespace Orion.Game.Simulation
             Faction faction, Vector2 campCenter, bool placePyramid)
         {
             Region buildingRegion;
-            Unit pyramid = unitTypes.FromName("Pyramid");
+            Entity commandCenterPrototype = unitTypes.FromName("Pyramid");
             if (placePyramid)
             {
-                Entity building = faction.CreateUnit(pyramid, (Point)campCenter);
+                Entity building = faction.CreateUnit(commandCenterPrototype, (Point)campCenter);
                 buildingRegion = building.GridRegion;
             }
             else
             {
-                buildingRegion = new Region((Point)campCenter, pyramid.Size);
+                buildingRegion = new Region((Point)campCenter, commandCenterPrototype.Size);
             }
 
-            Unit unitType = unitTypes.FromName("Smurf");
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY + 1));
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY));
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY + 1));
+            Entity workerPrototype = unitTypes.FromName("Smurf");
+            faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));
+            faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY + 1));
+            faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY));
+            faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY + 1));
 
             world.Entities.CreateResourceNode(ResourceType.Aladdium,
                 (Point)(campCenter + new Vector2(campSize / -4f, campSize / -4f)));

@@ -145,7 +145,7 @@ namespace Orion.Game.Simulation.Tasks
             Point? point = TryGetFreeSurroundingSpawnPoint(prototype);
             if (!point.HasValue) return null;
 
-            Entity spawnee = FactionMembership.GetFaction(Entity).CreateUnit((Unit)prototype, point.Value);
+            Entity spawnee = FactionMembership.GetFaction(Entity).CreateUnit(prototype, point.Value);
             Vector2 traineeDelta = spawnee.Spatial.Center - Entity.Spatial.Center;
             spawnee.Spatial.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
 

@@ -100,10 +100,6 @@
     <Compile Include="BinarySerializer.cs" />
     <Compile Include="Collections\BiDictionary.cs" />
     <Compile Include="Collections\ChunkList.cs" />
-    <Compile Include="Collections\HashCountedSet.cs" />
-    <Compile Include="Collections\HashCountedSet.Entry.cs" />
-    <Compile Include="Collections\HashCountedSet.InternalEntry.cs" />
-    <Compile Include="Collections\HashingPrimes.cs" />
     <Compile Include="Collections\Subarray.cs" />
     <Compile Include="Collections\ValidatingCollection.cs" />
     <Compile Include="Data\Bindable.cs" />

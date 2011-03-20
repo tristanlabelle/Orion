@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
-using System.Diagnostics;
 using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation
@@ -14,6 +11,7 @@ namespace Orion.Game.Presentation
     /// <summary>
     /// Handles the selection of <see cref="Entity"/>s using the mouse and keyboard.
     /// </summary>
+    [Obsolete("To be deleted in favor of Selection, in which focused prototype management should be integrated.")]
     public sealed class SelectionManager
     {
         #region Fields

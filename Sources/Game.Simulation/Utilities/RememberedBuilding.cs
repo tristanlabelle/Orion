@@ -62,7 +62,7 @@ namespace Orion.Game.Simulation.Utilities
         /// </summary>
         /// <param name="building">The building to be tested.</param>
         /// <returns>A value indicating if it matches this description.</returns>
-        public bool Matches(Unit building)
+        public bool Matches(Entity building)
         {
             Argument.EnsureNotNull(building, "building");
 

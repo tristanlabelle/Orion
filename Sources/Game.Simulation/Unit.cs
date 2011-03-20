@@ -36,7 +36,7 @@ namespace Orion.Game.Simulation
         /// </param>
         /// <param name="position">The initial position of the <see cref="Entity"/>.</param>
         /// <param name="faction">The <see cref="T:Faction"/> this <see cref="Entity"/> is part of.</param>
-        internal Unit(Handle handle, Unit prototype, Faction faction, Vector2 position)
+        internal Unit(Handle handle, Entity prototype, Faction faction, Vector2 position)
             : base(faction.World, handle)
         {
             Argument.EnsureNotNull(prototype, "meta");

@@ -6,12 +6,8 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.Game.Simulation.Pathfinding;
-using Orion.Game.Simulation.Skills;
-using Orion.Game.Simulation.Tasks;
-using Orion.Game.Simulation.Technologies;
-using ColorPalette = Orion.Engine.Colors;
 using Orion.Game.Simulation.Components;
+using Orion.Game.Simulation.Technologies;
 
 namespace Orion.Game.Simulation
 {

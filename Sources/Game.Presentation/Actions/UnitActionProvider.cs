@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Localization;
-using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Technologies;
 using Key = OpenTK.Input.Key;
-using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Actions
 {

@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
-using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Pathfinding;
-using Orion.Game.Simulation.Skills;
-using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Components;
-using System.Diagnostics;
 
 namespace Orion.Game.Presentation.Renderers
 {

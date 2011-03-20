@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Orion.Distiller")]
+[assembly: AssemblyTitle("Orion.ReplayPrinter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Virtual Machine")]
-[assembly: AssemblyProduct("Orion.Distiller")]
+[assembly: AssemblyProduct("Orion.ReplayPrinter")]
 [assembly: AssemblyCopyright("Copyright © Virtual Machine 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

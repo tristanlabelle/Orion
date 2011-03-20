@@ -59,14 +59,14 @@ namespace Orion.Game.Simulation.Components.Serialization
             Debug.Assert(entityElement.Name == "Entity");
 
             Unit entity = new Unit(handleGenerator());
-            Assembly currentAssembly = Assembly.GetExecutingAssembly();
             Type baseComponentType = typeof(Component);
+            Assembly componentAssembly = baseComponentType.Assembly;
             object[] constructorArguments = new object[] { entity };
             foreach (XmlElement componentElement in entityElement.ChildNodes.OfType<XmlElement>())
             {
                 string name = componentElement.Name;
-                string fullName = "Orion.Game.Simulation.Components." + name;
-                Type preciseComponentType = currentAssembly.GetType(fullName, true, true);
+                string fullName = baseComponentType.Namespace + "." + name;
+                Type preciseComponentType = componentAssembly.GetType(fullName, true, true);
                 if (entity.Components.Has(preciseComponentType))
                     throw new InvalidOperationException("Trying to attach multiple components of the same type to an entity ");
 

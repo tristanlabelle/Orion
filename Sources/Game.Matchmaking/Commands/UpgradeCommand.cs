@@ -7,7 +7,6 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
-using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Matchmaking.Commands
 {

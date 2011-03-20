@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation

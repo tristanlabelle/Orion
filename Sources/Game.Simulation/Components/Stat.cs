@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Diagnostics;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Components
 {

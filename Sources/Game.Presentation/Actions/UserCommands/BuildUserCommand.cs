@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
@@ -6,9 +7,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Components;
-using System.Collections.Generic;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {

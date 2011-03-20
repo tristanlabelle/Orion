@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Engine.Collections;
-using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
+using Orion.Engine.Localization;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
-using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
-using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {

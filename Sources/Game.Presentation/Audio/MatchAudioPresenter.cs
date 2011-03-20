@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
@@ -10,9 +9,8 @@ using Orion.Engine.Geometry;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
-using Orion.Game.Simulation.Utilities;
 using Orion.Game.Simulation.Components;
+using Orion.Game.Simulation.Utilities;
 
 namespace Orion.Game.Presentation.Audio
 {

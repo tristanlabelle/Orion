@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using Orion.Engine;
-using Orion.Engine.Collections;
 using Orion.Game.Simulation.Components;
-using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation
 {

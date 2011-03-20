@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK;
@@ -10,7 +9,6 @@ using Orion.Engine.Input;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
-using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;

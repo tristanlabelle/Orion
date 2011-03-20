@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.Engine;
-using Orion.Game.Simulation.Skills;
-using System.Reflection;
-using Orion.Game.Simulation.Components.Serialization;
-using System.Collections;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Orion.Engine;
 
 namespace Orion.Game.Simulation.Components
 {

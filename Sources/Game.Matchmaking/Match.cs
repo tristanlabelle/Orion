@@ -151,18 +151,18 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
-        /// Gets a random hero unit type from a given unit type.
+        /// Gets a random hero unit type from a given prototype.
         /// </summary>
-        /// <param name="unitType">The original unit type.</param>
-        /// <returns>One of the heroes of the original unit type, or that unit type itself.</returns>
-        public Unit RandomizeHero(Unit unitType)
+        /// <param name="prototype">The original protottype.</param>
+        /// <returns>One of the heroes of the original unit type, or that prototype itself.</returns>
+        public Entity RandomizeHero(Entity prototype)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
-            if (!areRandomHeroesEnabled) return unitType;
+            Argument.EnsureNotNull(prototype, "unitType");
+            if (!areRandomHeroesEnabled) return prototype;
 
             while (true)
             {
-                var heroUpgrades = unitType.Identity.Upgrades
+                var heroUpgrades = prototype.Identity.Upgrades
                     .Where(u => u.AladdiumCost == 0 && u.AlageneCost == 0);
 
                 int upgradeCount = heroUpgrades.Count();
@@ -172,20 +172,18 @@ namespace Orion.Game.Matchmaking
                 int upgradeIndex = random.Next(upgradeCount);
                 UnitTypeUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
 
-                Unit heroUnitType = UnitTypes.FromName(upgrade.Target);
-                if (heroUnitType == null)
+                Entity heroPrototype = UnitTypes.FromName(upgrade.Target);
+                if (heroPrototype == null)
                 {
-#if DEBUG
                     Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
-                        .FormatInvariant(upgrade.Target, unitType.Identity.Name));
-#endif
+                        .FormatInvariant(upgrade.Target, prototype.Identity.Name));
                     break;
                 }
 
-                unitType = heroUnitType;
+                prototype = heroPrototype;
             }
 
-            return unitType;
+            return prototype;
         }
 
         /// <summary>

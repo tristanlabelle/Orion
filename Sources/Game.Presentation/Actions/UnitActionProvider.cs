@@ -194,7 +194,7 @@ namespace Orion.Game.Presentation.Actions
                 .OrderBy(traineeType => (int)traineeType.GetStatValue(Identity.AladdiumCostStat)
                     + (int)traineeType.GetStatValue(Identity.AlageneCostStat));
 
-            foreach (Unit traineePrototype in traineePrototypes)
+            foreach (Entity traineePrototype in traineePrototypes)
             {
                 Point point = FindUnusedButton();
 
@@ -202,13 +202,13 @@ namespace Orion.Game.Presentation.Actions
                 int alageneCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Identity.AlageneCostStat);
                 int foodCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, FactionMembership.FoodCostStat);
 
-                Unit traineeTypeForClosure = traineePrototype;
+                Entity traineePrototypeForClosure = traineePrototype;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
                     Name = localizer.GetNoun(traineePrototype.Identity.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
                     Texture = graphics.GetEntityTexture(traineePrototype),
-                    Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
+                    Action = () => userInputManager.LaunchTrain(traineePrototypeForClosure)
                 };
             }
         }

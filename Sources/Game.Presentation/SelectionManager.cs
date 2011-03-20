@@ -11,7 +11,6 @@ namespace Orion.Game.Presentation
     /// <summary>
     /// Handles the selection of <see cref="Entity"/>s using the mouse and keyboard.
     /// </summary>
-    [Obsolete("To be deleted in favor of Selection, in which focused prototype management should be integrated.")]
     public sealed class SelectionManager
     {
         #region Fields

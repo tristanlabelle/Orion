@@ -69,15 +69,15 @@ namespace Orion.Game.Presentation.Actions
             int x = 0;
             int y = 3;
 
-            var buildingTypes = inputManager.Match.UnitTypes
+            var buildingPrototypes = inputManager.Match.UnitTypes
                 .Where(buildingType => builder.Supports(buildingType))
                 .OrderByDescending(buildingType => buildingType.Components.Has<Trainer>())
                 .ThenBy(buildingType => (int)buildingType.GetStatValue(Identity.AladdiumCostStat)
                     + (int)buildingType.GetStatValue(Identity.AlageneCostStat));
 
-            foreach (Unit buildingType in buildingTypes)
+            foreach (Entity buildingPrototype in buildingPrototypes)
             {
-                actions[x, y] = CreateButton(buildingType);
+                actions[x, y] = CreateButton(buildingPrototype);
 
                 x++;
                 if (x == 4)
@@ -90,20 +90,20 @@ namespace Orion.Game.Presentation.Actions
             actions[3, 0] = actionPanel.CreateCancelAction(inputManager, graphics);
         }
 
-        private ActionDescriptor CreateButton(Unit buildingType)
+        private ActionDescriptor CreateButton(Entity buildingPrototype)
         {
             Faction faction = inputManager.LocalFaction;
-            int aladdiumCost = (int)faction.GetStat(buildingType, Identity.AladdiumCostStat);
-            int alageneCost = (int)faction.GetStat(buildingType, Identity.AlageneCostStat);
+            int aladdiumCost = (int)faction.GetStat(buildingPrototype, Identity.AladdiumCostStat);
+            int alageneCost = (int)faction.GetStat(buildingPrototype, Identity.AlageneCostStat);
             
             return new ActionDescriptor()
             {
-                Name = localizer.GetNoun(buildingType.Identity.Name),
+                Name = localizer.GetNoun(buildingPrototype.Identity.Name),
                 Cost = new ResourceAmount(aladdiumCost, alageneCost),
-                Texture = graphics.GetEntityTexture(buildingType),
+                Texture = graphics.GetEntityTexture(buildingPrototype),
                 Action = () =>
                 {
-                    inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
+                    inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingPrototype);
                     actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
                 }
             };

@@ -166,19 +166,6 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Gets the collection of <see cref="Entity"/>s in this <see cref="Faction"/>.
         /// </summary>
-        public IEnumerable<Unit> Units
-        {
-            get
-            {
-                return world.Entities
-                    .OfType<Unit>()
-                    .Where(unit => FactionMembership.GetFaction(unit) == this);
-            }
-        }
-
-        /// <summary>
-        /// Gets the collection of <see cref="Entity"/>s in this <see cref="Faction"/>.
-        /// </summary>
         public IEnumerable<Entity> Entities
         {
             get

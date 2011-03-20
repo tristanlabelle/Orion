@@ -62,6 +62,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses a value indicating if this <see cref="Entity"/> is classified as a building.
         /// </summary>
+        [Persistent]
         public bool IsBuilding
         {
             get { return isBuilding; }

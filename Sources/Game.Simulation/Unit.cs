@@ -42,13 +42,20 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(prototype, "meta");
             Argument.EnsureNotNull(faction, "faction");
 
-            // components stuff
             foreach (Component component in prototype.Components)
                 Components.Add(component.Clone(this));
 
             if (Identity.Prototype == null) Identity.Prototype = prototype;
             Components.Get<Spatial>().Position = position;
-            Components.Get<FactionMembership>().Faction = faction;
+
+            FactionMembership factionMembership = Components.TryGet<FactionMembership>();
+            if (factionMembership == null)
+            {
+                factionMembership = new FactionMembership(this);
+                Components.Add(factionMembership);
+            }
+
+            factionMembership.Faction = faction;
         }
         #endregion
 

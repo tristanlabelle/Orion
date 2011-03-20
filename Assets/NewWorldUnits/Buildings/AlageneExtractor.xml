@@ -2,14 +2,19 @@
 <Entity>
 	<Identity>
 		<Name>AlageneExtractor</Name>
+		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>75</AladdiumCost>
 	</Identity>
+	
 	<AlageneExtractor/>
+	
 	<Health>
+		<Constitution>Mechanical</Constitution>
 		<MaxValue>75</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>1</Armor>
 	</Health>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -21,5 +26,4 @@
 	<Vision>
 		<Range>4</Range>
 	</Vision>
-	<Tags/>
 </Entity>

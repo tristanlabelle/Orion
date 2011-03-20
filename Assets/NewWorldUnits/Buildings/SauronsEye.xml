@@ -2,14 +2,17 @@
 <Entity>
 	<Identity>
 		<Name>SauronsEye</Name>
+		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>100</AladdiumCost>
 		<AlageneCost>25</AlageneCost>
 	</Identity>
+	
 	<Health>
 		<MaxValue>100</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>1</Armor>
 	</Health>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -21,5 +24,4 @@
 	<Vision>
 		<Range>16</Range>
 	</Vision>
-	<Tags/>
 </Entity>

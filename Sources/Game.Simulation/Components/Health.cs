@@ -64,6 +64,7 @@ namespace Orion.Game.Simulation.Components
         /// Accesses the <see cref="Constitution"/> of the <see cref="Entity"/>,
         /// determining if it supports being repaired or healed.
         /// </summary>
+        [Persistent]
         public Constitution Constitution
         {
             get { return constitution; }

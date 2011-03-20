@@ -2,16 +2,21 @@
 <Entity>
 	<Identity>
 		<Name>Supply</Name>
+		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>50</AladdiumCost>
 	</Identity>
+	
 	<FactionMembership>
 		<ProvidedFood>10</ProvidedFood>
 	</FactionMembership>
+	
 	<Health>
+		<Constitution>Mechanical</Constitution>
 		<MaxValue>80</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>2</Armor>
 	</Health>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -23,5 +28,4 @@
 	<Vision>
 		<Range>4</Range>
 	</Vision>
-	<Tags/>
 </Entity>

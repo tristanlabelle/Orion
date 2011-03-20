@@ -84,7 +84,7 @@ namespace Orion.Game.Simulation.Components.Serialization
                     if (property == null)
                         throw new InvalidOperationException("Couldn't find a field associated to the {0} XML tag".FormatInvariant(propertyElement.Name));
 
-                    DeserializeField(component, property, propertyElement, persistentOnly);
+                    DeserializeProperty(component, property, propertyElement, persistentOnly);
                     mandatoryProperties.Remove(property);
                 }
                 
@@ -97,12 +97,12 @@ namespace Orion.Game.Simulation.Components.Serialization
         }
 
         /// <summary>
-        /// Deserializes a field of a certain component based on XML data.
+        /// Deserializes a property of a certain component based on XML data.
         /// </summary>
-        /// <param name="component">The component for which the field should be deserialized</param>
-        /// <param name="propertyElement">The XML element for the field</param>
-        /// <returns>An Entity object with the specs from the XML file</returns>
-        private void DeserializeField(Component component, PropertyInfo property, XmlElement propertyElement, bool persistentOnly)
+        /// <param name="component">The component for which the property should be deserialized.</param>
+        /// <param name="property">The property to be deserialized.</param>
+        /// <param name="propertyElement">The XML element for the property.</param>
+        private void DeserializeProperty(Component component, PropertyInfo property, XmlElement propertyElement, bool persistentOnly)
         {
             Argument.EnsureNotNull(component, "component");
             Argument.EnsureNotNull(property, "property");

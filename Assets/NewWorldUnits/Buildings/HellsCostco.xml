@@ -2,14 +2,19 @@
 <Entity>
 	<Identity>
 		<Name>HellsCostco</Name>
+		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>80</AladdiumCost>
 	</Identity>
+	
 	<ResourceDepot/>
+	
 	<Health>
+		<Constitution>Mechanical</Constitution>
 		<MaxValue>100</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>2</Armor>
 	</Health>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -21,5 +26,4 @@
 	<Vision>
 		<Range>4</Range>
 	</Vision>
-	<Tags/>
 </Entity>

@@ -2,17 +2,22 @@
 <Entity>
 	<Identity>
 		<Name>BritishJeanMarc</Name>
+		<IsBuilding>True</IsBuilding>
 	</Identity>
+	
 	<Attacker>
 		<Power>12</Power>
 		<Range>8</Range>
 		<Delay>1</Delay>
 	</Attacker>
+	
 	<Health>
+		<Constitution>Mechanical</Constitution>
 		<MaxValue>220</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -24,5 +29,4 @@
 	<Vision>
 		<Range>9</Range>
 	</Vision>
-	<Tags/>
 </Entity>

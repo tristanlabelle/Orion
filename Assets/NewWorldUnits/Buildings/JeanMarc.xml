@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>JeanMarc</Name>
+		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>120</AladdiumCost>
 		<AlageneCost>40</AlageneCost>
 		<Upgrades>
@@ -12,16 +13,20 @@
 			</Item>
 		</Upgrades>
 	</Identity>
+	
 	<Attacker>
 		<Power>8</Power>
 		<Range>7</Range>
 		<Delay>2</Delay>
 	</Attacker>
+	
 	<Health>
+		<Constitution>Mechanical</Constitution>
 		<MaxValue>120</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>1</Armor>
 	</Health>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -33,5 +38,4 @@
 	<Vision>
 		<Range>7</Range>
 	</Vision>
-	<Tags/>
 </Entity>

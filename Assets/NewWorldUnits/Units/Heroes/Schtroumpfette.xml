@@ -19,17 +19,17 @@
 	<Builder>
 		<Speed>40</Speed>
 		<BuildableTypes>
-			<Item>Pyramide</Item>
-			<Item>Temple de 2012</Item>
-			<Item>Portail démoniaque</Item>
-			<Item>Centre de propagande</Item>
-			<Item>Maison de Tristan</Item>
+			<Item>Pyramid</Item>
+			<Item>2012Temple</Item>
+			<Item>DemonicPortal</Item>
+			<Item>PropagandaCenter</Item>
+			<Item>TristansHouse</Item>
 			<Item>Jean-Marc</Item>
-			<Item>Œil de Sauron</Item>
-			<Item>Extracteur d'Alagène</Item>
-			<Item>Réserve</Item>
-			<Item>Costco des Hells</Item>
-			<Item>Carrefour Laval</Item>
+			<Item>SauronsEye</Item>
+			<Item>AlageneExtractor</Item>
+			<Item>Supply</Item>
+			<Item>HellsCostco</Item>
+			<Item>CarrefourLaval</Item>
 		</BuildableTypes>
 	</Builder>
 	

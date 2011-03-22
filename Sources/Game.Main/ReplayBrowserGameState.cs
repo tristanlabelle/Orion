@@ -117,7 +117,7 @@ namespace Orion.Game.Main
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
             }
 
-            generator.PrepareWorld(world, match.UnitTypes);
+            generator.PrepareWorld(world, match.Prototypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

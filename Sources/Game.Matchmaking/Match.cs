@@ -22,29 +22,24 @@ namespace Orion.Game.Matchmaking
 
         private readonly World world;
         private readonly Random random;
-        private readonly Func<Point, bool> canBuildPredicate;
-        private readonly UnitTypeRegistry unitTypes;
+        private readonly PrototypeRegistry prototypes;
         private readonly TechnologyTree technologyTree;
         private bool isRunning = true;
         private bool areRandomHeroesEnabled = true;
         #endregion
 
         #region Constructors
-        public Match(AssetsDirectory assets, World world, Random random, Func<Point, bool> canBuildPredicate)
+        public Match(AssetsDirectory assets, World world, Random random)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(assets, "assets");
             Argument.EnsureNotNull(random, "random");
 
-            this.unitTypes = new UnitTypeRegistry(assets);
+            this.prototypes = new PrototypeRegistry(assets);
             this.technologyTree = new TechnologyTree(assets);
             this.world = world;
             this.random = random;
-            this.canBuildPredicate = canBuildPredicate;
         }
-
-        public Match(AssetsDirectory assets, World world, Random random)
-            : this(assets, world, random, null) { }
         #endregion
 
         #region Events
@@ -71,11 +66,11 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
-        /// Gets the collection of unit types available in this match.
+        /// Gets the collection of <see cref="Entity"/> prototypes available in this match.
         /// </summary>
-        public UnitTypeRegistry UnitTypes
+        public PrototypeRegistry Prototypes
         {
-            get { return unitTypes; }
+            get { return prototypes; }
         }
 
         /// <summary>
@@ -133,12 +128,6 @@ namespace Orion.Game.Matchmaking
         {
             isRunning = true;
         }
-
-        public bool CanBuild(Region region)
-        {
-            return world.IsFree(region, CollisionLayer.Ground)
-                && (canBuildPredicate == null || region.Points.All(p => canBuildPredicate(p)));
-        }
         
         /// <summary>
         /// Raises the <see cref="E:CheatUsed"/> event.
@@ -170,9 +159,9 @@ namespace Orion.Game.Matchmaking
                     break;
 
                 int upgradeIndex = random.Next(upgradeCount);
-                UnitTypeUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
+                EntityUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
 
-                Entity heroPrototype = UnitTypes.FromName(upgrade.Target);
+                Entity heroPrototype = Prototypes.FromName(upgrade.Target);
                 if (heroPrototype == null)
                 {
                     Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."

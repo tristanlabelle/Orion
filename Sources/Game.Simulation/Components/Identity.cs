@@ -28,8 +28,8 @@ namespace Orion.Game.Simulation.Components
         private int alageneCost;
         private float spawnTime = 1;
         private TrainType trainType;
-        private readonly ICollection<UnitTypeUpgrade> upgrades
-            = new ValidatingCollection<UnitTypeUpgrade>(upgrade => upgrade != null);
+        private readonly ICollection<EntityUpgrade> upgrades
+            = new ValidatingCollection<EntityUpgrade>(upgrade => upgrade != null);
         private Entity prototype;
         #endregion
 
@@ -113,7 +113,7 @@ namespace Orion.Game.Simulation.Components
         }
 
         [Persistent]
-        public ICollection<UnitTypeUpgrade> Upgrades
+        public ICollection<EntityUpgrade> Upgrades
         {
             get { return upgrades; }
         }
@@ -140,6 +140,20 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+#warning HACK: Upgrades should be retought to work in the component-based design
+        public void UpgradeTo(Identity target)
+        {
+            Argument.EnsureNotNull(target, "target");
+
+            Name = target.Name;
+            VisualIdentity = target.VisualIdentity;
+            SoundIdentity = target.SoundIdentity;
+
+            Upgrades.Clear();
+            foreach (EntityUpgrade upgrade in target.Upgrades)
+                Upgrades.Add(upgrade);
+        }
+
         /// <summary>
         /// Gets a value indicating if a given <see cref="Entity"/> is a building.
         /// </summary>

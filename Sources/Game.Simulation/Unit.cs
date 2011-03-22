@@ -54,31 +54,6 @@ namespace Orion.Game.Simulation
             factionMembership.Faction = faction;
         }
         #endregion
-
-        #region Properties
-        /// <summary>
-        /// Temporary measure until we broadly use the identity component.
-        /// </summary>
-        public Unit Type
-        {
-            get { return this; }
-            set
-            {
-                Argument.EnsureNotNull(value, "Type");
-
-                Identity newTypeIdentity = value.Identity;
-
-                Identity identity = Identity;
-                identity.Name = newTypeIdentity.Name;
-                identity.VisualIdentity = newTypeIdentity.VisualIdentity;
-                identity.SoundIdentity = newTypeIdentity.SoundIdentity;
-
-                identity.Upgrades.Clear();
-                foreach (UnitTypeUpgrade upgrade in value.Identity.Upgrades)
-                    identity.Upgrades.Add(upgrade);
-            }
-        }
-        #endregion
     }
 }
 

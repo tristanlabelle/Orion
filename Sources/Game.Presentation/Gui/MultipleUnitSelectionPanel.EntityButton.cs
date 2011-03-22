@@ -13,16 +13,16 @@ namespace Orion.Game.Presentation.Gui
 {
     partial class MultipleUnitSelectionPanel
     {
-        private sealed class UnitButton : Button
+        private sealed class EntityButton : Button
         {
             #region Fields
             private readonly MultipleUnitSelectionPanel panel;
             private readonly ImageBox imageBox;
-            private Entity unit;
+            private Entity entity;
             #endregion
 
             #region Constructors
-            public UnitButton(MultipleUnitSelectionPanel panel)
+            public EntityButton(MultipleUnitSelectionPanel panel)
             {
                 Argument.EnsureNotNull(panel, "panel");
 
@@ -43,13 +43,13 @@ namespace Orion.Game.Presentation.Gui
             /// <summary>
             /// Accesses the <see cref="Entity"/> displayed by this button.
             /// </summary>
-            public Entity Unit
+            public Entity Entity
             {
-                get { return unit; }
+                get { return entity; }
                 set
                 {
-                    unit = value;
-                    imageBox.Texture = unit == null ? null : panel.graphics.GetEntityTexture(unit);
+                    entity = value;
+                    imageBox.Texture = entity == null ? null : panel.graphics.GetEntityTexture(entity);
                     UpdateImageTint();
                 }
             }
@@ -62,11 +62,11 @@ namespace Orion.Game.Presentation.Gui
             public void UpdateImageTint()
             {
                 float healthFraction = 1;
-                if (unit != null)
+                if (entity != null)
                 {
-                    Health health = unit.Components.TryGet<Health>();
+                    Health health = entity.Components.TryGet<Health>();
                     if (health != null)
-                        healthFraction = health.Value / (float)unit.GetStatValue(Health.MaxValueStat);
+                        healthFraction = health.Value / (float)entity.GetStatValue(Health.MaxValueStat);
                 }
                 imageBox.Tint = HealthBarRenderer.GetColor(healthFraction);
             }
@@ -79,12 +79,12 @@ namespace Orion.Game.Presentation.Gui
 
             protected override void OnClicked(ButtonClickEvent @event)
             {
-                Debug.Assert(unit != null);
+                Debug.Assert(entity != null);
 
                 if (@event.Type == ButtonClickType.Mouse && @event.MouseEvent.IsShiftDown)
-                    panel.UnitDeselected.Raise(panel, unit);
+                    panel.EntityDeselected.Raise(panel, entity);
                 else
-                    panel.UnitSelected.Raise(panel, unit);
+                    panel.EntityFocused.Raise(panel, entity);
             }
             #endregion
         }

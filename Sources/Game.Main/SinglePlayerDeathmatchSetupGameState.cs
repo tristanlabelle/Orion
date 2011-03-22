@@ -134,7 +134,7 @@ namespace Orion.Game.Main
 
             Debug.Assert(localCommander != null, "No local player slot.");
 
-            generator.PrepareWorld(world, match.UnitTypes);
+            generator.PrepareWorld(world, match.Prototypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

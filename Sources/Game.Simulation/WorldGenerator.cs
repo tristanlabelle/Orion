@@ -16,7 +16,7 @@ namespace Orion.Game.Simulation
     {
         #region Methods
         public abstract Terrain GenerateTerrain();
-        public abstract void PrepareWorld(World world, UnitTypeRegistry unitTypes);
+        public abstract void PrepareWorld(World world, PrototypeRegistry unitTypes);
         #endregion
     }
 }

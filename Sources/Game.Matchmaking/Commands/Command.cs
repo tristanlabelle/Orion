@@ -90,7 +90,7 @@ namespace Orion.Game.Matchmaking.Commands
 
         protected bool IsValidUnitTypeHandle(Match match, Handle handle)
         {
-            return match.UnitTypes.FromHandle(handle) != null;
+            return match.Prototypes.FromHandle(handle) != null;
         }
         #endregion
 

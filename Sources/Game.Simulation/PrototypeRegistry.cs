@@ -10,17 +10,17 @@ using Orion.Game.Simulation.Components.Serialization;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Keeps the collection of registered <see cref="Entity"/>s.
+    /// Keeps the collection of registered <see cref="Entity"/>s prototypes.
     /// </summary>
     [Serializable]
-    public sealed class UnitTypeRegistry : IEnumerable<Unit>
+    public sealed class PrototypeRegistry : IEnumerable<Entity>
     {
         #region Fields
-        private readonly Dictionary<string, Unit> types = new Dictionary<string, Unit>();
+        private readonly Dictionary<string, Entity> prototypes = new Dictionary<string, Entity>();
         #endregion
 
         #region Constructors
-        public UnitTypeRegistry(AssetsDirectory assets)
+        public PrototypeRegistry(AssetsDirectory assets)
         {
             uint handle = 0;
             XmlDeserializer deserializer = new XmlDeserializer(() => new Handle(handle++));
@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation
             {
                 try
                 {
-                    Unit template = deserializer.DeserializeEntity(filePath, true);
+                    Entity template = deserializer.DeserializeEntity(filePath, true);
                     Register(template);
                 }
                 catch (IOException e)
@@ -42,38 +42,35 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        public Unit Register(Unit template)
+        public void Register(Entity template)
         {
             Argument.EnsureNotNull(template, "template");
-            types.Add(template.Identity.Name, template);
-            return template;
+            prototypes.Add(template.Identity.Name, template);
         }
 
-        public Unit FromHandle(Handle handle)
+        public Entity FromHandle(Handle handle)
         {
-            return types.Values.FirstOrDefault(unitType => unitType.Handle == handle);
+            return prototypes.Values.FirstOrDefault(prototype => prototype.Handle == handle);
         }
 
-        public Unit FromName(string name)
+        public Entity FromName(string name)
         {
-            Unit type;
-            types.TryGetValue(name, out type);
+            Entity type;
+            prototypes.TryGetValue(name, out type);
             return type;
         }
 
-        public IEnumerator<Unit> GetEnumerator()
+        public IEnumerator<Entity> GetEnumerator()
         {
-            return types.Values.GetEnumerator();
+            return prototypes.Values.GetEnumerator();
         }
         #endregion
 
         #region Explicit Members
-        #region IEnumerable Members
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
-        #endregion
         #endregion
     }
 }

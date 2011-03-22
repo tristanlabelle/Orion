@@ -184,7 +184,7 @@ namespace Orion.Game.Presentation.Actions
             Trainer trainer = prototype.Components.TryGet<Trainer>();
             if (trainer == null) return;
 
-            var traineePrototypes = userInputManager.Match.UnitTypes
+            var traineePrototypes = userInputManager.Match.Prototypes
                 .Where(traineeType => trainer.Supports(traineeType))
                 .OrderBy(traineeType => (int)traineeType.GetStatValue(Identity.AladdiumCostStat)
                     + (int)traineeType.GetStatValue(Identity.AlageneCostStat));

@@ -9,7 +9,7 @@ namespace Orion.Game.Simulation
     /// <summary>
     /// Represents a way a unit type can be upgraded to another type.
     /// </summary>
-    public sealed class UnitTypeUpgrade
+    public sealed class EntityUpgrade
     {
         #region Fields
         private readonly string target;
@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Constructors
-        public UnitTypeUpgrade(string target, int aladdiumCost, int alageneCost)
+        public EntityUpgrade(string target, int aladdiumCost, int alageneCost)
         {
             Argument.EnsureNotNull(target, "target");
             Argument.EnsurePositive(aladdiumCost, "aladdiumCost");
@@ -29,7 +29,7 @@ namespace Orion.Game.Simulation
             this.alageneCost = alageneCost;
         }
 
-        public UnitTypeUpgrade(string target)
+        public EntityUpgrade(string target)
             : this(target, 0, 0)
         { }
         #endregion

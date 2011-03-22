@@ -58,17 +58,17 @@ namespace Orion.Game.Presentation.Actions
             int x = 0;
             int y = 3;
 
-            foreach (UnitTypeUpgrade upgrade in prototype.Identity.Upgrades.Where(u => !u.IsFree))
+            foreach (EntityUpgrade upgrade in prototype.Identity.Upgrades.Where(u => !u.IsFree))
             {
-                Unit targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
-                if (targetType == null) continue;
+                Entity targetPrototype = inputManager.Match.Prototypes.FromName(upgrade.Target);
+                if (targetPrototype == null) continue;
 
                 buttons[x, y] = new ActionDescriptor()
                 {
                     Name = upgrade.Target,
                     Cost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost),
-                    Texture = graphics.GetEntityTexture(targetType),
-                    Action = () => inputManager.LaunchUpgrade(targetType)
+                    Texture = graphics.GetEntityTexture(targetPrototype),
+                    Action = () => inputManager.LaunchUpgrade(targetPrototype)
                 };
 
                 x++;

@@ -35,7 +35,7 @@ namespace Orion.Game.Simulation
 
         #region Methods
         #region Overrides
-        public override void PrepareWorld(World world, UnitTypeRegistry unitTypes)
+        public override void PrepareWorld(World world, PrototypeRegistry unitTypes)
         {
             foreach (Faction faction in world.Factions)
                 GenerateFactionCamp(world, unitTypes, faction, random, createPyramids);
@@ -117,7 +117,7 @@ namespace Orion.Game.Simulation
             }
         }
 
-        private void GenerateFactionCamp(World world, UnitTypeRegistry unitTypes,
+        private void GenerateFactionCamp(World world, PrototypeRegistry unitTypes,
             Faction faction, Random random, bool placePyramid)
         {
             Argument.EnsureNotNull(world, "world");
@@ -162,7 +162,7 @@ namespace Orion.Game.Simulation
             CreateCamp(world, unitTypes, faction, campCenter, placePyramid);
         }
 
-        private void CreateCamp(World world, UnitTypeRegistry unitTypes,
+        private void CreateCamp(World world, PrototypeRegistry unitTypes,
             Faction faction, Vector2 campCenter, bool placePyramid)
         {
             Region buildingRegion;

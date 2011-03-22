@@ -67,7 +67,7 @@ namespace Orion.Game.Presentation.Actions
             int x = 0;
             int y = 3;
 
-            var buildingPrototypes = inputManager.Match.UnitTypes
+            var buildingPrototypes = inputManager.Match.Prototypes
                 .Where(buildingType => builder.Supports(buildingType))
                 .OrderByDescending(buildingType => buildingType.Components.Has<Trainer>())
                 .ThenBy(buildingType => (int)buildingType.GetStatValue(Identity.AladdiumCostStat)

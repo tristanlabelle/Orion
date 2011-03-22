@@ -11,27 +11,27 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A command which causes a unit to upgrade to another unit type.
+    /// A command which causes an <see cref="Entity"/> to upgrade to another prototype.
     /// </summary>
     public sealed class UpgradeCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
-        private readonly Handle targetUnitTypeHandle;
+        private readonly Handle targetPrototypeHandle;
         #endregion
 
         #region Constructors
-        public UpgradeCommand(Handle factionHandle, IEnumerable<Handle> unitHandles, Handle targetUnitTypeHandle)
+        public UpgradeCommand(Handle factionHandle, IEnumerable<Handle> entityHandles, Handle targetPrototypeHandle)
             : base(factionHandle)
         {
-            Argument.EnsureNotNull(unitHandles, "trainerHandles");
+            Argument.EnsureNotNull(entityHandles, "entityHandles");
 
-            this.unitHandles = unitHandles.Distinct().ToList().AsReadOnly();
-            this.targetUnitTypeHandle = targetUnitTypeHandle;
+            this.unitHandles = entityHandles.Distinct().ToList().AsReadOnly();
+            this.targetPrototypeHandle = targetPrototypeHandle;
         }
 
-        public UpgradeCommand(Handle factionHandle, Handle unitHandle, Handle targetUnitTypeHandle)
-            : this(factionHandle, new[] { unitHandle }, targetUnitTypeHandle) { }
+        public UpgradeCommand(Handle factionHandle, Handle entityHandles, Handle targetPrototypeHandle)
+            : this(factionHandle, new[] { entityHandles }, targetPrototypeHandle) { }
         #endregion
 
         #region Properties
@@ -42,7 +42,7 @@ namespace Orion.Game.Matchmaking.Commands
 
         public Handle TargetUnitTypeHandle
         {
-            get { return targetUnitTypeHandle; }
+            get { return targetPrototypeHandle; }
         }
         #endregion
 
@@ -53,7 +53,7 @@ namespace Orion.Game.Matchmaking.Commands
 
             return IsValidFactionHandle(match, FactionHandle)
                 && unitHandles.All(handle => IsValidEntityHandle(match, handle))
-                && IsValidUnitTypeHandle(match, targetUnitTypeHandle);
+                && IsValidUnitTypeHandle(match, targetPrototypeHandle);
         }
 
         public override void Execute(Match match)
@@ -62,45 +62,45 @@ namespace Orion.Game.Matchmaking.Commands
 
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
 
-            Unit targetUnitType = match.UnitTypes.FromHandle(targetUnitTypeHandle);
-            int targetUnitTypeFoodCost = (int)faction.GetStat(targetUnitType, FactionMembership.FoodCostStat);
+            Entity targetPrototype = match.Prototypes.FromHandle(targetPrototypeHandle);
+            int targetUnitTypeFoodCost = (int)faction.GetStat(targetPrototype, FactionMembership.FoodCostStat);
 
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                UnitTypeUpgrade upgrade = unit.Identity.Upgrades.FirstOrDefault(u => u.Target == targetUnitType.Identity.Name);
+                Entity entity = match.World.Entities.FromHandle(unitHandle);
+                EntityUpgrade upgrade = entity.Identity.Upgrades.FirstOrDefault(u => u.Target == targetPrototype.Identity.Name);
                 if (upgrade == null)
                 {
                     throw new InvalidOperationException(
                         "Unit {0} cannot upgrade to {1}."
-                        .FormatInvariant(unit.Identity.Name, upgrade.Target));
+                        .FormatInvariant(entity.Identity.Name, upgrade.Target));
                 }
 
-                int unitFoodCost = (int)unit.GetStatValue(FactionMembership.FoodCostStat);
+                int unitFoodCost = (int)entity.GetStatValue(FactionMembership.FoodCostStat);
 
                 if (upgrade.AladdiumCost > faction.AladdiumAmount || upgrade.AlageneCost > faction.AlageneAmount)
                 {
-                    faction.RaiseWarning("Pas assez de ressources pour upgrader à {0}.".FormatInvariant(targetUnitType.Identity.Name));
+                    faction.RaiseWarning("Pas assez de ressources pour upgrader à {0}.".FormatInvariant(targetPrototype.Identity.Name));
                     return;
                 }
 
                 if (targetUnitTypeFoodCost > unitFoodCost
                     && targetUnitTypeFoodCost - unitFoodCost > faction.RemainingFoodAmount)
                 {
-                    faction.RaiseWarning("Pas assez de nourriture pour upgrader à {0}.".FormatInvariant(targetUnitType.Identity.Name));
+                    faction.RaiseWarning("Pas assez de nourriture pour upgrader à {0}.".FormatInvariant(targetPrototype.Identity.Name));
                     return;
                 }
 
                 faction.AladdiumAmount -= upgrade.AladdiumCost;
                 faction.AlageneAmount -= upgrade.AlageneCost;
-                unit.Type = targetUnitType;
+                entity.Identity.UpgradeTo(targetPrototype.Identity);
             }
         }
 
         public override string ToString()
         {
             return "Faction {0} upgrades {1} to {2}"
-                .FormatInvariant(FactionHandle, unitHandles.ToCommaSeparatedValues(), targetUnitTypeHandle);
+                .FormatInvariant(FactionHandle, unitHandles.ToCommaSeparatedValues(), targetPrototypeHandle);
         }
         
         #region Serialization
@@ -111,7 +111,7 @@ namespace Orion.Game.Matchmaking.Commands
 
             WriteHandle(writer, command.FactionHandle);
             WriteLengthPrefixedHandleArray(writer, command.unitHandles);
-            WriteHandle(writer, command.targetUnitTypeHandle);
+            WriteHandle(writer, command.targetPrototypeHandle);
         }
 
         public static UpgradeCommand Deserialize(BinaryReader reader)

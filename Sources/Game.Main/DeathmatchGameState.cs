@@ -86,8 +86,8 @@ namespace Orion.Game.Main
             this.singleEntitySelectionPanel.TaskCancelled += (sender, task) => userInputManager.LaunchCancelTask(task);
 
             this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(Graphics);
-            this.multipleUnitSelectionPanel.UnitSelected += OnMultipleSelectionPanelUnitSelected;
-            this.multipleUnitSelectionPanel.UnitDeselected += OnMultipleSelectionPanelUnitDeselected;
+            this.multipleUnitSelectionPanel.EntityFocused += OnMultipleSelectionPanelUnitSelected;
+            this.multipleUnitSelectionPanel.EntityDeselected += OnMultipleSelectionPanelUnitDeselected;
 
             this.actionPanel = new ActionPanel(ui);
             
@@ -234,7 +234,7 @@ namespace Orion.Game.Main
         {
             ui.SelectionInfoPanel = null;
             singleEntitySelectionPanel.Clear();
-            multipleUnitSelectionPanel.ClearUnits();
+            multipleUnitSelectionPanel.ClearEntities();
 
             if (selection.Count == 0)
             {
@@ -260,7 +260,7 @@ namespace Orion.Game.Main
             }
             else
             {
-                multipleUnitSelectionPanel.SetUnits(Selection.OfType<Unit>());
+                multipleUnitSelectionPanel.SetEntities(Selection);
                 ui.SelectionInfoPanel = multipleUnitSelectionPanel;
             }
         }

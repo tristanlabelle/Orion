@@ -82,13 +82,13 @@ namespace Orion.Game.Matchmaking
         public HarvestingAICommander(Match match, Faction faction)
             : base(match, faction)
         {
-            workerPrototype = match.UnitTypes.FromName("Smurf");
-            foodSupplyPrototype = match.UnitTypes.FromName("Supply");
-            resourceDepotPrototype = match.UnitTypes.FromName("HellsCostco");
-            alageneExtractorPrototype = match.UnitTypes.FromName("AlageneExtractor");
-            pyramidPrototype = match.UnitTypes.FromName("Pyramid");
-            defenseTowerPrototype = match.UnitTypes.FromName("JeanMarc");
-            laboratoryPrototype = match.UnitTypes.FromName("TristansHouse");
+            workerPrototype = match.Prototypes.FromName("Smurf");
+            foodSupplyPrototype = match.Prototypes.FromName("Supply");
+            resourceDepotPrototype = match.Prototypes.FromName("HellsCostco");
+            alageneExtractorPrototype = match.Prototypes.FromName("AlageneExtractor");
+            pyramidPrototype = match.Prototypes.FromName("Pyramid");
+            defenseTowerPrototype = match.Prototypes.FromName("JeanMarc");
+            laboratoryPrototype = match.Prototypes.FromName("TristansHouse");
 
             for (int y = 0; y < World.Height / explorationZoneSize; ++y)
             {
@@ -380,14 +380,14 @@ namespace Orion.Game.Matchmaking
                 }
             }
 
-            foreach (UnitTypeUpgrade upgrade in entity.Identity.Upgrades)
+            foreach (EntityUpgrade upgrade in entity.Identity.Upgrades)
             {
                 if (upgrade.IsFree) continue;
                 
                 var upgradeCost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost);
                 if (!(budget >= upgradeCost)) continue;
                 
-                var upgradedPrototype = Match.UnitTypes.FromName(upgrade.Target);
+                var upgradedPrototype = Match.Prototypes.FromName(upgrade.Target);
                 if (upgradedPrototype == null) continue;
                 
                 var command = new UpgradeCommand(Faction.Handle, entity.Handle, upgradedPrototype.Handle);

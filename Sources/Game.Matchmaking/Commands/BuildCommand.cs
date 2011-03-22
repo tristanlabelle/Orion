@@ -73,7 +73,7 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
 
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
-            Entity buildingPrototype = match.UnitTypes.FromHandle(buildingPrototypeHandle);
+            Entity buildingPrototype = match.Prototypes.FromHandle(buildingPrototypeHandle);
 
             if (buildingPrototype.Components.Has<AlageneExtractor>())
             {

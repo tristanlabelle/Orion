@@ -33,7 +33,7 @@ namespace Orion.Game.Simulation
             return worldData.Terrain;
         }
 
-        public override void PrepareWorld(World world, UnitTypeRegistry unitTypes)
+        public override void PrepareWorld(World world, PrototypeRegistry unitTypes)
         {
             // create resource nodes
             foreach (ResourceNodeTemplate node in worldData.AladdiumNodes)

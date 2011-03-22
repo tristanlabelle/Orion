@@ -583,15 +583,15 @@ namespace Orion.Game.Presentation
                 commander.SendMessage(text);
         }
 
-        public void LaunchUpgrade(Unit targetType)
+        public void LaunchUpgrade(Entity targetPrototype)
         {
-            Argument.EnsureNotNull(targetType, "targetType");
+            Argument.EnsureNotNull(targetPrototype, "targetPrototype");
 
             var entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
-                    && entity.Identity.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name));
+                    && entity.Identity.Upgrades.Any(upgrade => upgrade.Target == targetPrototype.Identity.Name));
 
-            commander.LaunchUpgrade(entities, targetType);
+            commander.LaunchUpgrade(entities, targetPrototype);
         }
         #endregion
         #endregion

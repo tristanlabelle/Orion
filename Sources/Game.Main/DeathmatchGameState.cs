@@ -244,19 +244,10 @@ namespace Orion.Game.Main
             else if (selection.Count == 1)
             {
                 Entity entity = selection.Single();
-
-                if (entity.Components.Has<Harvestable>())
-                {
-                    singleEntitySelectionPanel.ShowResourceNode(entity);
-                    ui.SelectionInfoPanel = singleEntitySelectionPanel;
-                }
-                else
-                {
-                    Faction entityFaction = FactionMembership.GetFaction(entity);
-                    bool isAllied = entityFaction != null && (LocalFaction.GetDiplomaticStance(entityFaction) & DiplomaticStance.SharedVision) != 0;
-                    singleEntitySelectionPanel.ShowUnit((Unit)entity, isAllied);
-                    ui.SelectionInfoPanel = singleEntitySelectionPanel;
-                }
+                Faction entityFaction = FactionMembership.GetFaction(entity);
+                bool isAllied = entityFaction != null && (LocalFaction.GetDiplomaticStance(entityFaction) & DiplomaticStance.SharedVision) != 0;
+                singleEntitySelectionPanel.Show(entity, isAllied);
+                ui.SelectionInfoPanel = singleEntitySelectionPanel;
             }
             else
             {

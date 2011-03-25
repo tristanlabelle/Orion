@@ -26,7 +26,7 @@ namespace Orion.Game.Simulation
         /// <see cref="Entity"/> and <see cref="World"/>.
         /// </summary>
         /// <param name="handle">A unique handle for this <see cref="Entity"/>.</param>
-        /// <param name="type">
+        /// <param name="prototype">
         /// The <see cref="Entity"/> which determines
         /// the stats and capabilities of this <see cref="Entity"/>
         /// </param>
@@ -35,7 +35,7 @@ namespace Orion.Game.Simulation
         internal Unit(Handle handle, Entity prototype, Faction faction, Vector2 position)
             : base(faction.World, handle)
         {
-            Argument.EnsureNotNull(prototype, "meta");
+            Argument.EnsureNotNull(prototype, "prototype");
             Argument.EnsureNotNull(faction, "faction");
 
             foreach (Component component in prototype.Components)

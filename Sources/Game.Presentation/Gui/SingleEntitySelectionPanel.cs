@@ -26,9 +26,8 @@ namespace Orion.Game.Presentation.Gui
         private readonly GameGraphics graphics;
         private readonly Localizer localizer;
         private readonly List<TodoButton> unusedTodoButtons = new List<TodoButton>();
-        private readonly Action<Health> damageChangedEventHandler;
         private readonly Action<TaskQueue> taskQueueChangedEventHandler;
-        private readonly Action<Entity> remainingAmountChangedEventHandler;
+        private readonly Action<UIManager, TimeSpan> updatedEventHandler;
 
         private Label nameLabel;
         private Label healthLabel;
@@ -37,6 +36,8 @@ namespace Orion.Game.Presentation.Gui
         private Label todoLabel;
         private StackLayout todoButtonStack;
         private Entity entity;
+        private int currentAmount;
+        private int currentMaxAmount;
         #endregion
 
         #region Constructors
@@ -47,9 +48,8 @@ namespace Orion.Game.Presentation.Gui
 
             this.graphics = graphics;
             this.localizer = localizer;
-            this.damageChangedEventHandler = health => UpdateHealth(health.Entity);
             this.taskQueueChangedEventHandler = UpdateTodoList;
-            this.remainingAmountChangedEventHandler = UpdateAmount;
+            this.updatedEventHandler = OnUpdated;
 
             DockLayout dock = new DockLayout();
             Content = dock;
@@ -84,30 +84,39 @@ namespace Orion.Game.Presentation.Gui
 
         #region Methods
         /// <summary>
-        /// Show information on a given unit.
+        /// Show information on a given <see cref="Entity"/>.
         /// </summary>
-        /// <param name="unit">The <see cref="Entity"/> for which information is to be shown.</param>
+        /// <param name="entity">The <see cref="Entity"/> for which information is to be shown.</param>
         /// <param name="showTasks">
         /// A value indicating if the <see cref="Task"/>s of the <see cref="Entity"/> are to be shown.
         /// </param>
-        public void ShowUnit(Unit unit, bool showTasks)
+        public void Show(Entity entity, bool showTasks)
         {
-            Argument.EnsureNotNull(unit, "unit");
-            if (unit == entity) return;
+            Argument.EnsureNotNull(entity, "entity");
+            if (entity == this.entity) return;
+
             Clear();
+            this.entity = entity;
 
-            nameLabel.Text = localizer.GetNoun(unit.Identity.Name);
-            imageBox.Texture = graphics.GetUnitTexture(unit.Identity.Name);
+            Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+            if (harvestable == null)
+            {
+                nameLabel.Text = localizer.GetNoun(entity.Identity.Name);
+                imageBox.Texture = graphics.GetUnitTexture(entity.Identity.Name);
+            }
+            else
+            {
+                nameLabel.Text = localizer.GetNoun(harvestable.Type.ToStringInvariant());
+                imageBox.Texture = graphics.GetResourceTexture(harvestable.Type);
+            }
 
-            UpdateHealth(unit);
-            Health health = unit.Components.Get<Health>();
-            health.DamageChanged += damageChangedEventHandler;
+            TryUpdateAmount();
 
             if (showTasks)
             {
                 todoLabel.VisibilityFlag = Visibility.Visible;
 
-                TaskQueue taskQueue = unit.Components.TryGet<TaskQueue>();
+                TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
                 if (taskQueue != null)
                 {
                     UpdateTodoList(taskQueue);
@@ -118,7 +127,7 @@ namespace Orion.Game.Presentation.Gui
             statsForm.VisibilityFlag = Visibility.Visible;
             foreach (Stat stat in statsToDisplay)
             {
-                float value = (float)unit.GetStatValue(stat);
+                float value = (float)entity.GetStatValue(stat);
                 if (value == 0) continue;
 
                 string statName = localizer.GetNoun(stat.Name + "Stat");
@@ -127,28 +136,6 @@ namespace Orion.Game.Presentation.Gui
 
                 statsForm.Entries.Add(headerLabel, valueLabel);
             }
-
-            entity = unit;
-        }
-
-        /// <summary>
-        /// Shows information on a given <see cref="ResourceNode"/>.
-        /// </summary>
-        /// <param name="resourceNode">The <see cref="ResourceNode"/> for which information is to be shown.</param>
-        public void ShowResourceNode(Entity resourceNode)
-        {
-            Argument.EnsureNotNull(resourceNode, "node");
-            if (resourceNode == entity) return;
-            Clear();
-
-            Harvestable harvestable = resourceNode.Components.Get<Harvestable>();
-            nameLabel.Text = localizer.GetNoun(harvestable.Type.ToStringInvariant());
-            imageBox.Texture = graphics.GetResourceTexture(resourceNode);
-            UpdateAmount(resourceNode);
-
-            harvestable.RemainingAmountChanged += remainingAmountChangedEventHandler;
-
-            entity = resourceNode;
         }
 
         /// <summary>
@@ -156,9 +143,14 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public void Clear()
         {
+            if (entity == null) return;
+
             nameLabel.Text = string.Empty;
             imageBox.Texture = null;
             healthLabel.Text = string.Empty;
+
+            currentAmount = 0;
+            currentMaxAmount = 0;
 
             ClearTodoList();
             todoLabel.VisibilityFlag = Visibility.Hidden;
@@ -166,25 +158,10 @@ namespace Orion.Game.Presentation.Gui
             statsForm.Entries.Clear();
             statsForm.VisibilityFlag = Visibility.Hidden;
 
-            if (entity == null) return;
+            TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+            if (taskQueue != null) taskQueue.Changed -= taskQueueChangedEventHandler;
 
-            if (entity is Unit)
-            {
-                Unit unit = (Unit)entity;
-
-                Health health = unit.Components.Get<Health>();
-                health.DamageChanged -= damageChangedEventHandler;
-
-                TaskQueue taskQueue = unit.Components.TryGet<TaskQueue>();
-                if (taskQueue != null) taskQueue.Changed -= taskQueueChangedEventHandler;
-            }
-            else if (entity.Components.Has<Harvestable>())
-            {
-                Harvestable harvest = entity.Components.Get<Harvestable>();
-                harvest.RemainingAmountChanged -= remainingAmountChangedEventHandler;
-            }
-
-            entity = null;
+            this.entity = null;
         }
 
         private void ClearTodoList()
@@ -199,10 +176,31 @@ namespace Orion.Game.Presentation.Gui
             todoButtonStack.Children.Clear();
         }
 
-        private void UpdateHealth(Entity entity)
+        private void TryUpdateAmount()
         {
-            Health health = entity.Components.Get<Health>();
-            healthLabel.Text = (int)Math.Ceiling(health.Value) + "/" + (int)entity.GetStatValue(Health.MaxValueStat);
+            int newAmount = currentAmount;
+            int newMaxAmount = currentMaxAmount;
+
+            Health health = entity.Components.TryGet<Health>();
+            Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+            if (health != null)
+            {
+                newMaxAmount = (int)entity.GetStatValue(Health.MaxValueStat);
+                newAmount = (int)Math.Ceiling(newMaxAmount - health.Damage);
+            }
+            else if (harvestable != null)
+            {
+                newMaxAmount = World.DefaultResourceAmount;
+                newAmount = harvestable.AmountRemaining;
+            }
+
+            if (newAmount != currentAmount || newMaxAmount != currentMaxAmount)
+            {
+                healthLabel.VisibilityFlag = newMaxAmount == 0 ? Visibility.Hidden : Visibility.Visible;
+                healthLabel.Text = newAmount + "/" + newMaxAmount;
+                currentMaxAmount = newMaxAmount;
+                currentAmount = newAmount;
+            }
         }
 
         private void UpdateTodoList(TaskQueue taskQueue)
@@ -225,11 +223,15 @@ namespace Orion.Game.Presentation.Gui
             }
         }
 
-        private void UpdateAmount(Entity resourceNode)
+        protected override void OnManagerChanged(UIManager previousManager)
         {
-            Debug.Assert(resourceNode.Components.Has<Harvestable>(), "Entity is not harvestable!");
-            Harvestable harvest = resourceNode.Components.Get<Harvestable>();
-            healthLabel.Text = harvest.AmountRemaining.ToString();
+            if (previousManager != null) previousManager.Updated -= updatedEventHandler;
+            if (Manager != null) Manager.Updated += updatedEventHandler;
+        }
+
+        private void OnUpdated(UIManager sender, TimeSpan elapsedTime)
+        {
+            if (entity != null) TryUpdateAmount();
         }
 
         private TodoButton GetTodoButton()

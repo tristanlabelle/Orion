@@ -36,7 +36,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
             if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
             {
-                Unit target = World.Entities.GetTopmostUnitAt(point);
+                Entity target = World.Entities.GetTopmostGridEntityAt(point);
                 if (target == null) InputManager.LaunchZoneAttack(location);
                 else InputManager.LaunchAttack(target);
             }

@@ -199,7 +199,7 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            Unit clickedUnit = World.Entities.GetTopmostUnitAt(point);
+            Entity clickedUnit = World.Entities.GetTopmostGridEntityAt(point);
             if (clickedUnit == null)
             {
                 Selection.Clear();
@@ -224,7 +224,7 @@ namespace Orion.Game.Presentation
             else
             {
                 Point point = (Point)args.Position;
-                hoveredEntity = World.IsWithinBounds(point) ? World.Entities.GetTopmostUnitAt(point) : null;
+                hoveredEntity = World.IsWithinBounds(point) ? World.Entities.GetTopmostGridEntityAt(point) : null;
             }
         }
 

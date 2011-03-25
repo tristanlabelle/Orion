@@ -385,7 +385,7 @@ namespace Orion.Game.Simulation
                     .WithMaxOrDefault(e => e.Spatial.CollisionLayer);
             }
 
-            public Unit GetTopmostUnitAt(Point point)
+            public Entity GetTopmostGridEntityAt(Point point)
             {
                 if (!world.IsWithinBounds(point))
                 {
@@ -393,7 +393,7 @@ namespace Orion.Game.Simulation
                     return null;
                 }
 
-                return airGrid[point] as Unit ?? groundGrid[point] as Unit;
+                return airGrid[point] ?? groundGrid[point];
             }
 
             /// <summary>

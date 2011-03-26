@@ -220,27 +220,27 @@
     </Noun>
     
     <!-- Stats -->
-    <Noun key="PowerStat">
+    <Noun key="Attacker.PowerStat">
         <Translation lang="en">Power</Translation>
         <Translation lang="fr">Force</Translation>
     </Noun>
-    <Noun key="ArmorStat">
+    <Noun key="Health.ArmorStat">
         <Translation lang="en">Armor</Translation>
         <Translation lang="fr">Armure</Translation>
     </Noun>
-    <Noun key="SpeedStat">
+    <Noun key="Mobile.SpeedStat">
         <Translation lang="en">Speed</Translation>
         <Translation lang="fr">Vitesse</Translation>
     </Noun>
-    <Noun key="RangeStat">
+    <Noun key="Attacker.RangeStat">
         <Translation lang="en">Attack Range</Translation>
         <Translation lang="fr">Portée d'attaque</Translation>
     </Noun>
-    <Noun key="ArmorTypeStat">
+    <Noun key="Health.ArmorTypeStat">
         <Translation lang="en">Armor Type</Translation>
         <Translation lang="fr">Type d'armure</Translation>
     </Noun>
-    <Noun key="SightRangeStat">
+    <Noun key="Vision.RangeStat">
         <Translation lang="en">Sight Range</Translation>
         <Translation lang="fr">Portée de vision</Translation>
     </Noun>

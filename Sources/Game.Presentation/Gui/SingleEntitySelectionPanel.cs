@@ -130,7 +130,7 @@ namespace Orion.Game.Presentation.Gui
                 float value = (float)entity.GetStatValue(stat);
                 if (value == 0) continue;
 
-                string statName = localizer.GetNoun(stat.Name + "Stat");
+                string statName = localizer.GetNoun(stat.FullName + "Stat");
                 Label headerLabel = Style.CreateLabel(statName + ":");
                 Label valueLabel = Style.CreateLabel(value.ToStringInvariant());
 

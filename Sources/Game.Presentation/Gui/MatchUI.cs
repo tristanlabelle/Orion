@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Data;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using Orion.Engine.Gui.Adornments;
+using Orion.Engine.Localization;
 using Orion.Game.Presentation.Actions;
-using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Key = OpenTK.Input.Key;
-using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -47,7 +41,11 @@ namespace Orion.Game.Presentation.Gui
         private ActionToolTip actionToolTip;
 
         private TimeSpan time;
-        private TimeSpan lastIdleWorkerCountChangedTime;
+
+        /// <summary>
+        /// The time at which a worker became idle.
+        /// </summary>
+        private TimeSpan workerIdledTime;
         private ActionButton lastActionButtonUnderMouse;
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
@@ -205,8 +203,14 @@ namespace Orion.Game.Presentation.Gui
                 if (value == IdleWorkerCount) return;
                 Argument.EnsurePositive(value, "InactiveWorkerCount");
 
+                if (value > 0 && idleWorkerCountLabel.Text == "0")
+                {
+                    // Only assign this when the counter's value becomes
+                    // nonzero to prevent the color animation to reset every time.
+                    workerIdledTime = time;
+                }
+
                 idleWorkerCountLabel.Text = value.ToStringInvariant();
-                lastIdleWorkerCountChangedTime = time;
             }
         }
 
@@ -349,7 +353,7 @@ namespace Orion.Game.Presentation.Gui
                 return;
             }
 
-            double timeElapsedInSeconds = time.TotalSeconds - lastIdleWorkerCountChangedTime.TotalSeconds;
+            double timeElapsedInSeconds = time.TotalSeconds - workerIdledTime.TotalSeconds;
             float intensity = (float)((0.2 + Math.Cos(timeElapsedInSeconds * 5) + 1) / 2 * 0.8);
 
             idleWorkerCountImageBox.Color = new ColorRgb(1, intensity, intensity);

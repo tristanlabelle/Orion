@@ -169,22 +169,25 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawEntity(GraphicsContext graphics, Entity entity)
         {
+            Spatial spatial = entity.Spatial;
+            if (spatial == null) return;
+
             Texture texture = gameGraphics.GetEntityTexture(entity);
 
-            Vector2 center = entity.Center;
+            Vector2 center = spatial.Center;
             center.Y += GetOscillation(entity) * 0.15f;
 
             float drawingAngle = GetDrawingAngle(entity);
             using (graphics.PushTransform(center, drawingAngle))
             {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, entity.Size.Width, entity.Size.Height);
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, spatial.Size.Width, spatial.Size.Height);
                 Faction faction = FactionMembership.GetFaction(entity);
                 graphics.Fill(localRectangle, texture, faction == null ? Colors.White : faction.Color);
             }
 
             if (entity.Components.Has<BuildProgress>())
             {
-                graphics.Fill(entity.BoundingRectangle, UnderConstructionTexture, Colors.White);
+                graphics.Fill(spatial.BoundingRectangle, UnderConstructionTexture, Colors.White);
             }
             else
             {
@@ -195,7 +198,7 @@ namespace Orion.Game.Presentation.Renderers
                 {
                     float fireTime = simulationTimeInSeconds + (entity.Handle.Value * fireSecondsPerFrame);
                     Texture fireTexture = fireAnimation.GetTextureFromTime(simulationTimeInSeconds);
-                    Rectangle fireRectangle = Rectangle.FromCenterSize(entity.Center, new Vector2(fireSize, fireSize));
+                    Rectangle fireRectangle = Rectangle.FromCenterSize(spatial.Center, new Vector2(fireSize, fireSize));
                     graphics.Fill(fireRectangle, fireTexture, new ColorRgba(1, 1, 1, fireAlpha));
                 }
             }
@@ -258,38 +261,38 @@ namespace Orion.Game.Presentation.Renderers
             for (int i = lasers.Count() - 1; i >= 0; i--)
             {
                 Laser laser = lasers[i];
+
                 Entity shooter = laser.Shooter;
-                Debug.Assert(shooter.Spatial == null, "Hitter has no Spatial component!");
-                if (shooter.Spatial.CollisionLayer != layer)
-                    continue;
+                Spatial shooterSpatial = shooter.Spatial;
+                Debug.Assert(shooterSpatial == null, "Hitter has no Spatial component!");
 
-                Attacker attacker = shooter.Components.Get<Attacker>();
-                if (attacker.TimeElapsedSinceLastHit > rangedShootTimeInSeconds)
-                    continue;
+                Spatial targetSpatial = laser.Target.Spatial;
 
-                float laserProgress = (World.LastSimulationStep.TimeInSeconds - laser.Time) / meleeHitSpinTimeInSeconds;
+                if (shooterSpatial.CollisionLayer != layer) continue;
 
-                Vector2 delta = laser.Target.Center - shooter.Center;
+                float laserProgress = (World.LastSimulationStep.TimeInSeconds - laser.Time) / rangedShootTimeInSeconds;
+
+                Vector2 delta = laser.Target.Center - shooterSpatial.Center;
                 if (laserProgress > 1)
                 {
                     lasers.RemoveAt(i);
                     continue;
                 }
 
-                if (!Rectangle.Intersects(shooter.BoundingRectangle, bounds)
-                    && !Rectangle.Intersects(laser.Target.BoundingRectangle, bounds))
+                if (!Rectangle.Intersects(shooterSpatial.BoundingRectangle, bounds)
+                    && !Rectangle.Intersects(targetSpatial.BoundingRectangle, bounds))
                     continue;
 
                 Vector2 normalizedDelta = Vector2.Normalize(delta);
                 float distance = delta.LengthFast;
 
-                Vector2 laserCenter = shooter.Center + normalizedDelta * laserProgress * distance;
+                Vector2 laserCenter = shooterSpatial.Center + normalizedDelta * laserProgress * distance;
                 if (!faction.CanSee(new Region((int)laserCenter.X, (int)laserCenter.Y, 1, 1)))
                     continue;
 
-                Vector2 laserStart = shooter.Center + (normalizedDelta
+                Vector2 laserStart = shooterSpatial.Center + (normalizedDelta
                     * Math.Max(0, laserProgress * distance - laserLength * 0.5f));
-                Vector2 laserEnd = shooter.Center + (normalizedDelta
+                Vector2 laserEnd = shooterSpatial.Center + (normalizedDelta
                     * Math.Min(distance, laserProgress * distance + laserLength * 0.5f));
 
                 LineSegment lineSegment = new LineSegment(laserStart, laserEnd);

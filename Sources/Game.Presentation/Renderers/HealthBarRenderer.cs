@@ -26,11 +26,12 @@ namespace Orion.Game.Presentation.Renderers
         #region Methods
         public static void Draw(GraphicsContext context, Entity entity)
         {
+            Spatial spatial = entity.Spatial;
             Health health = entity.Components.TryGet<Health>();
-            if (health == null) return;
+            if (spatial == null || health == null) return;
             
             float healthbarWidth = (float)Math.Log((int)entity.GetStatValue(Health.MaxValueStat));
-            Rectangle unitBoundingRectangle = entity.BoundingRectangle;
+            Rectangle unitBoundingRectangle = spatial.BoundingRectangle;
             float y = unitBoundingRectangle.CenterY - unitBoundingRectangle.Height * 0.75f;
             float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
             Draw(context, entity, new Vector2(x, y));

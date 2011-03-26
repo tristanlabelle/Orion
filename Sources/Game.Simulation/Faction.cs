@@ -368,7 +368,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
             int sightRange = (int)entity.GetStatValue(Vision.RangeStat);
-            Vector2 extent = entity.BoundingRectangle.Extent;
+            Vector2 extent = entity.Spatial.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
             Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);

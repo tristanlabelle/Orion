@@ -313,7 +313,7 @@ namespace Orion.Game.Simulation
 
             private void CommitMove(Entity entity, Vector2 oldPosition)
             {
-                Vector2 oldCenter = oldPosition + entity.BoundingRectangle.Extent;
+                Vector2 oldCenter = oldPosition + entity.Spatial.BoundingRectangle.Extent;
                 zoneManager.UpdateZone(entity, oldCenter);
             }
 
@@ -437,7 +437,7 @@ namespace Orion.Game.Simulation
             public IEnumerable<Entity> Intersecting(Circle area)
             {
                 return zoneManager.Intersecting(area.BoundingRectangle)
-                    .Where(entity => Intersection.Test(area, entity.BoundingRectangle));
+                    .Where(entity => Intersection.Test(area, entity.Spatial.BoundingRectangle));
             }
 
             public IEnumerable<Entity> Intersecting(Vector2 location)

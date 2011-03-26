@@ -61,8 +61,10 @@ namespace Orion.Game.Presentation.Renderers
 
             foreach (Entity entity in Selection)
             {
-                if (!Faction.CanSee(entity)) continue;
-                graphics.Stroke(entity.BoundingRectangle, selectionMarkerColor);
+                Spatial spatial = entity.Spatial;
+                if (spatial == null || !Faction.CanSee(entity)) continue;
+
+                graphics.Stroke(spatial.BoundingRectangle, selectionMarkerColor);
             }
         }
 

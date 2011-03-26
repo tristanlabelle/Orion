@@ -57,12 +57,13 @@ namespace Orion.Game.Presentation.Renderers
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
             Rectangle clippingBounds = viewBounds;
-            foreach (Entity entity in World.Entities.Where(e => e.Components.Has<Harvestable>()))
+            foreach (Entity entity in World.Entities)
             {
-                Spatial positionComponent = entity.Spatial;
-                Rectangle boundingRectangle = entity.BoundingRectangle;
-                if (!Rectangle.Intersects(clippingBounds, boundingRectangle)
-                    || !faction.HasPartiallySeen(positionComponent.GridRegion))
+                Spatial spatial = entity.Spatial;
+                if (spatial == null
+                    || !entity.Components.Has<Harvestable>()
+                    || !Rectangle.Intersects(clippingBounds, spatial.BoundingRectangle)
+                    || !faction.HasPartiallySeen(spatial.GridRegion))
                     continue;
 
                 drawDelegate(graphicsContext, entity);
@@ -71,19 +72,23 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawUnclipped(GraphicsContext graphicsContext, Entity resourceNode)
         {
-            Debug.Assert(resourceNode.Components.Has<Harvestable>(), "Entity is not a resource node!");
-            Harvestable harvestData = resourceNode.Components.Get<Harvestable>();
-            string resourceTypeName = harvestData.Type.ToStringInvariant();
+            Harvestable harvestable = resourceNode.Components.Get<Harvestable>();
+            Spatial spatial = resourceNode.Spatial;
+
+            string resourceTypeName = harvestable.Type.ToStringInvariant();
             Texture texture = gameGraphics.GetMiscTexture(resourceTypeName);
-            graphicsContext.Fill(resourceNode.BoundingRectangle, texture);
+
+            graphicsContext.Fill(spatial.BoundingRectangle, texture);
         }
 
         private void DrawMiniatureUnclipped(GraphicsContext graphicsContext, Entity resourceNode)
         {
-            Debug.Assert(resourceNode.Components.Has<Harvestable>(), "Entity is not a resource node!");
             Harvestable harvestData = resourceNode.Components.Get<Harvestable>();
+            Spatial spatial = resourceNode.Spatial;
+
             ColorRgb color = GetResourceColor(harvestData.Type);
-            graphicsContext.Fill(resourceNode.BoundingRectangle, color);
+
+            graphicsContext.Fill(spatial.BoundingRectangle, color);
         }
 
         public static ColorRgb GetResourceColor(ResourceType type)

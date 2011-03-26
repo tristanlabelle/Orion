@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,6 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Components;
 using FactionComponent = Orion.Game.Simulation.Components.FactionMembership;
-using System.Collections.Generic;
 
 namespace Orion.Game.Simulation
 {
@@ -139,14 +139,6 @@ namespace Orion.Game.Simulation
         public Vector2 Center
         {
             get { return new Vector2(Position.X + Size.Width * 0.5f, Position.Y + Size.Height * 0.5f); }
-        }
-
-        /// <summary>
-        /// Gets a <see cref="Rectangle"/> that bounds the physical representation of this <see cref="Entity"/>.
-        /// </summary>
-        public Rectangle BoundingRectangle
-        {
-            get { return new Rectangle(Position.X, Position.Y, Size.Width, Size.Height); }
         }
 
         /// <summary>

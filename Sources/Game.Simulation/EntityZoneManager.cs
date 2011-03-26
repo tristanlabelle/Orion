@@ -100,7 +100,7 @@ namespace Orion.Game.Simulation
                     for (int i = 0; i < zone.Count; ++i)
                     {
                         Entity entity = zone[i];
-                        if (Rectangle.Intersects(area, entity.BoundingRectangle))
+                        if (Rectangle.Intersects(area, entity.Spatial.BoundingRectangle))
                             yield return entity;
                     }
                 }

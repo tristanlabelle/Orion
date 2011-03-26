@@ -110,8 +110,9 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateRepair(SimulationStep step)
         {
+            Spatial targetSpatial = target.Spatial;
             Health targetHealth = target.Components.TryGet<Health>();
-            if (targetHealth == null) return;
+            if (targetSpatial == null || targetHealth == null) return;
 
             if (!TryGetCredit()) return;
 
@@ -149,10 +150,10 @@ namespace Orion.Game.Simulation.Tasks
             {
                 // Smells like a hack!
                 Entity node = World.Entities
-                    .Intersecting(target.BoundingRectangle)
+                    .Intersecting(targetSpatial.BoundingRectangle)
                     .Where(e => e.Components.Has<Harvestable>())
                     .Where(e => !e.Components.Get<Harvestable>().IsEmpty)
-                    .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
+                    .First(n => Region.Intersects(n.GridRegion, targetSpatial.GridRegion));
 
                 if (TaskQueue.Count == 1)
                     TaskQueue.OverrideWith(new HarvestTask(Entity, node));

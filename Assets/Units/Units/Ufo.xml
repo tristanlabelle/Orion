@@ -7,6 +7,7 @@
 		<Upgrades>
 			<Item>Mothership</Item>
 		</Upgrades>
+		<SpawnTime>100</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>2</FoodCost>

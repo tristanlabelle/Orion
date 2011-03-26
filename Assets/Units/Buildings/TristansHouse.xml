@@ -5,6 +5,7 @@
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>150</AladdiumCost>
 		<AlageneCost>50</AlageneCost>
+		<SpawnTime>200</SpawnTime>
 	</Identity>
 	
 	<Researcher>

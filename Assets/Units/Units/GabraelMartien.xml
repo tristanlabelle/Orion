@@ -3,6 +3,7 @@
 	<Identity>
 		<Name>GabraelMartien</Name>
 		<AladdiumCost>30</AladdiumCost>
+		<SpawnTime>30</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>1</FoodCost>

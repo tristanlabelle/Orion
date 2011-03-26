@@ -7,6 +7,7 @@
 		<Upgrades>
 			<Item>RaptorJesus</Item>
 		</Upgrades>
+		<SpawnTime>80</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>2</FoodCost>

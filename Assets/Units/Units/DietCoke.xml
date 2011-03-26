@@ -3,6 +3,7 @@
 	<Identity>
 		<Name>DietCoke</Name>
 		<AlageneCost>2000</AlageneCost>
+		<SpawnTime>160</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>5</FoodCost>

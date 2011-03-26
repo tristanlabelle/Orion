@@ -6,6 +6,7 @@
 		<Upgrades>
 			<Item>Anthrax</Item>
 		</Upgrades>
+		<SpawnTime>70</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>1</FoodCost>

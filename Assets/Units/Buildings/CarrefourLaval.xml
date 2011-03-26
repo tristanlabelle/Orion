@@ -4,6 +4,7 @@
 		<Name>CarrefourLaval</Name>
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>140</AladdiumCost>
+		<SpawnTime>300</SpawnTime>
 	</Identity>
 	
 	<Trainer>

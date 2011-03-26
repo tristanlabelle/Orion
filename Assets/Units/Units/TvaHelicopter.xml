@@ -4,6 +4,7 @@
 		<Name>TvaHelicopter</Name>
 		<AladdiumCost>25</AladdiumCost>
 		<AlageneCost>25</AlageneCost>
+		<SpawnTime>75</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>1</FoodCost>

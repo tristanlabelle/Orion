@@ -4,6 +4,7 @@
 		<Name>HellsCostco</Name>
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>80</AladdiumCost>
+		<SpawnTime>100</SpawnTime>
 	</Identity>
 	
 	<ResourceDepot/>

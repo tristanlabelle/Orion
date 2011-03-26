@@ -3,6 +3,7 @@
 	<Identity>
 		<Name>Mentos</Name>
 		<AladdiumCost>2000</AladdiumCost>
+		<SpawnTime>160</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>5</FoodCost>

@@ -5,6 +5,7 @@
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>100</AladdiumCost>
 		<AlageneCost>25</AlageneCost>
+		<SpawnTime>100</SpawnTime>
 	</Identity>
 	
 	<Health>

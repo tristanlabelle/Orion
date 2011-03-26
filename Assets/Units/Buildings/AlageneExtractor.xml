@@ -4,6 +4,7 @@
 		<Name>AlageneExtractor</Name>
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>75</AladdiumCost>
+		<SpawnTime>75</SpawnTime>
 	</Identity>
 	
 	<AlageneExtractor/>

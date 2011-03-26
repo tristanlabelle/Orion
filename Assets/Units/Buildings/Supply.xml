@@ -4,6 +4,7 @@
 		<Name>Supply</Name>
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>50</AladdiumCost>
+		<SpawnTime>80</SpawnTime>
 	</Identity>
 	
 	<FactionMembership>

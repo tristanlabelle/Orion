@@ -5,6 +5,7 @@
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>120</AladdiumCost>
 		<AlageneCost>40</AlageneCost>
+		<SpawnTime>120</SpawnTime>
 		<Upgrades>
 			<Item>
 				<Target>BritishJeanMarc</Target>

@@ -3,6 +3,7 @@
 	<Identity>
 		<Name>BritishJeanMarc</Name>
 		<IsBuilding>True</IsBuilding>
+		<SpawnTime>220</SpawnTime>
 	</Identity>
 	
 	<Attacker>

@@ -8,6 +8,7 @@
 			<Item>BlueCollarSmurf</Item>
 			<Item>Smurfette</Item>
 		</Upgrades>
+		<SpawnTime>20</SpawnTime>
 	</Identity>
 	
 	<FactionMembership>

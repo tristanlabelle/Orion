@@ -4,6 +4,7 @@
 		<Name>Pyramid</Name>
 		<IsBuilding>True</IsBuilding>
 		<AladdiumCost>250</AladdiumCost>
+		<SpawnTime>400</SpawnTime>
 	</Identity>
 	
 	<FactionMembership>

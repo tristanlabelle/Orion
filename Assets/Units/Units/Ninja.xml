@@ -7,6 +7,7 @@
 		<Upgrades>
 			<Item>Leonardo</Item>
 		</Upgrades>
+		<SpawnTime>40</SpawnTime>
 	</Identity>
 	<FactionMembership>
 		<FoodCost>2</FoodCost>

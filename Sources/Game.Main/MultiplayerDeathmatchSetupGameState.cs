@@ -189,13 +189,13 @@ namespace Orion.Game.Main
             OnEntered();
         }
 
-        protected internal override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(TimeSpan timeDelta)
         {
-            Graphics.UpdateGui(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDelta);
             networking.Poll();
             if (IsHost)
             {
-                elapsedTimeSinceLastAdvertize += TimeSpan.FromSeconds(timeDeltaInSeconds);
+                elapsedTimeSinceLastAdvertize += timeDelta;
                 if (elapsedTimeSinceLastAdvertize > advertizePeriod)
                 {
                     elapsedTimeSinceLastAdvertize = TimeSpan.Zero;

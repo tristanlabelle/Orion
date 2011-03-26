@@ -238,11 +238,11 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Updates the user interface for a frame, allowing it to process queued input.
         /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the previous frame, in seconds.</param>
-        public void UpdateGui(float timeDeltaInSeconds)
+        /// <param name="timeDelta">The time elapsed since the previous frame.</param>
+        public void UpdateGui(TimeSpan timeDelta)
         {
             DispatchInputEvents();
-            uiManager.Update(TimeSpan.FromSeconds(timeDeltaInSeconds));
+            uiManager.Update(timeDelta);
         }
 
         /// <summary>

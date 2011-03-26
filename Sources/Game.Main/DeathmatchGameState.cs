@@ -150,14 +150,16 @@ namespace Orion.Game.Main
             OnEntered();
         }
 
-        protected internal override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(TimeSpan timeDelta)
         {
+            float secondsElapsed = (float)timeDelta.TotalSeconds;
+
             if (match.IsRunning)
             {
                 SimulationStep step = new SimulationStep(
                     lastSimulationStep.Number + 1,
-                    lastSimulationStep.TimeInSeconds + timeDeltaInSeconds,
-                    timeDeltaInSeconds);
+                    lastSimulationStep.TimeInSeconds + secondsElapsed,
+                    secondsElapsed);
 
                 match.World.Update(step);
 
@@ -166,26 +168,26 @@ namespace Orion.Game.Main
 
             commandPipeline.Update(lastSimulationStep);
 
-            Graphics.UpdateGui(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDelta);
 
-            UpdateCamera(timeDeltaInSeconds);
+            UpdateCamera(timeDelta);
             audioPresenter.SetViewBounds(camera.ViewBounds);
         }
 
-        private void UpdateCamera(float timeDeltaInSeconds)
+        private void UpdateCamera(TimeSpan timeDelta)
        { 
             Entity firstSelectedEntity = Selection.FirstOrDefault();
             if (ui.IsFollowingSelection && firstSelectedEntity != null)
-        {
+            {
                 camera.ScrollDirection = Point.Zero;
                 camera.Target = firstSelectedEntity.Position;
-        }
+            }
             else
             {
                 camera.ScrollDirection = ui.ScrollDirection;
             }
 
-            camera.Update(timeDeltaInSeconds);
+            camera.Update(timeDelta);
         }
 
         protected internal override void Draw(GameGraphics Graphics)

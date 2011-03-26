@@ -84,7 +84,7 @@ namespace Orion.Game.Main
 
                     while (timeAccumulator >= TargetSecondsPerFrame)
                     {
-                        gameStateManager.Update(TargetSecondsPerFrame);
+                        gameStateManager.Update(TimeSpan.FromSeconds(TargetSecondsPerFrame));
                         updateRateCounter.Update();
 
                         gameTime += TargetSecondsPerFrame;

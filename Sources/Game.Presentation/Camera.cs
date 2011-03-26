@@ -127,18 +127,20 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Updates this <see cref="Camera"/> for a frame.
         /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
-        public void Update(float timeDeltaInSeconds)
+        /// <param name="timeDelta">The time elapsed since the last frame.</param>
+        public void Update(TimeSpan timeDelta)
         {
+            float secondsElapsed = (float)timeDelta.TotalSeconds;
+
             if (currentZoomLevel != targetZoomLevel)
             {
                 int interpolationSign = Math.Sign(targetZoomLevel - currentZoomLevel);
-                currentZoomLevel += interpolationSign * zoomLevelInterpolationSpeed * timeDeltaInSeconds;
+                currentZoomLevel += interpolationSign * zoomLevelInterpolationSpeed * secondsElapsed;
                 if (Math.Sign(targetZoomLevel - currentZoomLevel) != interpolationSign)
                     currentZoomLevel = targetZoomLevel;
             }
 
-            target += new Vector2(scrollDirection.X, scrollDirection.Y) * timeDeltaInSeconds * ScrollSpeed;
+            target += new Vector2(scrollDirection.X, scrollDirection.Y) * secondsElapsed * ScrollSpeed;
             target = new Rectangle(worldSize.Width, worldSize.Height).Clamp(target);
         }
 

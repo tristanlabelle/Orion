@@ -252,13 +252,12 @@ namespace Orion.Game.Simulation
 
         protected virtual void OnMoved(Vector2 oldPosition, Vector2 newPosition)
         {
-#if DEBUG
             if (isDead)
             {
                 // #if'd so the FormatInvariant is not executed in release.
                 Debug.Fail("{0} is dead and yet moves.".FormatInvariant(this));
             }
-#endif
+
             var handler = Moved;
             if (handler != null) handler(this, oldPosition, newPosition);
             world.OnEntityMoved(this, oldPosition, newPosition);

@@ -64,10 +64,10 @@ namespace Orion.Game.Main
             lobby.Enable();
         }
 
-        protected internal override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(TimeSpan timeDelta)
         {
             lobby.Update();
-            graphics.UpdateGui(timeDeltaInSeconds);
+            graphics.UpdateGui(timeDelta);
         }
 
         protected internal override void Draw(GameGraphics graphics)

@@ -55,7 +55,7 @@ namespace Orion.Game.Simulation.Utilities
 
         public IEnumerable<Entity> ActiveWorkers
         {
-            get { return activeWorkers.Cast<Entity>(); }
+            get { return activeWorkers; }
         }
 
         [PropertyChangedEvent("WorkerActivityStateChanged")]

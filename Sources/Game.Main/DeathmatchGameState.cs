@@ -309,7 +309,7 @@ namespace Orion.Game.Main
         {
             if (workerActivityMonitor.InactiveWorkerCount == 0) return;
 
-            var inactiveWorkers = workerActivityMonitor.InactiveWorkers.Cast<Entity>();
+            var inactiveWorkers = workerActivityMonitor.InactiveWorkers;
 
             if (all)
             {

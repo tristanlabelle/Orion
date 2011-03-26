@@ -463,11 +463,6 @@ namespace Orion.Game.Simulation
             #endregion
             #endregion
             #endregion
-
-            internal object Where(Func<Entity, int, bool> func)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

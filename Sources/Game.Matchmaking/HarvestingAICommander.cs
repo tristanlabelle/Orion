@@ -183,7 +183,7 @@ namespace Orion.Game.Matchmaking
         
         private void UpdateDefense(ref ResourceAmount budget)
         {
-            var firstUnthreatenedVisibleEnemy = World.Entities.OfType<Entity>()
+            var firstUnthreatenedVisibleEnemy = World.Entities
                 .FirstOrDefault(u => Faction.CanSee(u)
                     && buildings.None(b => Identity.GetPrototype(b) == defenseTowerPrototype && (b.Center - u.Center).LengthFast < 5));
             if (firstUnthreatenedVisibleEnemy == null) return;
@@ -276,7 +276,6 @@ namespace Orion.Game.Matchmaking
                 // Find a nearby depot;
                 nodeData.NearbyDepot = World.Entities
                     .Intersecting(new Circle(node.Center, maximumResourceDepotDistance))
-                    .OfType<Entity>()
                     .Where(u => FactionMembership.GetFaction(u) == Faction && u.Components.Has<ResourceDepot>())
                     .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;

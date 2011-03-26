@@ -52,7 +52,7 @@ namespace Orion.Game.Simulation.IO
             foreach (Entity node in concreteResourceNodes)
             {
                 Harvestable harvestData = node.Components.Get<Harvestable>();
-                ResourceNodeTemplate template = new ResourceNodeTemplate(harvestData.Type, Point.Truncate(node.Position), harvestData.AmountRemaining);
+                ResourceNodeTemplate template = new ResourceNodeTemplate(harvestData.Type, Point.Truncate(node.Position), harvestData.Amount);
                 resourceNodes.Add(template);
             }
 

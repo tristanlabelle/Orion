@@ -163,7 +163,7 @@ namespace Orion.Game.Simulation
                 node.Components.Add(identity);
 
                 Harvestable harvestableComponent = new Harvestable(node);
-                harvestableComponent.AmountRemaining = World.DefaultResourceAmount;
+                harvestableComponent.Amount = World.DefaultResourceAmount;
                 harvestableComponent.Type = type;
                 node.Components.Add(harvestableComponent);
 

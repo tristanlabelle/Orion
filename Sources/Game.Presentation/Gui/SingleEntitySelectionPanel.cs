@@ -191,7 +191,7 @@ namespace Orion.Game.Presentation.Gui
             else if (harvestable != null)
             {
                 newMaxAmount = World.DefaultResourceAmount;
-                newAmount = harvestable.AmountRemaining;
+                newAmount = harvestable.Amount;
             }
 
             if (newAmount != currentAmount || newMaxAmount != currentMaxAmount)

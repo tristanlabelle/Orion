@@ -7,34 +7,40 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Harvestable : Component
+    /// <summary>
+    /// A component which enables <see cref="Entity">entities</see> to
+    /// be harvested for resources.
+    /// </summary>
+    public sealed class Harvestable : Component
     {
         #region Fields
-        public static readonly Stat HarvestRateStat = new Stat(typeof(Harvestable), StatType.Real, "HarvestRate");
-
-        private int resourceAmount;
+        private int amount = 1;
         private ResourceType type;
         #endregion
 
         #region Constructors
-        public Harvestable(Entity e)
-            : base(e)
-        { }
+        public Harvestable(Entity entity) : base(entity) { }
         #endregion
 
         #region Events
-        public event Action<Entity> RemainingAmountChanged;
+        /// <summary>
+        /// Raised when the amount of resources available in this node changes.
+        /// </summary>
+        public event Action<Entity> AmountChanged;
         #endregion
 
         #region Properties
         [Mandatory]
-        public int AmountRemaining
+        public int Amount
         {
-            get { return resourceAmount; }
+            get { return amount; }
             set
             {
-                resourceAmount = value;
-                RemainingAmountChanged.Raise(Entity);
+                Argument.EnsurePositive(value, "Amount");
+                if (value == amount) return;
+
+                amount = value;
+                AmountChanged.Raise(Entity);
             }
         }
 
@@ -48,14 +54,14 @@ namespace Orion.Game.Simulation.Components
         [Transient]
         public bool IsEmpty
         {
-            get { return resourceAmount == 0; }
+            get { return amount == 0; }
         }
         #endregion
 
         #region Methods
         public void Harvest(int amount)
         {
-            AmountRemaining -= amount;
+            Amount = Math.Max(0, this.amount - amount);
         }
         #endregion
     }

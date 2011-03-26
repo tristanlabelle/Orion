@@ -1,19 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="TristansHouse" Width="3" Height="3">
-	<Skills>
-		<Basic SightRange="4" MaxHealth="200" ArmorType="Heavy" Armor="3" AladdiumCost="150" AlageneCost="50"/>
-		<Research>
-			<Target>SwiftSmurf</Target>
-			<Target>ImportJeanMarc</Target>
-			<Target>HolyTrinity</Target>
-			<Target>HeftySmurf</Target>
-			<Target>SpaghettiAlfredo</Target>
-			<Target>IslamForce</Target>
-			<Target>Pandemic</Target>
-		</Research>
-		<Train Speed="10">
-			<Target>Mentos</Target>
-			<Target>DietCoke</Target>
-		</Train>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>TristansHouse</Name>
+		<IsBuilding>True</IsBuilding>
+		<AladdiumCost>150</AladdiumCost>
+		<AlageneCost>50</AlageneCost>
+	</Identity>
+	
+	<Researcher>
+		<Technologies>
+			<Item>SwiftSmurf</Item>
+			<Item>ImportJeanMarc</Item>
+			<Item>HolyTrinity</Item>
+			<Item>HeftySmurf</Item>
+			<Item>SpaghettiAlfredo</Item>
+			<Item>IslamForce</Item>
+			<Item>Pandemic</Item>
+		</Technologies>
+	</Researcher>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>200</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
+</Entity>

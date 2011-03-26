@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="2012Temple" Width="3" Height="3">
-	<Skills>
-		<Basic SightRange="8" MaxHealth="200" ArmorType="Heavy" Armor="3" AladdiumCost="150"/>
-		<Train Speed="10">
-			<Target>Pirate</Target>
-			<Target>Ninja</Target>
-			<Target>Viking</Target>
-		</Train>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>2012Temple</Name>
+		<IsBuilding>True</IsBuilding>
+		<AladdiumCost>150</AladdiumCost>
+	</Identity>
+	
+	<Trainer>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>Pirate</Item>
+			<Item>Ninja</Item>
+			<Item>Viking</Item>
+		</TrainableTypes>
+	</Trainer>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>200</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
+</Entity>

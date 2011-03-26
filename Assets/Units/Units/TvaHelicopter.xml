@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="TvaHelicopter" Width="2" Height="2" IsAirborne="True">
-	<Skills>
-		<Basic SightRange="12" MaxHealth="75" ArmorType="Light" Armor="1" AladdiumCost="25" AlageneCost="25" FoodCost="1"/>
-		<Move Speed="15"/>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>TvaHelicopter</Name>
+		<AladdiumCost>25</AladdiumCost>
+		<AlageneCost>25</AlageneCost>
+	</Identity>
+	<FactionMembership>
+		<FoodCost>1</FoodCost>
+	</FactionMembership>
+	<Health>
+		<MaxValue>75</MaxValue>
+		<ArmorType>Light</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	<Mobile>
+		<Speed>15</Speed>
+		
+	</Mobile>
+	<Spatial>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	<Vision>
+		<Range>12</Range>
+	</Vision>
+	<Tags/>
+</Entity>

@@ -1,21 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="BlueCollarSmurf" VoicesTemplate="Smurf" Width="1" Height="1" IsSuicidable="False">
-	<Skills>
-		<Basic SightRange="3" MaxHealth="50" ArmorType="Light" Armor="0" FoodCost="5"/>
-		<Move Speed="2"/>
-		<Attack Power="1" Range="0" Delay="10" EffectiveAgainst="" IneffectiveAgainst=""/>
-		<Build Speed="2">
-			<Target>Pyramid</Target>
-			<Target>2012Temple</Target>
-			<Target>DemonicPortal</Target>
-			<Target>PropagandaCenter</Target>
-			<Target>TristansHouse</Target>
-			<Target>JeanMarc</Target>
-			<Target>SauronsEye</Target>
-			<Target>AlageneExtractor</Target>
-			<Target>Supply</Target>
-			<Target>HellsCostco</Target>
-			<Target>CarrefourLaval</Target>
-		</Build>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>BlueCollarSmurf</Name>
+		<AladdiumCost>50</AladdiumCost>
+		<SoundIdentity>Smurf</SoundIdentity>
+	</Identity>
+	
+	<FactionMembership>
+		<FoodCost>5</FoodCost>
+	</FactionMembership>
+	
+	<Attacker>
+		<Power>1</Power>
+		<Range>0</Range>
+		<Delay>10</Delay>
+	</Attacker>
+	
+	<Builder>
+		<Speed>2</Speed>
+		<BuildableTypes>
+			<Item>Pyramid</Item>
+			<Item>2012Temple</Item>
+			<Item>DemonicPortal</Item>
+			<Item>PropagandaCenter</Item>
+			<Item>TristansHouse</Item>
+			<Item>JeanMarc</Item>
+			<Item>SauronsEye</Item>
+			<Item>AlageneExtractor</Item>
+			<Item>Supply</Item>
+			<Item>HellsCostco</Item>
+			<Item>CarrefourLaval</Item>
+		</BuildableTypes>
+	</Builder>
+	
+	<Health>
+		<MaxValue>50</MaxValue>
+		<ArmorType>Light</ArmorType>
+		<Armor>0</Armor>
+	</Health>
+	
+	<Mobile>
+		<Speed>2</Speed>
+		
+	</Mobile>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+	</Spatial>
+	<Vision>
+		<Range>3</Range>
+	</Vision>
+	
+	<Tags>
+		<List>
+			<Item>worker</Item>
+		</List>
+	</Tags>
+</Entity>

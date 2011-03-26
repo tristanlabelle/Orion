@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Mentos" Width="1" Height="1">
-	<Skills>
-		<Basic SightRange="3" MaxHealth="160" ArmorType="Supernatural" Armor="4" AladdiumCost="2000" FoodCost="5"/>
-		<Move Speed="3"/>
-		<SuicideBomb Radius="10" Damage="400">
+<Entity>
+	<Identity>
+		<Name>Mentos</Name>
+		<AladdiumCost>2000</AladdiumCost>
+	</Identity>
+	<FactionMembership>
+		<FoodCost>5</FoodCost>
+	</FactionMembership>
+	<Kamikaze>
+		<Radius>10</Radius>
+		<Damage>400</Damage>
+		<Targets>
 			<Target>DietCoke</Target>
-		</SuicideBomb>
-	</Skills>
-</UnitType>
+		</Targets>
+	</Kamikaze>
+	<Health>
+		<MaxValue>160</MaxValue>
+		<ArmorType>Supernatural</ArmorType>
+		<Armor>4</Armor>
+	</Health>
+	<Mobile>
+		<Speed>3</Speed>
+		
+	</Mobile>
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+	</Spatial>
+	<Vision>
+		<Range>3</Range>
+	</Vision>
+	<Tags/>
+</Entity>

@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Mothership" Width="3" Height="3" IsAirborne="True">
-	<Skills>
-		<Basic SightRange="10" MaxHealth="250" ArmorType="Heavy" Armor="8" FoodCost="2"/>
-		<Move Speed="6"/>
-		<Attack Power="30" Range="8" Delay="3" EffectiveAgainst="Light" IneffectiveAgainst=""/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="ChuckNorris" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Mothership</Name>
+		<Upgrades>
+			<Item>ChuckNorris</Item>
+		</Upgrades>
+		<SoundIdentity>FlyingSpaghettiMonster</SoundIdentity>
+	</Identity>
+	<FactionMembership>
+		<FoodCost>2</FoodCost>
+	</FactionMembership>
+	<Attacker>
+		<Power>30</Power>
+		<Range>8</Range>
+		<Delay>3</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Light</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Light armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attacker>
+	<Health>
+		<MaxValue>250</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>8</Armor>
+	</Health>
+	<Mobile>
+		<Speed>6</Speed>
+		
+	</Mobile>
+	<Spatial>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+	<Vision>
+		<Range>10</Range>
+	</Vision>
+	<Tags/>
+</Entity>

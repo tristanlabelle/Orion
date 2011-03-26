@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="HellsCostco" Width="2" Height="2">
-	<Skills>
-		<Basic SightRange="4" MaxHealth="100" ArmorType="Heavy" Armor="2" AladdiumCost="80"/>
-		<StoreResources/>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>HellsCostco</Name>
+		<IsBuilding>True</IsBuilding>
+		<AladdiumCost>80</AladdiumCost>
+	</Identity>
+	
+	<ResourceDepot/>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>100</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
+</Entity>

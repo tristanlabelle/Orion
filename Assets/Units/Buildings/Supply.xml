@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Supply" Width="2" Height="2">
-	<Skills>
-		<Basic SightRange="4" MaxHealth="80" ArmorType="Heavy" Armor="2" AladdiumCost="50"/>
-		<ProvideFood Amount="10"/>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Supply</Name>
+		<IsBuilding>True</IsBuilding>
+		<AladdiumCost>50</AladdiumCost>
+	</Identity>
+	
+	<FactionMembership>
+		<ProvidedFood>10</ProvidedFood>
+	</FactionMembership>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>80</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
+</Entity>

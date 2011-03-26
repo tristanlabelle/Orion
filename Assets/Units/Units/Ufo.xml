@@ -1,11 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Ufo" Width="2" Height="2" IsAirborne="True">
-	<Skills>
-		<Basic SightRange="10" MaxHealth="100" ArmorType="Heavy" Armor="3" AladdiumCost="140" AlageneCost="140" FoodCost="2"/>
-		<Move Speed="8"/>
-		<Attack Power="7" Range="8" Delay="3" EffectiveAgainst="Heavy" IneffectiveAgainst=""/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Mothership" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Ufo</Name>
+		<AladdiumCost>140</AladdiumCost>
+		<AlageneCost>140</AlageneCost>
+		<Upgrades>
+			<Item>Mothership</Item>
+		</Upgrades>
+	</Identity>
+	<FactionMembership>
+		<FoodCost>2</FoodCost>
+	</FactionMembership>
+	<Attacker>
+		<Power>7</Power>
+		<Range>8</Range>
+		<Delay>3</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Heavy</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Heavy armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attacker>
+	<Health>
+		<MaxValue>100</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	<Mobile>
+		<Speed>8</Speed>
+		
+	</Mobile>
+	<Spatial>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	<Vision>
+		<Range>10</Range>
+	</Vision>
+	<Tags/>
+</Entity>

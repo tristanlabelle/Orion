@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="CarrefourLaval" Width="4" Height="4">
-	<Skills>
-		<Basic SightRange="10" MaxHealth="300" ArmorType="Heavy" Armor="4" AladdiumCost="140"/>
-		<Train Speed="10">
-			<Target>GabraelMartien</Target>
-		</Train>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>CarrefourLaval</Name>
+		<IsBuilding>True</IsBuilding>
+		<AladdiumCost>140</AladdiumCost>
+	</Identity>
+	
+	<Trainer>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>GabraelMartien</Item>
+		</TrainableTypes>
+	</Trainer>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>300</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>4</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>4</Width>
+			<Height>4</Height>
+		</Size>
+	</Spatial>
+	
+	<Vision>
+		<Range>10</Range>
+	</Vision>
+</Entity>

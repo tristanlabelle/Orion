@@ -29,8 +29,6 @@ namespace Orion.Game.Simulation.Components
         private float delay = 1;
         private float splashRadius;
         private float timeElapsedSinceLastHit = float.PositiveInfinity;
-        private readonly HashSet<ArmorType> superEffectiveTargets = new HashSet<ArmorType>();
-        private readonly HashSet<ArmorType> ineffectiveTargets = new HashSet<ArmorType>();
         private readonly List<DamageFilter> damageFilters = new List<DamageFilter>();
         #endregion
 
@@ -110,18 +108,6 @@ namespace Orion.Game.Simulation.Components
         public bool Splashes
         {
             get { return splashRadius > 0; }
-        }
-
-        [Persistent]
-        public ICollection<ArmorType> SuperEffectiveTargets
-        {
-            get { return superEffectiveTargets; }
-        }
-
-        [Persistent]
-        public ICollection<ArmorType> IneffectiveTargets
-        {
-            get { return ineffectiveTargets; }
         }
 
         [Persistent]
@@ -272,9 +258,11 @@ namespace Orion.Game.Simulation.Components
             Argument.EnsureNotNull(targetHealth, "targetHealth");
 
             float damage = (float)Entity.GetStatValue(PowerStat);
-            
-            if (superEffectiveTargets.Contains(targetHealth.ArmorType)) damage *= 2;
-            if (ineffectiveTargets.Contains(targetHealth.ArmorType)) damage /= 2;
+            foreach (DamageFilter filter in damageFilters)
+            {
+                if (filter.Applies(targetHealth.Entity))
+                    damage += filter.AdditionalDamage;
+            }
 
             damage -= targetHealth.Armor;
 

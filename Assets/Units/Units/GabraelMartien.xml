@@ -1,8 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="GabraelMartien" Width="1" Height="1">
-	<Skills>
-		<Basic SightRange="5" MaxHealth="30" ArmorType="Supernatural" Armor="1" AladdiumCost="30" FoodCost="1"/>
-		<Move Speed="8"/>
-		<Attack Power="1" Range="0" Delay="1" EffectiveAgainst="" IneffectiveAgainst="Light Heavy Supernatural"/>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>GabraelMartien</Name>
+		<AladdiumCost>30</AladdiumCost>
+	</Identity>
+	<FactionMembership>
+		<FoodCost>1</FoodCost>
+	</FactionMembership>
+	<Attacker>
+		<Power>1</Power>
+		<Range>0</Range>
+		<Delay>1</Delay>
+	</Attacker>
+	<Health>
+		<MaxValue>30</MaxValue>
+		<ArmorType>Supernatural</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	<Mobile>
+		<Speed>8</Speed>
+		
+	</Mobile>
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+	</Spatial>
+	<Vision>
+		<Range>5</Range>
+	</Vision>
+	<Tags/>
+</Entity>

@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation
         {
             uint handle = 0;
             XmlDeserializer deserializer = new XmlDeserializer(() => new Handle(handle++));
-            foreach (string filePath in assets.EnumerateFiles("NewWorldUnits", "*.xml", SearchOption.AllDirectories))
+            foreach (string filePath in assets.EnumerateFiles("Units", "*.xml", SearchOption.AllDirectories))
             {
                 try
                 {

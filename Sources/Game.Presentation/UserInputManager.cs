@@ -313,10 +313,13 @@ namespace Orion.Game.Presentation
         {
             if (target.Components.Has<Harvestable>())
             {
-                if (LocalFaction.CanHarvest(target))
+                if (LocalFaction.CanHarvest(target) && Selection.Any(entity => entity.Components.Has<Harvester>()))
                     LaunchHarvest(target);
-                else
+                else if (Selection.Any(entity => entity.Components.Has<Mobile>()))
                     LaunchMove(target.Position);
+                else
+                    LaunchChangeRallyPoint(target.Center);
+
                 return;
             }
 

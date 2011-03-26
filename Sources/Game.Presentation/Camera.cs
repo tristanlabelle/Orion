@@ -17,12 +17,14 @@ namespace Orion.Game.Presentation
         private const float defaultTileSizeInPixels = 32;
         private const float defaultScrollSpeed = 40;
         private const int maximumZoomLevel = 4;
+        private const float zoomLevelInterpolationSpeed = 5;
 
         private Size worldSize;
         private Size viewportSize;
         private Vector2 target;
         private Point scrollDirection;
-        private int zoomLevel;
+        private int targetZoomLevel;
+        private float currentZoomLevel;
         #endregion
 
         #region Constructors
@@ -75,12 +77,12 @@ namespace Orion.Game.Presentation
         /// </summary>
         public int ZoomLevel
         {
-            get { return zoomLevel; }
+            get { return targetZoomLevel; }
             set
             {
                 if (value < MinimumZoomLevel) value = MinimumZoomLevel;
                 if (value > maximumZoomLevel) value = maximumZoomLevel;
-                zoomLevel = value;
+                targetZoomLevel = value;
             }
         }
 
@@ -91,7 +93,7 @@ namespace Orion.Game.Presentation
 
         private float ZoomScale
         {
-            get { return (float)Math.Pow(2, zoomLevel / 2.0); }
+            get { return (float)Math.Pow(2, currentZoomLevel / 2.0); }
         }
 
         private float TileSizeInPixels
@@ -111,7 +113,7 @@ namespace Orion.Game.Presentation
         /// </summary>
         public void ZoomIn()
         {
-            if (zoomLevel < maximumZoomLevel) zoomLevel++;
+            if (targetZoomLevel < maximumZoomLevel) targetZoomLevel++;
         }
 
         /// <summary>
@@ -119,7 +121,7 @@ namespace Orion.Game.Presentation
         /// </summary>
         public void ZoomOut()
         {
-            if (zoomLevel > MinimumZoomLevel) zoomLevel--;
+            if (targetZoomLevel > MinimumZoomLevel) targetZoomLevel--;
         }
 
         /// <summary>
@@ -128,6 +130,14 @@ namespace Orion.Game.Presentation
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
         public void Update(float timeDeltaInSeconds)
         {
+            if (currentZoomLevel != targetZoomLevel)
+            {
+                int interpolationSign = Math.Sign(targetZoomLevel - currentZoomLevel);
+                currentZoomLevel += interpolationSign * zoomLevelInterpolationSpeed * timeDeltaInSeconds;
+                if (Math.Sign(targetZoomLevel - currentZoomLevel) != interpolationSign)
+                    currentZoomLevel = targetZoomLevel;
+            }
+
             target += new Vector2(scrollDirection.X, scrollDirection.Y) * timeDeltaInSeconds * ScrollSpeed;
             target = new Rectangle(worldSize.Width, worldSize.Height).Clamp(target);
         }

@@ -127,13 +127,27 @@ namespace Orion.Game.Simulation
             /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Entity"/>.</param>
             /// <param name="point">The initial position of the <see cref="Entity"/> to be created.</param>
             /// <returns>The newly created <see cref="Entity"/>.</returns>
-            internal Unit CreateUnit(Entity prototype, Faction faction, Point point)
+            internal Entity CreateUnit(Entity prototype, Faction faction, Point point)
             {
-                Handle handle = handleGenerator();
-                Unit unit = new Unit(handle, prototype, faction, point);
-                Add(unit);
+                Argument.EnsureNotNull(prototype, "faction");
+                Argument.EnsureNotNull(faction, "faction");
 
-                return unit;
+                Entity entity = CreateEntity();
+                entity.SpecializeWithPrototype(prototype);
+
+                FactionMembership membership = entity.Components.TryGet<FactionMembership>();
+                if (membership == null)
+                {
+                    membership = new FactionMembership(entity);
+                    entity.Components.Add(membership);
+                }
+                membership.Faction = faction;
+
+                entity.Components.Get<Spatial>().Position = point;
+                entity.Components.Add(new TaskQueue(entity));
+                Add(entity);
+
+                return entity;
             }
 
             internal Entity CreateEntity()

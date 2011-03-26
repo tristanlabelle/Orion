@@ -156,7 +156,6 @@
     <Compile Include="Technologies\TechnologyTree.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="TileVisibility.cs" />
-    <Compile Include="Unit.cs" />
     <Compile Include="World.EntityCollection.cs" />
     <Compile Include="PrototypeRegistry.cs" />
     <Compile Include="Utilities\WorkerActivityMonitor.cs" />

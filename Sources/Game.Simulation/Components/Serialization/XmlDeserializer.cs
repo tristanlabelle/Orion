@@ -40,7 +40,7 @@ namespace Orion.Game.Simulation.Components.Serialization
         /// <param name="filePath">The path of the XML document</param>
         /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded</param>
         /// <returns>An Entity object with the specs from the XML file</returns>
-        public Unit DeserializeEntity(string filePath, bool persistentOnly)
+        public Entity DeserializeEntity(string filePath, bool persistentOnly)
         {
             XmlDocument document = new XmlDocument();
             document.Load(filePath);
@@ -54,11 +54,11 @@ namespace Orion.Game.Simulation.Components.Serialization
         /// <param name="filePath">The path of the XML document</param>
         /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded</param>
         /// <returns>An Entity object with the specs from the XML file</returns>
-        public Unit DeserializeEntity(XmlElement entityElement, bool persistentOnly)
+        public Entity DeserializeEntity(XmlElement entityElement, bool persistentOnly)
         {
             Debug.Assert(entityElement.Name == "Entity");
 
-            Unit entity = new Unit(handleGenerator());
+            Entity entity = new Entity(handleGenerator());
             Type baseComponentType = typeof(Component);
             Assembly componentAssembly = baseComponentType.Assembly;
             object[] constructorArguments = new object[] { entity };

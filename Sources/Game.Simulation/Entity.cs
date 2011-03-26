@@ -194,6 +194,15 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
+        public void SpecializeWithPrototype(Entity prototype)
+        {
+            Debug.Assert(components.Count == 0, "Respecializing an entity!");
+            foreach (Component component in prototype.Components)
+                components.Add(component.Clone(this));
+
+            if (Identity.Prototype == null) Identity.Prototype = prototype;
+        }
+
         /// <summary>
         /// Gets the value of a given <see cref="Stat"/> for this <see cref="Entity"/>.
         /// </summary>

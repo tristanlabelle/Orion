@@ -3,8 +3,13 @@
 	<Identity>
 		<Name>BritishJeanMarc</Name>
 		<IsBuilding>True</IsBuilding>
-		<SpawnTime>220</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<SpawnTime>220</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Attacker>
 		<Power>12</Power>

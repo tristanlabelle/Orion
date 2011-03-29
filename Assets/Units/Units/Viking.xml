@@ -2,16 +2,20 @@
 <Entity>
 	<Identity>
 		<Name>Viking</Name>
-		<AladdiumCost>100</AladdiumCost>
 		<Upgrades>
 			<Item>Thor</Item>
 			<Item>Obelix</Item>
 		</Upgrades>
-		<SpawnTime>70</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>3</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Aladdium>100</Aladdium>
+		<Food>3</Food>
+		<SpawnTime>70</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>13</Power>
 		<Range>0</Range>
@@ -26,15 +30,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>70</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>2</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>6</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -42,8 +48,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>8</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

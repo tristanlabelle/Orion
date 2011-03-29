@@ -7,9 +7,13 @@
 		</Upgrades>
 		<SoundIdentity>Pirate</SoundIdentity>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>1</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>1</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>16</Power>
 		<Range>0</Range>
@@ -24,15 +28,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>120</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>2</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>8</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -40,8 +46,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>8</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

@@ -70,8 +70,8 @@ namespace Orion.Game.Presentation.Actions
             var buildingPrototypes = inputManager.Match.Prototypes
                 .Where(buildingType => builder.Supports(buildingType))
                 .OrderByDescending(buildingType => buildingType.Components.Has<Trainer>())
-                .ThenBy(buildingType => (int)buildingType.GetStatValue(Identity.AladdiumCostStat)
-                    + (int)buildingType.GetStatValue(Identity.AlageneCostStat));
+                .ThenBy(buildingType => (int)buildingType.GetStatValue(Cost.AladdiumStat)
+                    + (int)buildingType.GetStatValue(Cost.AlageneStat));
 
             foreach (Entity buildingPrototype in buildingPrototypes)
             {
@@ -91,8 +91,8 @@ namespace Orion.Game.Presentation.Actions
         private ActionDescriptor CreateButton(Entity buildingPrototype)
         {
             Faction faction = inputManager.LocalFaction;
-            int aladdiumCost = (int)faction.GetStat(buildingPrototype, Identity.AladdiumCostStat);
-            int alageneCost = (int)faction.GetStat(buildingPrototype, Identity.AlageneCostStat);
+            int aladdiumCost = (int)faction.GetStat(buildingPrototype, Cost.AladdiumStat);
+            int alageneCost = (int)faction.GetStat(buildingPrototype, Cost.AlageneStat);
             
             return new ActionDescriptor()
             {

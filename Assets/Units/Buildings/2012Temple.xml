@@ -3,8 +3,14 @@
 	<Identity>
 		<Name>2012Temple</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>150</AladdiumCost>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>150</Aladdium>
+		<SpawnTime>200</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Trainer>
 		<Speed>10</Speed>

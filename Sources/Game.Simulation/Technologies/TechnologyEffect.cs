@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation.Technologies
             Debug.Assert((float)delta != 0, "Technology effect has a change of zero and will have no effect.");
             Debug.Assert(stat != Vision.RangeStat
                 && stat != FactionMembership.ProvidedFoodStat
-                && stat != FactionMembership.FoodCostStat,
+                && stat != Cost.FoodStat,
                 "Technology effects changing stat {0} are not supported, they would cause bugs.".FormatInvariant(stat));
         }
         #endregion

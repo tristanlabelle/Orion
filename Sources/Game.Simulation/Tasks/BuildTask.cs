@@ -97,8 +97,8 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            int aladdiumCost = (int)faction.GetStat(plan.BuildingType, Identity.AladdiumCostStat);
-            int alageneCost = (int)faction.GetStat(plan.BuildingType, Identity.AlageneCostStat);
+            int aladdiumCost = (int)faction.GetStat(plan.BuildingType, Cost.AladdiumStat);
+            int alageneCost = (int)faction.GetStat(plan.BuildingType, Cost.AlageneStat);
             bool hasEnoughResources = faction.AladdiumAmount >= aladdiumCost
                 && faction.AlageneAmount >= alageneCost;
 

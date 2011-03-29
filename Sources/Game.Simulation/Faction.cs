@@ -355,7 +355,7 @@ namespace Orion.Game.Simulation
 
             Entity entity = world.Entities.CreateUnit(prototype, this, point);
             entity.Spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
-            UsedFoodAmount += (int)GetStat(prototype, FactionMembership.FoodCostStat);
+            UsedFoodAmount += (int)GetStat(prototype, Cost.FoodStat);
 
             return entity;
         }
@@ -380,7 +380,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(entity != null);
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
-            UsedFoodAmount -= (int)GetStat(entity, FactionMembership.FoodCostStat);
+            UsedFoodAmount -= (int)GetStat(entity, Cost.FoodStat);
         }
 
         /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
@@ -392,8 +392,8 @@ namespace Orion.Game.Simulation
             Debug.Assert(newPrototype != null);
             Debug.Assert(oldPrototype != newPrototype);
 
-            UsedFoodAmount -= (int)GetStat(oldPrototype, FactionMembership.FoodCostStat);
-            UsedFoodAmount += (int)GetStat(newPrototype, FactionMembership.FoodCostStat);
+            UsedFoodAmount -= (int)GetStat(oldPrototype, Cost.FoodStat);
+            UsedFoodAmount += (int)GetStat(newPrototype, Cost.FoodStat);
 
             if (entity.Components.Has<BuildProgress>())
             {

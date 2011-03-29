@@ -51,17 +51,17 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            foreach (Entity ruin in faction.World.Entities.Where(e => e.Components.Has<TimedExistence>()))
+            foreach (Entity ruin in faction.World.Entities)
             {
+                TimedExistence timeout = ruin.Components.TryGet<TimedExistence>();
+                if (timeout == null) continue;
+
                 Region gridRegion = ruin.Spatial.GridRegion;
                 Rectangle rectangle = gridRegion.ToRectangle();
                 if (!Rectangle.Intersects(rectangle, viewBounds))
                     continue;
 
                 if (!faction.CanSee(gridRegion)) continue;
-
-                TimedExistence timeout = ruin.Components.Get<TimedExistence>();
-                Identity identity = ruin.Identity;
 
                 Faction ruinFaction = FactionMembership.GetFaction(ruin);
                 ColorRgb factionColor = faction == null ? Colors.White : faction.Color;
@@ -70,7 +70,7 @@ namespace Orion.Game.Presentation.Renderers
                 if (alpha < 0) alpha = 0;
                 if (alpha > maxRuinAlpha) alpha = maxRuinAlpha;
 
-                Texture texture = identity.TrainType == TrainType.OnSite ? buildingRuinTexture : skeletonTexture;
+                Texture texture = ruin.Identity.IsBuilding ? buildingRuinTexture : skeletonTexture;
 
                 ColorRgba color = new ColorRgba(factionColor, alpha);
                 graphicsContext.Fill(rectangle, texture, color);

@@ -116,8 +116,8 @@ namespace Orion.Game.Simulation.Tasks
 
             if (!TryGetCredit()) return;
 
-            int aladdiumCost = (int)target.GetStatValue(Identity.AladdiumCostStat);
-            int alageneCost = (int)target.GetStatValue(Identity.AlageneCostStat);
+            int aladdiumCost = (int)target.GetStatValue(Cost.AladdiumStat);
+            int alageneCost = (int)target.GetStatValue(Cost.AlageneStat);
 
             float healthToRepair = (float)Entity.GetStatValue(Builder.SpeedStat)
                 * repairSpeedRatio * step.TimeDeltaInSeconds;
@@ -164,8 +164,8 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool TryGetCredit()
         {
-            int aladdiumCost = (int)Target.GetStatValue(Identity.AladdiumCostStat);
-            int alageneCost = (int)Target.GetStatValue(Identity.AlageneCostStat);
+            int aladdiumCost = (int)Target.GetStatValue(Cost.AladdiumStat);
+            int alageneCost = (int)Target.GetStatValue(Cost.AlageneStat);
 
             bool needsAladdiumCredit = aladdiumCost > 0 && aladdiumCreditRemaining <= 0;
             bool needsAlageneCredit = alageneCost > 0 && alageneCreditRemaining <= 0;

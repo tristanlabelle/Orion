@@ -3,10 +3,15 @@
 	<Identity>
 		<Name>TristansHouse</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>150</AladdiumCost>
-		<AlageneCost>50</AlageneCost>
-		<SpawnTime>200</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>150</Aladdium>
+		<Alagene>50</Alagene>
+		<SpawnTime>200</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Researcher>
 		<Technologies>

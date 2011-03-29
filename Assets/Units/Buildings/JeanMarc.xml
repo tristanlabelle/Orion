@@ -3,9 +3,6 @@
 	<Identity>
 		<Name>JeanMarc</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>120</AladdiumCost>
-		<AlageneCost>40</AlageneCost>
-		<SpawnTime>120</SpawnTime>
 		<Upgrades>
 			<Item>
 				<Target>BritishJeanMarc</Target>
@@ -14,6 +11,14 @@
 			</Item>
 		</Upgrades>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>120</Aladdium>
+		<Alagene>40</Alagene>
+		<SpawnTime>120</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Attacker>
 		<Power>8</Power>

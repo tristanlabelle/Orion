@@ -7,9 +7,14 @@
 		</Upgrades>
 		<SoundIdentity>FlyingSpaghettiMonster</SoundIdentity>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>3</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>3</Food>
+		<SpawnTime>75</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>50</Power>
 		<Range>8</Range>
@@ -25,15 +30,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>300</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>5</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>3</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -41,8 +48,10 @@
 			<Height>3</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>10</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

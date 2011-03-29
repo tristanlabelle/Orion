@@ -2,15 +2,19 @@
 <Entity>
 	<Identity>
 		<Name>Pirate</Name>
-		<AladdiumCost>50</AladdiumCost>
 		<Upgrades>
 			<Item>Bluebeard</Item>
 		</Upgrades>
-		<SpawnTime>40</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>1</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Aladdium>50</Aladdium>
+		<Food>1</Food>
+		<SpawnTime>40</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>5</Power>
 		<Range>0</Range>
@@ -25,15 +29,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>40</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>1</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>8</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -41,8 +47,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>8</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

@@ -2,18 +2,20 @@
 <Entity>
 	<Identity>
 		<Name>Smurf</Name>
-		<AladdiumCost>50</AladdiumCost>
 		<Upgrades>
 			<Item>PapaSmurf</Item>
 			<Item>BlueCollarSmurf</Item>
 			<Item>Smurfette</Item>
 		</Upgrades>
-		<SpawnTime>20</SpawnTime>
 	</Identity>
 	
-	<FactionMembership>
-		<FoodCost>1</FoodCost>
-	</FactionMembership>
+	<Cost>
+		<Aladdium>50</Aladdium>
+		<Food>1</Food>
+		<SpawnTime>20</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Attacker>
 		<Power>8</Power>

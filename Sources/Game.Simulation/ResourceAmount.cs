@@ -112,9 +112,9 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(prototype, "prototype");
             Argument.EnsureNotNull(faction, "faction");
 
-            int aladdiumCost = (int)faction.GetStat(prototype, Identity.AladdiumCostStat);
-            int alageneCost = (int)faction.GetStat(prototype, Identity.AlageneCostStat);
-            int foodCost = (int)faction.GetStat(prototype, FactionMembership.FoodCostStat);
+            int aladdiumCost = (int)faction.GetStat(prototype, Cost.AladdiumStat);
+            int alageneCost = (int)faction.GetStat(prototype, Cost.AlageneStat);
+            int foodCost = (int)faction.GetStat(prototype, Cost.FoodStat);
 
             return new ResourceAmount(aladdiumCost, alageneCost, foodCost);
         }

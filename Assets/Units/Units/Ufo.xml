@@ -2,16 +2,20 @@
 <Entity>
 	<Identity>
 		<Name>Ufo</Name>
-		<AladdiumCost>140</AladdiumCost>
-		<AlageneCost>140</AlageneCost>
 		<Upgrades>
 			<Item>Mothership</Item>
 		</Upgrades>
-		<SpawnTime>100</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>2</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Aladdium>140</Aladdium>
+		<Alagene>140</Alagene>
+		<Food>2</Food>
+		<SpawnTime>100</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>7</Power>
 		<Range>8</Range>
@@ -26,15 +30,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>100</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>8</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -42,8 +48,10 @@
 			<Height>2</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>10</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

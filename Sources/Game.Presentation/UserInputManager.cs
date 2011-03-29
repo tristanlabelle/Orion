@@ -173,7 +173,7 @@ namespace Orion.Game.Presentation
                 ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.Spatial.CollisionLayer)
                 : null;
 
-            if (clickedEntity == null)
+            if (clickedEntity == null || !clickedEntity.Identity.IsSelectable)
             {
                 if (!shiftKeyPressed) Selection.Clear();
                 return;

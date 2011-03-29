@@ -7,9 +7,13 @@
 		</Upgrades>
 		<SoundIdentity>Obelix</SoundIdentity>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>4</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>4</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>25</Power>
 		<Range>0</Range>
@@ -24,15 +28,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>200</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>3</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>8</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -40,8 +46,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>8</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

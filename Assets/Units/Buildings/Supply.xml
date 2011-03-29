@@ -3,9 +3,12 @@
 	<Identity>
 		<Name>Supply</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>50</AladdiumCost>
-		<SpawnTime>80</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>50</Aladdium>
+		<SpawnTime>80</SpawnTime>
+	</Cost>
 	
 	<FactionMembership>
 		<ProvidedFood>10</ProvidedFood>

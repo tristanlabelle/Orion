@@ -80,7 +80,7 @@ namespace Orion.Game.Simulation.Tasks
             Health buildingHealth = building.Components.TryGet<Health>();
             if (buildingHealth != null) buildingHealth.SetValue(1);
             
-            buildProgress.RequiredTime = TimeSpan.FromSeconds((float)building.GetStatValue(Identity.SpawnTimeStat));
+            buildProgress.RequiredTime = TimeSpan.FromSeconds((float)building.GetStatValue(Cost.SpawnTimeStat));
 
             return building;
         }

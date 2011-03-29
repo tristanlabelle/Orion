@@ -3,9 +3,14 @@
 	<Identity>
 		<Name>CarrefourLaval</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>140</AladdiumCost>
-		<SpawnTime>300</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>140</Aladdium>
+		<SpawnTime>300</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Trainer>
 		<Speed>10</Speed>

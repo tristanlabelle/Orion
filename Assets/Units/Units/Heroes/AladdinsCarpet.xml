@@ -6,21 +6,27 @@
 			<Item>ChuckNorris</Item>
 		</Upgrades>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>2</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>2</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Transporter>
 		<Capacity>10</Capacity>
 	</Transporter>
+	
 	<Health>
 		<MaxValue>140</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>2</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>15</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -28,8 +34,10 @@
 			<Height>2</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>8</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

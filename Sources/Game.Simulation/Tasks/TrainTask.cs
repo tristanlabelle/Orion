@@ -47,7 +47,7 @@ namespace Orion.Game.Simulation.Tasks
             get
             {
                 float requiredTime = (float)FactionMembership.GetFaction(Entity)
-                    .GetStat(prototype, Identity.SpawnTimeStat);
+                    .GetStat(prototype, Cost.SpawnTimeStat);
                 return Math.Min(elapsedTime / requiredTime, 1);
             }
         }
@@ -65,7 +65,7 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             Faction faction = FactionMembership.GetFaction(Entity);
-            int foodCost = (int)faction.GetStat(prototype, FactionMembership.FoodCostStat);
+            int foodCost = (int)faction.GetStat(prototype, Cost.FoodStat);
             if (faction != null && faction.RemainingFoodAmount < foodCost)
             {
                 if (!waitingForEnoughFood)
@@ -83,7 +83,7 @@ namespace Orion.Game.Simulation.Tasks
             float trainingSpeed = (float)Entity.GetStatValue(Trainer.SpeedStat);
             elapsedTime += step.TimeDeltaInSeconds * trainingSpeed;
 
-            float requiredTime = (float)faction.GetStat(prototype, Identity.SpawnTimeStat);
+            float requiredTime = (float)faction.GetStat(prototype, Cost.SpawnTimeStat);
             if (elapsedTime < requiredTime) return;
 
             Entity trainee = TrySpawn();

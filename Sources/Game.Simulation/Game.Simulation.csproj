@@ -74,6 +74,7 @@
     <Compile Include="Components\Builder.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\Constitution.cs" />
+    <Compile Include="Components\Cost.cs" />
     <Compile Include="Components\DamageFilter.cs" />
     <Compile Include="Components\Energy.cs" />
     <Compile Include="Components\FactionMembership.cs" />
@@ -112,7 +113,6 @@
     <Compile Include="RandomWorldGenerator.cs" />
     <Compile Include="ResourceAmount.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
-    <Compile Include="TrainType.cs" />
     <Compile Include="EntityUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />
     <Compile Include="Utilities\RememberedBuilding.cs" />

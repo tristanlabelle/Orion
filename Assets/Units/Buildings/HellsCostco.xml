@@ -3,9 +3,14 @@
 	<Identity>
 		<Name>HellsCostco</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>80</AladdiumCost>
-		<SpawnTime>100</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>80</Aladdium>
+		<SpawnTime>100</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<ResourceDepot/>
 	

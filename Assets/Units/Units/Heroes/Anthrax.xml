@@ -7,9 +7,13 @@
 		</Upgrades>
 		<SoundIdentity>SwineFlu</SoundIdentity>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>2</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>2</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>5</Power>
 		<Range>9</Range>
@@ -24,15 +28,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>100</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>2</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>15</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -40,8 +46,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>9</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

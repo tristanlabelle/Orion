@@ -331,29 +331,26 @@ namespace Orion.Game.Simulation
             EntityAdded.Raise(this, entity);
         }
 
-        /// <remarks>Invoked by World.EntityCollection.</remarks>
+        /// <remarks>Invoked by <see cref="World.EntityCollection"/>.</remarks>
         private void OnEntityRemoved(Entity entity)
         {
             EntityRemoved.Raise(this, entity);
         }
 
-        /// <remarks>Invoked by Entity.</remarks>
+        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
         internal void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
             entities.MoveFrom(entity, oldPosition);
         }
 
-        /// <remarks>Invoked by Entity.</remarks>
+        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
         internal void OnEntityDied(Entity entity)
         {
             EntityDied.Raise(this, entity);
             entities.Remove(entity);
 
-            Identity identity = entity.Identity;
-            if (identity.LeavesRemains)
-            {
+            if (entity.Identity.LeavesRemains)
                 CreateRuinsForEntity(entity);
-            }
         }
 
         internal void RaiseBuildingConstructed(Entity entity)
@@ -366,22 +363,26 @@ namespace Orion.Game.Simulation
         private void CreateRuinsForEntity(Entity entity)
         {
             Entity ruins = entities.CreateEntity();
-            Identity identity = new Identity(ruins);
-            identity.LeavesRemains = false;
-            identity.IsSelectable = false;
-            identity.Name = "Ruins";
-            identity.TrainType = entity.Identity.TrainType;
-            ruins.Components.Add(identity);
 
-            TimedExistence timeout = new TimedExistence(ruins);
-            timeout.LifeSpan = entity.Components.Has<Mobile>() ? 30 : 120;
-            ruins.Components.Add(timeout);
+            ruins.Components.Add(new Identity(ruins)
+            {
+                IsBuilding = entity.Identity.IsBuilding,
+                LeavesRemains = false,
+                IsSelectable = false,
+                Name = "Ruins"
+            });
 
-            Spatial spatial = new Spatial(ruins);
-            spatial.Position = entity.Position;
-            spatial.CollisionLayer = CollisionLayer.None;
-            spatial.Size = entity.Spatial.Size;
-            ruins.Components.Add(spatial);
+            ruins.Components.Add(new TimedExistence(ruins)
+            {
+                LifeSpan = entity.Identity.IsBuilding ? 30 : 120
+            });
+
+            ruins.Components.Add(new Spatial(ruins)
+            {
+                Position = entity.Position,
+                CollisionLayer = CollisionLayer.None,
+                Size = entity.Spatial.Size
+            });
 
             if (entity.Components.Has<FactionMembership>())
             {
@@ -389,6 +390,7 @@ namespace Orion.Game.Simulation
                 membership.Faction = entity.Components.Get<FactionMembership>().Faction;
                 ruins.Components.Add(membership);
             }
+
             entities.Add(ruins);
         }
 

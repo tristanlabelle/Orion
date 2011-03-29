@@ -35,11 +35,11 @@ namespace Orion.Game.Simulation.Components.Serialization
 
         #region Methods
         /// <summary>
-        /// Generates an Entity object from an XML file located at a given path.
+        /// Generates an <see cref="Entity"/> from an XML file located at a given path.
         /// </summary>
-        /// <param name="filePath">The path of the XML document</param>
-        /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded</param>
-        /// <returns>An Entity object with the specs from the XML file</returns>
+        /// <param name="filePath">The path of the XML document.</param>
+        /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded.</param>
+        /// <returns>An Entity object with the specs from the XML file.</returns>
         public Entity DeserializeEntity(string filePath, bool persistentOnly)
         {
             XmlDocument document = new XmlDocument();
@@ -49,11 +49,11 @@ namespace Orion.Game.Simulation.Components.Serialization
         }
 
         /// <summary>
-        /// Generates and Entity object from an Entity XML element.
+        /// Generates an <see cref="Entity"/> from an "Entity" XML element.
         /// </summary>
-        /// <param name="filePath">The path of the XML document</param>
-        /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded</param>
-        /// <returns>An Entity object with the specs from the XML file</returns>
+        /// <param name="filePath">The path of the XML document.</param>
+        /// <param name="persistentOnly">Indicates if only persistent and mandatory attributes should be loaded.</param>
+        /// <returns>An Entity object with the specs from the XML file.</returns>
         public Entity DeserializeEntity(XmlElement entityElement, bool persistentOnly)
         {
             Debug.Assert(entityElement.Name == "Entity");

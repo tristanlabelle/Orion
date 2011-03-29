@@ -4,9 +4,13 @@
 	<Identity>
 		<Name>ChuckNorris</Name>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>10</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>10</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>75</Power>
 		<Range>0</Range>
@@ -36,15 +40,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>500</MaxValue>
 		<ArmorType>Divine</ArmorType>
 		<Armor>5</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>20</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -52,8 +58,10 @@
 			<Height>4</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>20</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

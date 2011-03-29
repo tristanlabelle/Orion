@@ -158,21 +158,26 @@ namespace Orion.Game.Simulation
             public Entity CreateResourceNode(ResourceType type, Point point)
             {
                 Entity node = new Entity(world, handleGenerator());
-                Identity identity = new Identity(node);
-                identity.LeavesRemains = false;
-                node.Components.Add(identity);
 
-                Harvestable harvestableComponent = new Harvestable(node);
-                harvestableComponent.Amount = World.DefaultResourceAmount;
-                harvestableComponent.Type = type;
-                node.Components.Add(harvestableComponent);
+                node.Components.Add(new Identity(node)
+                {
+                    Name = type.ToStringInvariant(),
+                    VisualIdentity = type.ToStringInvariant(),
+                    LeavesRemains = false,
+                });
 
-                Spatial positionComponent = new Spatial(node);
-                positionComponent.Size = new Size(2, 2);
-                positionComponent.Position = point;
-                if (type == ResourceType.Aladdium)
-                    positionComponent.CollisionLayer = CollisionLayer.Ground;
-                node.Components.Add(positionComponent);
+                node.Components.Add(new Harvestable(node)
+                {
+                    Amount = World.DefaultResourceAmount,
+                    Type = type
+                });
+
+                node.Components.Add(new Spatial(node)
+                {
+                    Size = new Size(2, 2),
+                    Position = point,
+                    CollisionLayer = type == ResourceType.Aladdium ? CollisionLayer.Ground : CollisionLayer.Air
+                });
                 
                 Add(node);
                 return node;

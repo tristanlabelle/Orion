@@ -298,6 +298,7 @@ namespace Orion.Game.Presentation
 
             List<Entity> entities = world.Entities
                 .Intersecting(rectangle)
+                .Where(entity => entity.Identity.IsSelectable)
                 .ToList();
 
             if (add) entities.RemoveAll(entity => Contains(entity));

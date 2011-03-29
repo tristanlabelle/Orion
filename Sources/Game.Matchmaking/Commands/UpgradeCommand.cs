@@ -63,7 +63,7 @@ namespace Orion.Game.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
 
             Entity targetPrototype = match.Prototypes.FromHandle(targetPrototypeHandle);
-            int targetUnitTypeFoodCost = (int)faction.GetStat(targetPrototype, FactionMembership.FoodCostStat);
+            int targetUnitTypeFoodCost = (int)faction.GetStat(targetPrototype, Cost.FoodStat);
 
             foreach (Handle unitHandle in unitHandles)
             {
@@ -76,7 +76,7 @@ namespace Orion.Game.Matchmaking.Commands
                         .FormatInvariant(entity.Identity.Name, upgrade.Target));
                 }
 
-                int unitFoodCost = (int)entity.GetStatValue(FactionMembership.FoodCostStat);
+                int unitFoodCost = (int)entity.GetStatValue(Cost.FoodStat);
 
                 if (upgrade.AladdiumCost > faction.AladdiumAmount || upgrade.AlageneCost > faction.AlageneAmount)
                 {

@@ -186,16 +186,16 @@ namespace Orion.Game.Presentation.Actions
 
             var traineePrototypes = userInputManager.Match.Prototypes
                 .Where(traineeType => trainer.Supports(traineeType))
-                .OrderBy(traineeType => (int)traineeType.GetStatValue(Identity.AladdiumCostStat)
-                    + (int)traineeType.GetStatValue(Identity.AlageneCostStat));
+                .OrderBy(traineeType => (int)traineeType.GetStatValue(Cost.AladdiumStat)
+                    + (int)traineeType.GetStatValue(Cost.AlageneStat));
 
             foreach (Entity traineePrototype in traineePrototypes)
             {
                 Point point = FindUnusedButton();
 
-                int aladdiumCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Identity.AladdiumCostStat);
-                int alageneCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Identity.AlageneCostStat);
-                int foodCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, FactionMembership.FoodCostStat);
+                int aladdiumCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Cost.AladdiumStat);
+                int alageneCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Cost.AlageneStat);
+                int foodCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Cost.FoodStat);
 
                 Entity traineePrototypeForClosure = traineePrototype;
                 actions[point.X, point.Y] = new ActionDescriptor()

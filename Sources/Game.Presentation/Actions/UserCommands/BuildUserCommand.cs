@@ -39,8 +39,8 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             {
                 if (!minLocation.HasValue) return false;
 
-                int aladdiumCost = (int)LocalFaction.GetStat(prototype, Identity.AladdiumCostStat);
-                int alageneCost = (int)LocalFaction.GetStat(prototype, Identity.AlageneCostStat);
+                int aladdiumCost = (int)LocalFaction.GetStat(prototype, Cost.AladdiumStat);
+                int alageneCost = (int)LocalFaction.GetStat(prototype, Cost.AlageneStat);
                 Region region = new Region(minLocation.Value, prototype.Size);
                 if (aladdiumCost > LocalFaction.AladdiumAmount
                     || alageneCost > LocalFaction.AlageneAmount

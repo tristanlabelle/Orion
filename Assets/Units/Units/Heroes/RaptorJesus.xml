@@ -7,27 +7,34 @@
 		</Upgrades>
 		<SoundIdentity>Jesus</SoundIdentity>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>2</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>2</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>14</Power>
 		<Range>0</Range>
 		<Delay>3</Delay>
 	</Attacker>
+	
 	<Healer>
 		<Speed>6</Speed>
 		<Range>6</Range>
 	</Healer>
+	
 	<Health>
 		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>2</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>14</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -35,8 +42,10 @@
 			<Height>2</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>8</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

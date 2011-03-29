@@ -2,12 +2,16 @@
 <Entity>
 	<Identity>
 		<Name>DietCoke</Name>
-		<AlageneCost>2000</AlageneCost>
-		<SpawnTime>160</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>5</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Alagene>2000</Alagene>
+		<Food>5</Food>
+		<SpawnTime>160</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Kamikaze>
 		<Radius>10</Radius>
 		<Damage>400</Damage>
@@ -15,15 +19,17 @@
 			<Target>Mentos</Target>
 		</Targets>
 	</Kamikaze>
+	
 	<Health>
 		<MaxValue>160</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>4</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>3</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -31,8 +37,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>3</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

@@ -3,10 +3,15 @@
 	<Identity>
 		<Name>DemonicPortal</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>180</AladdiumCost>
-		<AlageneCost>70</AlageneCost>
-		<SpawnTime>300</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>180</Aladdium>
+		<Alagene>70</Alagene>
+		<SpawnTime>300</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Trainer>
 		<Speed>10</Speed>

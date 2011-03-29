@@ -40,12 +40,7 @@ namespace Orion.Game.Simulation.Components
         [Transient]
         public int LoadSize
         {
-            get
-            {
-                return passengers
-                    .Select(e => e.Components.Get<FactionMembership>())
-                    .Sum(c => c.FoodCost);
-            }
+            get { return passengers.Sum(entity => Cost.GetResourceAmount(entity).Food); }
         }
 
         [Transient]
@@ -62,6 +57,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Determines if a given <see cref="Entity"/> can be embarked in this transport.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> to be tested.</param>
+        /// <returns>A value indicating if the <see cref="Entity"/> can be embarked.</returns>
         public bool CanEmbark(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
@@ -75,14 +75,18 @@ namespace Orion.Game.Simulation.Components
             if (embarkeeMembership == null) return false;
 
             FactionMembership embarkerMembership = entity.Components.TryGet<FactionMembership>();
-
+            ResourceAmount embarkeeCost = Cost.GetResourceAmount(entity);
             if (embarkerMembership == null)
-                return RemainingSpace <= embarkeeMembership.FoodCost;
+                return RemainingSpace <= embarkeeCost.Food;
 
             return (embarkerMembership == null || embarkerMembership.Faction == embarkeeMembership.Faction)
-                && RemainingSpace <= embarkeeMembership.FoodCost;
+                && RemainingSpace <= embarkeeCost.Food;
         }
 
+        /// <summary>
+        /// Embarks a given <see cref="Entity"/> in this transport.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> to be embarked.</param>
         public void Embark(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
@@ -97,6 +101,10 @@ namespace Orion.Game.Simulation.Components
             passengers.Add(entity);
         }
 
+        /// <summary>
+        /// Disembarks a given <see cref="Entity"/> from this transport.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> to be disembarked.</param>
         public void Disembark(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");

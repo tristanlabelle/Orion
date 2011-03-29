@@ -2,16 +2,20 @@
 <Entity>
 	<Identity>
 		<Name>Jedihad</Name>
-		<AladdiumCost>30</AladdiumCost>
-		<AlageneCost>90</AlageneCost>
 		<Upgrades>
 			<Item>Allah Skywalker</Item>
 		</Upgrades>
-		<SpawnTime>65</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>2</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Aladdium>30</Aladdium>
+		<Alagene>90</Alagene>
+		<Food>2</Food>
+		<SpawnTime>65</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>5</Power>
 		<Range>3</Range>
@@ -33,15 +37,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>65</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>3</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>9</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -49,8 +55,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>8</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

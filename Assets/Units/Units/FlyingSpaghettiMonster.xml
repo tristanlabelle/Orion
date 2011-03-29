@@ -2,16 +2,20 @@
 <Entity>
 	<Identity>
 		<Name>FlyingSpaghettiMonster</Name>
-		<AladdiumCost>250</AladdiumCost>
-		<AlageneCost>175</AlageneCost>
 		<Upgrades>
 			<Item>YourMom</Item>
 		</Upgrades>
-		<SpawnTime>150</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>3</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Aladdium>250</Aladdium>
+		<Alagene>175</Alagene>
+		<Food>3</Food>
+		<SpawnTime>150</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>24</Power>
 		<Range>6</Range>
@@ -27,15 +31,17 @@
 			</Item>
 		</DamageFilters>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>150</MaxValue>
 		<ArmorType>Heavy</ArmorType>
 		<Armor>4</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>2</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -43,8 +49,10 @@
 			<Height>3</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>10</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

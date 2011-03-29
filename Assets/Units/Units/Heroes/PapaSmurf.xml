@@ -7,9 +7,13 @@
 		</Upgrades>
 		<SoundIdentity>Smurf</SoundIdentity>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>1</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Food>1</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>8</Power>
 		<Range>0</Range>
@@ -46,7 +50,6 @@
 	
 	<Mobile>
 		<Speed>8</Speed>
-		
 	</Mobile>
 	
 	<Spatial>
@@ -56,6 +59,7 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>7</Range>
 	</Vision>

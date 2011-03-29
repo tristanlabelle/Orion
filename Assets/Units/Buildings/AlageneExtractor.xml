@@ -3,9 +3,14 @@
 	<Identity>
 		<Name>AlageneExtractor</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>75</AladdiumCost>
-		<SpawnTime>75</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>75</Aladdium>
+		<SpawnTime>75</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<AlageneExtractor/>
 	

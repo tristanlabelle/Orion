@@ -6,10 +6,12 @@
 			<Item>ChuckNorris</Item>
 		</Upgrades>
 	</Identity>
+
+	<Cost>
+		<Food>1</Food>
+	</Cost>
 	
-	<FactionMembership>
-		<FoodCost>1</FoodCost>
-	</FactionMembership>
+	<FactionMembership/>
 	
 	<Healer>
 		<Speed>4</Speed>

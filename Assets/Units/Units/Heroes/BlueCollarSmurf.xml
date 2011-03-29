@@ -2,13 +2,15 @@
 <Entity>
 	<Identity>
 		<Name>BlueCollarSmurf</Name>
-		<AladdiumCost>50</AladdiumCost>
 		<SoundIdentity>Smurf</SoundIdentity>
 	</Identity>
 	
-	<FactionMembership>
-		<FoodCost>5</FoodCost>
-	</FactionMembership>
+	<Cost>
+		<Aladdium>50</Aladdium>
+		<Food>5</Food>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Attacker>
 		<Power>1</Power>
@@ -41,7 +43,6 @@
 	
 	<Mobile>
 		<Speed>2</Speed>
-		
 	</Mobile>
 	
 	<Spatial>
@@ -51,6 +52,7 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>3</Range>
 	</Vision>

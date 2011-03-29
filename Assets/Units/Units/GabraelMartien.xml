@@ -2,26 +2,33 @@
 <Entity>
 	<Identity>
 		<Name>GabraelMartien</Name>
-		<AladdiumCost>30</AladdiumCost>
-		<SpawnTime>30</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>1</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Aladdium>30</Aladdium>
+		<Alagene>30</Alagene>
+		<Food>1</Food>
+		<SpawnTime>70</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Attacker>
 		<Power>1</Power>
 		<Range>0</Range>
 		<Delay>1</Delay>
 	</Attacker>
+	
 	<Health>
 		<MaxValue>30</MaxValue>
 		<ArmorType>Supernatural</ArmorType>
 		<Armor>1</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>8</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Ground</CollisionLayer>
 		<Size>
@@ -29,8 +36,10 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>5</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

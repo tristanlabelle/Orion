@@ -2,22 +2,27 @@
 <Entity>
 	<Identity>
 		<Name>TvaHelicopter</Name>
-		<AladdiumCost>25</AladdiumCost>
-		<AlageneCost>25</AlageneCost>
-		<SpawnTime>75</SpawnTime>
 	</Identity>
-	<FactionMembership>
-		<FoodCost>1</FoodCost>
-	</FactionMembership>
+	
+	<Cost>
+		<Aladdium>25</Aladdium>
+		<Alagene>25</Alagene>
+		<Food>1</Food>
+		<SpawnTime>75</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
 	<Health>
 		<MaxValue>75</MaxValue>
 		<ArmorType>Light</ArmorType>
 		<Armor>1</Armor>
 	</Health>
+	
 	<Mobile>
 		<Speed>15</Speed>
-		
 	</Mobile>
+	
 	<Spatial>
 		<CollisionLayer>Air</CollisionLayer>
 		<Size>
@@ -25,8 +30,10 @@
 			<Height>2</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>12</Range>
 	</Vision>
+	
 	<Tags/>
 </Entity>

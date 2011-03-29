@@ -14,20 +14,12 @@ namespace Orion.Game.Simulation.Components
     public sealed class Identity : Component
     {
         #region Fields
-        public static readonly Stat AladdiumCostStat = new Stat(typeof(Identity), StatType.Integer, "AladdiumCost");
-        public static readonly Stat AlageneCostStat = new Stat(typeof(Identity), StatType.Integer, "AlageneCost");
-        public static readonly Stat SpawnTimeStat = new Stat(typeof(Identity), StatType.Real, "SpawnTime");
-
         private string name;
         private string visualIdentity;
         private string soundIdentity;
         private bool isBuilding;
         private bool isSelectable = true;
         private bool leavesRemains = true;
-        private int aladdiumCost;
-        private int alageneCost;
-        private float spawnTime = 1;
-        private TrainType trainType;
         private readonly ICollection<EntityUpgrade> upgrades
             = new ValidatingCollection<EntityUpgrade>(upgrade => upgrade != null);
         private Entity prototype;
@@ -70,49 +62,6 @@ namespace Orion.Game.Simulation.Components
         }
 
         [Persistent]
-        public TrainType TrainType
-        {
-            get { return trainType; }
-            set { trainType = value; }
-        }
-
-        [Persistent]
-        public int AladdiumCost
-        {
-            get { return aladdiumCost; }
-            set
-            {
-                Argument.EnsurePositive(value, "AladdiumCost");
-                aladdiumCost = value;
-            }
-        }
-
-        [Persistent]
-        public int AlageneCost
-        {
-            get { return alageneCost; }
-            set
-            {
-                Argument.EnsurePositive(value, "AlageneCost");
-                alageneCost = value;
-            }
-        }
-
-        /// <summary>
-        /// Accesses the time needed to build or train this <see cref="Entity"/>.
-        /// </summary>
-        [Persistent]
-        public float SpawnTime
-        {
-            get { return spawnTime; }
-            set
-            {
-                Argument.EnsurePositive(value, "SpawnTime");
-                spawnTime = value;
-            }
-        }
-
-        [Persistent]
         public ICollection<EntityUpgrade> Upgrades
         {
             get { return upgrades; }
@@ -122,7 +71,7 @@ namespace Orion.Game.Simulation.Components
         public bool IsSelectable
         {
             get { return isSelectable; }
-            set { isSelectable = false; }
+            set { isSelectable = value; }
         }
 
         [Persistent]

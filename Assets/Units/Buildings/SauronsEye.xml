@@ -3,10 +3,15 @@
 	<Identity>
 		<Name>SauronsEye</Name>
 		<IsBuilding>True</IsBuilding>
-		<AladdiumCost>100</AladdiumCost>
-		<AlageneCost>25</AlageneCost>
-		<SpawnTime>100</SpawnTime>
 	</Identity>
+	
+	<Cost>
+		<Aladdium>100</Aladdium>
+		<Alagene>25</Alagene>
+		<SpawnTime>100</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
 	
 	<Health>
 		<MaxValue>100</MaxValue>

@@ -16,12 +16,10 @@ namespace Orion.Game.Simulation.Components
     public sealed class FactionMembership : Component
     {
         #region Fields
-        public static readonly Stat FoodCostStat = new Stat(typeof(FactionMembership), StatType.Integer, "FoodCost");
         public static readonly Stat ProvidedFoodStat = new Stat(typeof(FactionMembership), StatType.Integer, "ProvidedFood");
 
         private Faction faction;
         private bool isKeepAlive = true;
-        private int foodCost;
         private int providedFood;
         #endregion
 
@@ -54,16 +52,6 @@ namespace Orion.Game.Simulation.Components
         {
             get { return isKeepAlive; }
             set { isKeepAlive = value; }
-        }
-
-        [Mandatory]
-        public int FoodCost
-        {
-            get { return foodCost; }
-            set
-            {
-                Argument.EnsurePositive(value, "FoodCost");
-                foodCost = value; }
         }
 
         [Persistent]

@@ -33,7 +33,7 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Proprieties
-        public Entity BuildingType
+        public Entity BuildingPrototype
         {
             get { return buildingPrototype; }
         }

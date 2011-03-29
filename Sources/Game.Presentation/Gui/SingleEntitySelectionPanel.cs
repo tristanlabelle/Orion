@@ -102,7 +102,7 @@ namespace Orion.Game.Presentation.Gui
             if (harvestable == null)
             {
                 nameLabel.Text = localizer.GetNoun(entity.Identity.Name);
-                imageBox.Texture = graphics.GetUnitTexture(entity.Identity.Name);
+                imageBox.Texture = graphics.GetEntityTexture(entity);
             }
             else
             {

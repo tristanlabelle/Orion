@@ -404,7 +404,7 @@ namespace Orion.Game.Presentation.Gui
             Button inactiveWorkersButton = new Button()
             {
                 AcquireKeyboardFocusWhenPressed = false,
-                Content = CreateResourcePanel(graphics.GetUnitTexture("Smurf"), out idleWorkerCountImageBox, out idleWorkerCountLabel)
+                Content = CreateResourcePanel(graphics.GetEntityTexture("Smurf"), out idleWorkerCountImageBox, out idleWorkerCountLabel)
             };
 
             // Hack to detect if button is pressed while shift is down.

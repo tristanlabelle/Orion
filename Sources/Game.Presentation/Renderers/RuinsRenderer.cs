@@ -34,8 +34,8 @@ namespace Orion.Game.Presentation.Renderers
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.faction = faction;
-            this.buildingRuinTexture = gameGraphics.GetUnitTexture("Ruins");
-            this.skeletonTexture = gameGraphics.GetUnitTexture("Skeleton");
+            this.buildingRuinTexture = gameGraphics.GetEntityTexture("Ruins");
+            this.skeletonTexture = gameGraphics.GetEntityTexture("Skeleton");
         }
         #endregion
 

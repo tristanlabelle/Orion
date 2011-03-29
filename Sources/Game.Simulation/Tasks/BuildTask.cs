@@ -24,10 +24,10 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(plan, "plan");
 
             Builder builder = entity.Components.TryGet<Builder>();
-            if (builder == null || !builder.Supports(plan.BuildingType))
+            if (builder == null || !builder.Supports(plan.BuildingPrototype))
             {
                 throw new ArgumentException("{0} cannot build {1}."
-                    .FormatInvariant(entity, plan.BuildingType));
+                    .FormatInvariant(entity, plan.BuildingPrototype));
             }
 
             this.plan = plan;
@@ -38,7 +38,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Properties
         public override string Description
         {
-            get { return "Building {0}".FormatInvariant(plan.BuildingType); }
+            get { return "Building {0}".FormatInvariant(plan.BuildingPrototype); }
         }
 
         public BuildingPlan Plan
@@ -87,25 +87,25 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            CollisionLayer layer = plan.BuildingType.Spatial.CollisionLayer;
+            CollisionLayer layer = plan.BuildingPrototype.Spatial.CollisionLayer;
             if (!World.IsFree(plan.GridRegion, layer))
             {
                 string warning = "Pas de place pour construire le bâtiment {0}"
-                    .FormatInvariant(plan.BuildingType.Identity.Name);
+                    .FormatInvariant(plan.BuildingPrototype.Identity.Name);
                 faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;
             }
 
-            int aladdiumCost = (int)faction.GetStat(plan.BuildingType, Cost.AladdiumStat);
-            int alageneCost = (int)faction.GetStat(plan.BuildingType, Cost.AlageneStat);
+            int aladdiumCost = (int)faction.GetStat(plan.BuildingPrototype, Cost.AladdiumStat);
+            int alageneCost = (int)faction.GetStat(plan.BuildingPrototype, Cost.AlageneStat);
             bool hasEnoughResources = faction.AladdiumAmount >= aladdiumCost
                 && faction.AlageneAmount >= alageneCost;
 
             if (!hasEnoughResources)
             {
                 string warning = "Pas assez de ressources pour construire le bâtiment {0}"
-                    .FormatInvariant(plan.BuildingType.Identity.Name);
+                    .FormatInvariant(plan.BuildingPrototype.Identity.Name);
                 faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;

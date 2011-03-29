@@ -100,7 +100,7 @@ namespace Orion.Game.Presentation
         #region Methods
         #region Textures
         /// <summary>
-        /// Gets a texture for a miscellaneous game element. 
+        /// Gets a <see cref="Texture"/> for a miscellaneous game element. 
         /// </summary>
         /// <param name="name">The name of the game element.</param>
         /// <returns>The texture for that game element.</returns>
@@ -110,20 +110,20 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets a texture representing a unit.
+        /// Gets a <see cref="Texture"/> representing an <see cref="Entity"/>.
         /// </summary>
-        /// <param name="unitTypeName">The name of a type of unit.</param>
-        /// <returns>The texture for that unit type.</returns>
-        public Texture GetUnitTexture(string unitTypeName)
+        /// <param name="name">The name of a type of <see cref="Entity"/>.</param>
+        /// <returns>The <see cref="Texture"/> for that <see cref="Entity"/> type.</returns>
+        public Texture GetEntityTexture(string name)
         {
-            Argument.EnsureNotNull(unitTypeName, "unitTypeName");
+            Argument.EnsureNotNull(name, "name");
 
-            string fullName = Path.Combine("Units", unitTypeName);
+            string fullName = Path.Combine("Entities", name);
             return GetTexture(fullName);
         }
         
         /// <summary>
-        /// Gets a texture for a GUI element.
+        /// Gets a <see cref="Texture"/> for a GUI element.
         /// </summary>
         /// <param name="name">The name of the gui texture.</param>
         /// <returns>The GUI texture with that name.</returns>
@@ -136,7 +136,7 @@ namespace Orion.Game.Presentation
         }
         
         /// <summary>
-        /// Gets a texture for a mouse ursor.
+        /// Gets a <see cref="Texture"/> for a mouse cursor.
         /// </summary>
         /// <param name="name">The name of the mouse cursor.</param>
         /// <returns>The mouse cursor texture with that name.</returns>
@@ -149,21 +149,21 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets a texture representing an <see cref="Entity"/>.
+        /// Gets a <see cref="Texture"/> representing an <see cref="Entity"/>.
         /// </summary>
         /// <param name="entity">The <see cref="Entity"/>.</param>
-        /// <returns>The texture for that <see cref="Entity"/>.</returns>
+        /// <returns>The <see cref="Texture"/> for that <see cref="Entity"/>.</returns>
         public Texture GetEntityTexture(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            return GetUnitTexture(entity.Identity.VisualIdentity ?? entity.Identity.Name);
+            return GetEntityTexture(entity.Identity.VisualIdentity ?? entity.Identity.Name);
         }
 
         /// <summary>
-        /// Gets a texture representing a resource.
+        /// Gets a <see cref="Texture"/> representing a resource.
         /// </summary>
         /// <param name="type">The type of resource for which to retrieve a texture.</param>
-        /// <returns>The texture for that resource type.</returns>
+        /// <returns>The <see cref="Texture"/> for that resource type.</returns>
         public Texture GetResourceTexture(ResourceType type)
         {
             string name = type.ToStringInvariant();
@@ -171,10 +171,10 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets a texture representing a resource.
+        /// Gets a <see cref="Texture"/> representing a resource.
         /// </summary>
         /// <param name="node">The resource node for which to retrieve a texture.</param>
-        /// <returns>The texture for that resource node.</returns>
+        /// <returns>The <see cref="Texture"/> for that resource node.</returns>
         public Texture GetResourceTexture(Entity node)
         {
             Argument.EnsureNotNull(node, "node");
@@ -183,10 +183,10 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets a texture representing an action in the UI.
+        /// Gets a <see cref="Texture"/> representing an action in the UI.
         /// </summary>
         /// <param name="actionName">The name of the UI action.</param>
-        /// <returns>The texture for that action.</returns>
+        /// <returns>The <see cref="Texture"/> for that action.</returns>
         public Texture GetActionTexture(string actionName)
         {
             string fullName = Path.Combine(Path.Combine("Gui", "Actions"), actionName);
@@ -194,10 +194,10 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets a texture representing an action in the UI.
+        /// Gets a <see cref="Texture"/> representing an action in the UI.
         /// </summary>
         /// <param name="task">A task based on the action.</param>
-        /// <returns>The texture for that action.</returns>
+        /// <returns>The <see cref="Texture"/> for that action.</returns>
         public Texture GetActionTexture(Task task)
         {
             string taskName = task.GetType().Name;
@@ -206,10 +206,10 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets a texture representing a technology.
+        /// Gets a <see cref="Texture"/> representing a technology.
         /// </summary>
         /// <param name="actionName">The technology.</param>
-        /// <returns>The texture for that technology.</returns>
+        /// <returns>The <see cref="Texture"/> for that technology.</returns>
         public Texture GetTechnologyTexture(Technology technology)
         {
             Argument.EnsureNotNull(technology, "technology");

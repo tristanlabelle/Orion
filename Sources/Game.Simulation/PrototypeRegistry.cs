@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation
         {
             uint handle = 0;
             XmlDeserializer deserializer = new XmlDeserializer(() => new Handle(handle++));
-            foreach (string filePath in assets.EnumerateFiles("Units", "*.xml", SearchOption.AllDirectories))
+            foreach (string filePath in assets.EnumerateFiles("Entities", "*.xml", SearchOption.AllDirectories))
             {
                 try
                 {
@@ -34,7 +34,7 @@ namespace Orion.Game.Simulation
                 catch (IOException e)
                 {
                     Debug.Fail(
-                        "Failed to read unit type from file {0}:\n{1}"
+                        "Failed to read entity from file {0}:\n{1}"
                         .FormatInvariant(filePath, e));
                 }
             }

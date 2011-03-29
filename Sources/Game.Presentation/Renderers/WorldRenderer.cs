@@ -145,7 +145,7 @@ namespace Orion.Game.Presentation.Renderers
             ColorRgba tint = new ColorRgba(Colors.DarkBlue, 0.5f);
             foreach (BuildingPlan plan in plans)
             {
-                Texture buildingTexture = gameGraphics.GetUnitTexture(plan.BuildingType.Identity.Name);
+                Texture buildingTexture = gameGraphics.GetEntityTexture(plan.BuildingPrototype);
                 Rectangle buildingRectangle = plan.GridRegion.ToRectangle();
                 graphicsContext.Fill(buildingRectangle, buildingTexture, tint);
             }

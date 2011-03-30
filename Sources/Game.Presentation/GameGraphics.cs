@@ -162,7 +162,7 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Gets a <see cref="Texture"/> representing a resource.
         /// </summary>
-        /// <param name="type">The type of resource for which to retrieve a texture.</param>
+        /// <param name="type">The type of resource for which to retrieve a <see cref="Texture"/>.</param>
         /// <returns>The <see cref="Texture"/> for that resource type.</returns>
         public Texture GetResourceTexture(ResourceType type)
         {
@@ -173,7 +173,7 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Gets a <see cref="Texture"/> representing a resource.
         /// </summary>
-        /// <param name="node">The resource node for which to retrieve a texture.</param>
+        /// <param name="node">The resource node for which to retrieve a <see cref="Texture"/>.</param>
         /// <returns>The <see cref="Texture"/> for that resource node.</returns>
         public Texture GetResourceTexture(Entity node)
         {

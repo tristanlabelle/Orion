@@ -115,11 +115,10 @@
     <Compile Include="Renderers\DeathmatchRenderer.cs" />
     <Compile Include="Renderers\MinimapRenderer.cs" />
     <Compile Include="Renderers\ResourcesRenderer.cs" />
-    <Compile Include="Renderers\RuinsRenderer.cs" />
     <Compile Include="Renderers\SelectionRenderer.cs" />
     <Compile Include="Renderers\TerrainRenderer.cs" />
     <Compile Include="Renderers\UnderAttackWarningRenderer.cs" />
-    <Compile Include="Renderers\UnitsRenderer.cs" />
+    <Compile Include="Renderers\EntityRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="Selection.cs" />
     <Compile Include="SelectionGroupManager.cs" />

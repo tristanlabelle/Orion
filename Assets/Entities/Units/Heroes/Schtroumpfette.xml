@@ -48,7 +48,6 @@
 	
 	<Mobile>
 		<Speed>8</Speed>
-		
 	</Mobile>
 	
 	<Spatial>
@@ -58,6 +57,7 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+	
 	<Vision>
 		<Range>6</Range>
 	</Vision>

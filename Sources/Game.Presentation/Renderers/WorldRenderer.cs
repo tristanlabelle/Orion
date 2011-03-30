@@ -20,7 +20,7 @@ namespace Orion.Game.Presentation.Renderers
 
         private readonly TerrainRenderer terrainRenderer;
         private readonly ResourcesRenderer resourcesRenderer;
-        private readonly UnitsRenderer unitsRenderer;
+        private readonly EntityRenderer unitsRenderer;
         private readonly ExplosionRenderer explosionRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
         #endregion
@@ -43,7 +43,7 @@ namespace Orion.Game.Presentation.Renderers
 
             this.terrainRenderer = new TerrainRenderer(World.Terrain, gameGraphics);
             this.resourcesRenderer = new ResourcesRenderer(faction, gameGraphics);
-            this.unitsRenderer = new UnitsRenderer(faction, gameGraphics);
+            this.unitsRenderer = new EntityRenderer(faction, gameGraphics);
             this.explosionRenderer = new ExplosionRenderer(faction.World, gameGraphics);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
         }

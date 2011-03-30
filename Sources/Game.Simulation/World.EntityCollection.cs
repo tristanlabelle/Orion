@@ -176,7 +176,7 @@ namespace Orion.Game.Simulation
                 {
                     Size = new Size(2, 2),
                     Position = point,
-                    CollisionLayer = type == ResourceType.Aladdium ? CollisionLayer.Ground : CollisionLayer.Air
+                    CollisionLayer = type == ResourceType.Aladdium ? CollisionLayer.Ground : CollisionLayer.None
                 });
                 
                 Add(node);

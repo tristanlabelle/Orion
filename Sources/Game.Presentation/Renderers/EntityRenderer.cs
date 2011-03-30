@@ -14,7 +14,7 @@ namespace Orion.Game.Presentation.Renderers
     /// <summary>
     /// Provides functionality to draw <see cref="Entity"/>s on-screen.
     /// </summary>
-    public sealed class UnitsRenderer
+    public sealed class EntityRenderer
     {
         private struct Laser
         {
@@ -34,6 +34,9 @@ namespace Orion.Game.Presentation.Renderers
         /// </summary>
         private static readonly float fireHealthRatio = 0.5f;
 
+        private const float maxRuinAlpha = 0.8f;
+        private const float ruinFadeDurationInSeconds = 1;
+
         private static readonly Size miniatureUnitSize = new Size(3, 3);
 
         private static readonly float shadowAlpha = 0.3f;
@@ -49,14 +52,13 @@ namespace Orion.Game.Presentation.Renderers
         private readonly GameGraphics gameGraphics;
         private readonly SpriteAnimation fireAnimation;
         private readonly BuildingMemoryRenderer buildingMemoryRenderer;
-        private readonly RuinsRenderer ruinsRenderer;
         private readonly List<Laser> lasers = new List<Laser>();
         private float simulationTimeInSeconds;
         private bool drawHealthBars;
         #endregion
 
         #region Constructors
-        public UnitsRenderer(Faction faction, GameGraphics gameGraphics)
+        public EntityRenderer(Faction faction, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(faction, "faction");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
@@ -65,7 +67,6 @@ namespace Orion.Game.Presentation.Renderers
             this.gameGraphics = gameGraphics;
             this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
             this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, gameGraphics);
-            this.ruinsRenderer = new RuinsRenderer(faction, gameGraphics);
 
             World.Updated += OnWorldUpdated;
             World.HitOccured += OnUnitHitting;
@@ -113,13 +114,13 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            ruinsRenderer.Draw(graphicsContext, viewBounds);
-
             DrawRememberedBuildings(graphicsContext);
 
-            DrawGroundEntities(graphicsContext, viewBounds);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.None, DrawEntity);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Ground, DrawEntity);
             DrawLasers(graphicsContext, viewBounds, CollisionLayer.Ground);
-            DrawAirborneEntities(graphicsContext, viewBounds);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Air, DrawEntityShadow);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Air, DrawEntity);
             DrawLasers(graphicsContext, viewBounds, CollisionLayer.Air);
         }
 
@@ -145,26 +146,22 @@ namespace Orion.Game.Presentation.Renderers
             buildingMemoryRenderer.Draw(graphics);
         }
 
-        private IEnumerable<Entity> GetClippedVisibleEntities(Rectangle clippingBounds)
+        private void DrawEntities(GraphicsContext graphicsContext, Rectangle viewBounds,
+            CollisionLayer collisionLayer, Action<GraphicsContext, Entity> drawDelegate)
         {
-            return World.Entities
-                .Intersecting(clippingBounds)
-                .Where(entity => !entity.Components.Has<Harvestable>() && faction.CanSee(entity));
-        }
+            foreach (Entity entity in World.Entities.Intersecting(viewBounds))
+            {
+                Spatial spatial = entity.Spatial;
+                if (spatial == null
+                    || spatial.CollisionLayer != collisionLayer
+                    || !faction.CanSee(entity)
+                    || entity.Components.Has<Harvestable>())
+                {
+                    continue;
+                }
 
-        private void DrawGroundEntities(GraphicsContext graphicsContext, Rectangle viewBounds)
-        {
-            var entities = GetClippedVisibleEntities(viewBounds)
-                .Where(entity => entity.Spatial.CollisionLayer == CollisionLayer.Ground);
-            foreach (Entity entity in entities) DrawEntity(graphicsContext, entity);
-        }
-
-        private void DrawAirborneEntities(GraphicsContext graphicsContext, Rectangle viewBounds)
-        {
-            var entities = GetClippedVisibleEntities(viewBounds)
-                .Where(entity => entity.Spatial.CollisionLayer == CollisionLayer.Air);
-            foreach (Entity entity in entities) DrawUnitShadow(graphicsContext, entity);
-            foreach (Entity entity in entities) DrawEntity(graphicsContext, entity);
+                DrawEntity(graphicsContext, entity);
+            }
         }
 
         private void DrawEntity(GraphicsContext graphics, Entity entity)
@@ -181,8 +178,8 @@ namespace Orion.Game.Presentation.Renderers
             using (graphics.PushTransform(center, drawingAngle))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, spatial.Size.Width, spatial.Size.Height);
-                Faction faction = FactionMembership.GetFaction(entity);
-                graphics.Fill(localRectangle, texture, faction == null ? Colors.White : faction.Color);
+                ColorRgba color = GetEntitySpriteColor(entity);
+                graphics.Fill(localRectangle, texture, color);
             }
 
             if (entity.Components.Has<BuildProgress>())
@@ -206,7 +203,24 @@ namespace Orion.Game.Presentation.Renderers
             if (DrawHealthBars) HealthBarRenderer.Draw(graphics, entity);
         }
 
-        private void DrawUnitShadow(GraphicsContext graphicsContext, Entity entity)
+        private ColorRgba GetEntitySpriteColor(Entity entity)
+        {
+            Faction faction = FactionMembership.GetFaction(entity);
+            ColorRgb color = faction == null ? Colors.White : faction.Color;
+
+            float alpha = 1;
+            TimedExistence timeout = entity.Components.TryGet<TimedExistence>();
+            if (timeout != null)
+            {
+                alpha = timeout.TimeLeft / ruinFadeDurationInSeconds;
+                if (alpha < 0) alpha = 0;
+                if (alpha > maxRuinAlpha) alpha = maxRuinAlpha;
+            }
+
+            return color.ToRgba(alpha);
+        }
+
+        private void DrawEntityShadow(GraphicsContext graphicsContext, Entity entity)
         {
             Texture texture = gameGraphics.GetEntityTexture(entity);
             ColorRgba tint = new ColorRgba(Colors.Black, shadowAlpha);
@@ -225,7 +239,7 @@ namespace Orion.Game.Presentation.Renderers
 
         private float GetOscillation(Entity entity)
         {
-            if (entity.Spatial.CollisionLayer == CollisionLayer.Ground) return 0;
+            if (entity.Spatial.CollisionLayer != CollisionLayer.Air) return 0;
 
             float period = 3 + entity.Size.Area / 4.0f;
             float offset = (entity.Handle.Value % 8) / 8.0f * period;
@@ -240,7 +254,10 @@ namespace Orion.Game.Presentation.Renderers
         {
             // Workaround the fact that our entity textures face up,
             // and building textures are not supposed to be rotated.
-            if (entity.Identity.IsBuilding) return 0;
+#warning HACK: To replace with a Sprite component's "Rotates" property
+            if (entity.Identity.IsBuilding
+                || entity.Components.Has<Harvestable>()
+                || entity.Components.Has<TimedExistence>()) return 0;
 
             Debug.Assert(entity.Components.Has<Spatial>(), "An entity without a spatial component is being drawn.");
             float angle = entity.Spatial.Angle;
@@ -264,10 +281,6 @@ namespace Orion.Game.Presentation.Renderers
 
                 Entity shooter = laser.Shooter;
                 Spatial shooterSpatial = shooter.Spatial;
-                Debug.Assert(shooterSpatial == null, "Hitter has no Spatial component!");
-
-                Spatial targetSpatial = laser.Target.Spatial;
-
                 if (shooterSpatial.CollisionLayer != layer) continue;
 
                 float laserProgress = (World.LastSimulationStep.TimeInSeconds - laser.Time) / rangedShootTimeInSeconds;
@@ -279,6 +292,7 @@ namespace Orion.Game.Presentation.Renderers
                     continue;
                 }
 
+                Spatial targetSpatial = laser.Target.Spatial;
                 if (!Rectangle.Intersects(shooterSpatial.BoundingRectangle, bounds)
                     && !Rectangle.Intersects(targetSpatial.BoundingRectangle, bounds))
                     continue;

@@ -366,10 +366,9 @@ namespace Orion.Game.Simulation
 
             ruins.Components.Add(new Identity(ruins)
             {
-                IsBuilding = entity.Identity.IsBuilding,
                 LeavesRemains = false,
                 IsSelectable = false,
-                Name = "Ruins"
+                Name = entity.Identity.IsBuilding ? "Ruins" : "Skeleton"
             });
 
             ruins.Components.Add(new TimedExistence(ruins)

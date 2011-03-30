@@ -50,6 +50,8 @@
 		</Size>
 	</Spatial>
 	
+	<Sprite/>
+	
 	<Vision>
 		<Range>10</Range>
 	</Vision>

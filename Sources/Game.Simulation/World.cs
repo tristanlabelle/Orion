@@ -349,7 +349,7 @@ namespace Orion.Game.Simulation
             EntityDied.Raise(this, entity);
             entities.Remove(entity);
 
-            if (entity.Identity.LeavesRemains)
+            if (entity.Components.Has<Health>())
                 CreateRuinsForEntity(entity);
         }
 
@@ -366,9 +366,13 @@ namespace Orion.Game.Simulation
 
             ruins.Components.Add(new Identity(ruins)
             {
-                LeavesRemains = false,
                 IsSelectable = false,
                 Name = entity.Identity.IsBuilding ? "Ruins" : "Skeleton"
+            });
+
+            ruins.Components.Add(new Sprite(ruins)
+            {
+                Rotates = false
             });
 
             ruins.Components.Add(new TimedExistence(ruins)

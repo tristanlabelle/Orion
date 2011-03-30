@@ -621,6 +621,7 @@ namespace Orion.Game.Simulation
                         return true;
                 }
             }
+
             return false;
         }
 

@@ -161,9 +161,12 @@ namespace Orion.Game.Simulation
 
                 node.Components.Add(new Identity(node)
                 {
-                    Name = type.ToStringInvariant(),
-                    VisualIdentity = type.ToStringInvariant(),
-                    LeavesRemains = false,
+                    Name = type.ToStringInvariant()
+                });
+
+                node.Components.Add(new Sprite(node)
+                {
+                    Rotates = false
                 });
 
                 node.Components.Add(new Harvestable(node)

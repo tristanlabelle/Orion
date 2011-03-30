@@ -169,17 +169,21 @@ namespace Orion.Game.Presentation.Renderers
             Spatial spatial = entity.Spatial;
             if (spatial == null) return;
 
-            Texture texture = gameGraphics.GetEntityTexture(entity);
-
-            Vector2 center = spatial.Center;
-            center.Y += GetOscillation(entity) * 0.15f;
-
-            float drawingAngle = GetDrawingAngle(entity);
-            using (graphics.PushTransform(center, drawingAngle))
+            Sprite sprite = entity.Components.TryGet<Sprite>();
+            if (sprite != null)
             {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, spatial.Size.Width, spatial.Size.Height);
-                ColorRgba color = GetEntitySpriteColor(entity);
-                graphics.Fill(localRectangle, texture, color);
+                Texture texture = gameGraphics.GetEntityTexture(sprite.Name);
+
+                Vector2 center = spatial.Center;
+                center.Y += GetOscillation(entity) * 0.15f;
+
+                float drawingAngle = GetDrawingAngle(sprite);
+                using (graphics.PushTransform(center, drawingAngle))
+                {
+                    Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, spatial.Size.Width, spatial.Size.Height);
+                    ColorRgba color = GetEntitySpriteColor(entity);
+                    graphics.Fill(localRectangle, texture, color);
+                }
             }
 
             if (entity.Components.Has<BuildProgress>())
@@ -222,10 +226,13 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawEntityShadow(GraphicsContext graphicsContext, Entity entity)
         {
-            Texture texture = gameGraphics.GetEntityTexture(entity);
+            Sprite sprite = entity.Components.TryGet<Sprite>();
+            if (sprite == null) return;
+
+            Texture texture = gameGraphics.GetEntityTexture(sprite.Name);
             ColorRgba tint = new ColorRgba(Colors.Black, shadowAlpha);
 
-            float drawingAngle = GetDrawingAngle(entity);
+            float drawingAngle = GetDrawingAngle(sprite);
             float oscillation = GetOscillation(entity);
             float distance = shadowDistance - oscillation * 0.1f;
             Vector2 center = entity.Center + new Vector2(-distance, distance);
@@ -250,16 +257,12 @@ namespace Orion.Game.Presentation.Renderers
             return sine;
         }
 
-        private static float GetDrawingAngle(Entity entity)
+        private static float GetDrawingAngle(Sprite sprite)
         {
-            // Workaround the fact that our entity textures face up,
-            // and building textures are not supposed to be rotated.
-#warning HACK: To replace with a Sprite component's "Rotates" property
-            if (entity.Identity.IsBuilding
-                || entity.Components.Has<Harvestable>()
-                || entity.Components.Has<TimedExistence>()) return 0;
+            if (!sprite.Rotates) return 0;
 
-            Debug.Assert(entity.Components.Has<Spatial>(), "An entity without a spatial component is being drawn.");
+            Entity entity = sprite.Entity;
+
             float angle = entity.Spatial.Angle;
             float baseAngle = angle + (float)Math.PI * 0.5f;
 

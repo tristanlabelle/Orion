@@ -53,6 +53,8 @@
 		</Size>
 	</Spatial>
 	
+	<Sprite/>
+	
 	<Vision>
 		<Range>3</Range>
 	</Vision>

@@ -47,6 +47,8 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+
+	<Sprite/>
 	
 	<Vision>
 		<Range>7</Range>

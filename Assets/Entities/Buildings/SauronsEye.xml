@@ -26,6 +26,10 @@
 			<Height>2</Height>
 		</Size>
 	</Spatial>
+
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
 	
 	<Vision>
 		<Range>16</Range>

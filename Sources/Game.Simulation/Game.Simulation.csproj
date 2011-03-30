@@ -83,6 +83,7 @@
     <Compile Include="Components\Health.cs" />
     <Compile Include="Components\Researcher.cs" />
     <Compile Include="Components\ResourceDepot.cs" />
+    <Compile Include="Components\Sprite.cs" />
     <Compile Include="Components\Stat.cs" />
     <Compile Include="Components\Identity.cs" />
     <Compile Include="Components\Kamikaze.cs" />

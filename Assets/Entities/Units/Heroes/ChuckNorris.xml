@@ -59,6 +59,8 @@
 		</Size>
 	</Spatial>
 	
+	<Sprite/>
+	
 	<Vision>
 		<Range>20</Range>
 	</Vision>

@@ -37,6 +37,10 @@
 			<Height>3</Height>
 		</Size>
 	</Spatial>
+
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
 	
 	<Vision>
 		<Range>8</Range>

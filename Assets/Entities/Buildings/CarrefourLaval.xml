@@ -34,6 +34,10 @@
 		</Size>
 	</Spatial>
 	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
 	<Vision>
 		<Range>10</Range>
 	</Vision>

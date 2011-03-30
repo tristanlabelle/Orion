@@ -156,7 +156,11 @@ namespace Orion.Game.Presentation
         public Texture GetEntityTexture(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            return GetEntityTexture(entity.Identity.VisualIdentity ?? entity.Identity.Name);
+
+            Sprite sprite = entity.Components.TryGet<Sprite>();
+            return sprite == null || sprite.Name == null
+                ? DefaultTexture
+                : GetEntityTexture(sprite.Name);
         }
 
         /// <summary>

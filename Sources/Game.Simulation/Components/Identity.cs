@@ -15,11 +15,9 @@ namespace Orion.Game.Simulation.Components
     {
         #region Fields
         private string name;
-        private string visualIdentity;
         private string soundIdentity;
         private bool isBuilding;
         private bool isSelectable = true;
-        private bool leavesRemains = true;
         private readonly ICollection<EntityUpgrade> upgrades
             = new ValidatingCollection<EntityUpgrade>(upgrade => upgrade != null);
         private Entity prototype;
@@ -35,13 +33,6 @@ namespace Orion.Game.Simulation.Components
         {
             get { return name; }
             set { name = value; }
-        }
-
-        [Persistent]
-        public string VisualIdentity
-        {
-            get { return visualIdentity ?? name; }
-            set { visualIdentity = value; }
         }
 
         [Persistent]
@@ -74,13 +65,6 @@ namespace Orion.Game.Simulation.Components
             set { isSelectable = value; }
         }
 
-        [Persistent]
-        public bool LeavesRemains
-        {
-            get { return leavesRemains; }
-            set { leavesRemains = value; }
-        }
-
         public Entity Prototype
         {
             get { return prototype; }
@@ -95,7 +79,6 @@ namespace Orion.Game.Simulation.Components
             Argument.EnsureNotNull(target, "target");
 
             Name = target.Name;
-            VisualIdentity = target.VisualIdentity;
             SoundIdentity = target.SoundIdentity;
 
             Upgrades.Clear();
@@ -115,7 +98,8 @@ namespace Orion.Game.Simulation.Components
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            return entity.Identity != null && entity.Identity.IsBuilding;
+            Identity identity = entity.Identity;
+            return identity != null && identity.isBuilding;
         }
 
         /// <summary>

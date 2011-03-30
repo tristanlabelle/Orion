@@ -37,6 +37,8 @@
 			<Height>1</Height>
 		</Size>
 	</Spatial>
+
+	<Sprite/>
 	
 	<Vision>
 		<Range>3</Range>

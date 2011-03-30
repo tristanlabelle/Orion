@@ -29,6 +29,10 @@
 		</Size>
 	</Spatial>
 	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
 	<Vision>
 		<Range>4</Range>
 	</Vision>

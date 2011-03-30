@@ -16,7 +16,7 @@ namespace Orion.Game.Simulation.Components
         public static readonly Stat AladdiumStat = new Stat(typeof(Cost), StatType.Integer, "Aladdium");
         public static readonly Stat AlageneStat = new Stat(typeof(Cost), StatType.Integer, "Alagene");
         public static readonly Stat FoodStat = new Stat(typeof(Cost), StatType.Integer, "Food");
-        public static readonly Stat SpawnTimeStat = new Stat(typeof(Cost), StatType.Real, "Spawn");
+        public static readonly Stat SpawnTimeStat = new Stat(typeof(Cost), StatType.Real, "SpawnTime");
 
         private int aladdium;
         private int alagene;

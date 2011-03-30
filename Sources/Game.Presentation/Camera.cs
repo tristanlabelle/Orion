@@ -17,7 +17,7 @@ namespace Orion.Game.Presentation
         private const float defaultTileSizeInPixels = 32;
         private const float defaultScrollSpeed = 40;
         private const int maximumZoomLevel = 4;
-        private const float zoomLevelInterpolationSpeed = 5;
+        private const float zoomLevelInterpolationSpeed = 25;
 
         private Size worldSize;
         private Size viewportSize;

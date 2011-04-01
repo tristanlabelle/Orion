@@ -4,7 +4,7 @@
 		<Basic SightRange="8" MaxHealth="300" ArmorType="Heavy" Armor="3" AladdiumCost="180" AlageneCost="70"/>
 		<Train Speed="10">
 			<Target>SwineFlu</Target>
-			<Target>UFO</Target>
+			<Target>Ufo</Target>
 			<Target>FlyingCarpet</Target>
 		</Train>
 	</Skills>

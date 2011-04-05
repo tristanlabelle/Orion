@@ -114,7 +114,6 @@
     <Compile Include="Renderers\IMatchRenderer.cs" />
     <Compile Include="Renderers\DeathmatchRenderer.cs" />
     <Compile Include="Renderers\MinimapRenderer.cs" />
-    <Compile Include="Renderers\ResourcesRenderer.cs" />
     <Compile Include="Renderers\SelectionRenderer.cs" />
     <Compile Include="Renderers\TerrainRenderer.cs" />
     <Compile Include="Renderers\UnderAttackWarningRenderer.cs" />

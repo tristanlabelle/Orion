@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.Engine;
-using OpenTK;
-using Orion.Engine.Geometry;
 using System.Diagnostics;
+using OpenTK;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
@@ -17,7 +14,7 @@ namespace Orion.Game.Simulation.Components
     {
         #region Fields
         private CollisionLayer collisionLayer;
-        private Size size;
+        private Size size = new Size(1, 1);
 
         private Vector2 position;
         private float angle;

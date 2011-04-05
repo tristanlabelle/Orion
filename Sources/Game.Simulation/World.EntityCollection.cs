@@ -129,10 +129,10 @@ namespace Orion.Game.Simulation
             /// <returns>The newly created <see cref="Entity"/>.</returns>
             internal Entity CreateUnit(Entity prototype, Faction faction, Point point)
             {
-                Argument.EnsureNotNull(prototype, "faction");
+                Argument.EnsureNotNull(prototype, "prototype");
                 Argument.EnsureNotNull(faction, "faction");
 
-                Entity entity = CreateEntity();
+                Entity entity = CreateEmpty();
                 entity.SpecializeWithPrototype(prototype);
 
                 FactionMembership membership = entity.Components.TryGet<FactionMembership>();
@@ -150,40 +150,9 @@ namespace Orion.Game.Simulation
                 return entity;
             }
 
-            internal Entity CreateEntity()
+            internal Entity CreateEmpty()
             {
                 return new Entity(world, handleGenerator());
-            }
-
-            public Entity CreateResourceNode(ResourceType type, Point point)
-            {
-                Entity node = new Entity(world, handleGenerator());
-
-                node.Components.Add(new Identity(node)
-                {
-                    Name = type.ToStringInvariant()
-                });
-
-                node.Components.Add(new Sprite(node)
-                {
-                    Rotates = false
-                });
-
-                node.Components.Add(new Harvestable(node)
-                {
-                    Amount = World.DefaultResourceAmount,
-                    Type = type
-                });
-
-                node.Components.Add(new Spatial(node)
-                {
-                    Size = new Size(2, 2),
-                    Position = point,
-                    CollisionLayer = type == ResourceType.Aladdium ? CollisionLayer.Ground : CollisionLayer.None
-                });
-                
-                Add(node);
-                return node;
             }
             #endregion
 

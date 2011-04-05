@@ -17,11 +17,6 @@ namespace Orion.Game.Simulation
     [Serializable]
     public sealed partial class World
     {
-        #region Static
-        public const int DefaultResourceAmount = 4000;
-        public static readonly Size DefaultResourceNodeSize = new Size(2, 2);
-        #endregion
-
         #region Fields
         private const int minimumPathfindingNodeCount = 150;
         private const int maximumPathfindingNodeCount = 5000;
@@ -362,7 +357,7 @@ namespace Orion.Game.Simulation
 
         private void CreateRuinsForEntity(Entity entity)
         {
-            Entity ruins = entities.CreateEntity();
+            Entity ruins = entities.CreateEmpty();
 
             ruins.Components.Add(new Identity(ruins)
             {

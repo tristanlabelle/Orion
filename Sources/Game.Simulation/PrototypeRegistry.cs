@@ -41,6 +41,18 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
+        #region Properties
+        public Entity AladdiumNode
+        {
+            get { return FromName("Aladdium"); }
+        }
+
+        public Entity AlageneNode
+        {
+            get { return FromName("Alagene"); }
+        }
+        #endregion
+
         #region Methods
         public void Register(Entity template)
         {
@@ -58,6 +70,11 @@ namespace Orion.Game.Simulation
             Entity type;
             prototypes.TryGetValue(name, out type);
             return type;
+        }
+
+        public Entity FromResourceType(ResourceType type)
+        {
+            return type == ResourceType.Aladdium ? AladdiumNode : AlageneNode;
         }
 
         public IEnumerator<Entity> GetEnumerator()

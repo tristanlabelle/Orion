@@ -8,6 +8,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
+using Orion.Game.Simulation.Utilities;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -28,6 +29,9 @@ namespace Orion.Game.Presentation.Renderers
         private static readonly float fireSize = 2;
         private static readonly float fireAlpha = 0.8f;
         private static readonly float fireSecondsPerFrame = 0.04f;
+
+        private static readonly ColorRgb miniatureAladdiumColor = Colors.Green;
+        private static readonly ColorRgb miniatureAlageneColor = Colors.LightCyan;
 
         /// <summary>
         /// The health ratio below which buildings are on fire.
@@ -51,7 +55,7 @@ namespace Orion.Game.Presentation.Renderers
         private readonly Faction faction;
         private readonly GameGraphics gameGraphics;
         private readonly SpriteAnimation fireAnimation;
-        private readonly BuildingMemoryRenderer buildingMemoryRenderer;
+        private readonly FogOfWarMemory fogOfWarMemory;
         private readonly List<Laser> lasers = new List<Laser>();
         private float simulationTimeInSeconds;
         private bool drawHealthBars;
@@ -66,7 +70,7 @@ namespace Orion.Game.Presentation.Renderers
             this.faction = faction;
             this.gameGraphics = gameGraphics;
             this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
-            this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, gameGraphics);
+            this.fogOfWarMemory = new FogOfWarMemory(faction);
 
             World.Updated += OnWorldUpdated;
             World.HitOccured += OnUnitHitting;
@@ -114,7 +118,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            DrawRememberedBuildings(graphicsContext);
+            DrawRememberedEntities(graphicsContext);
 
             DrawEntities(graphicsContext, viewBounds, CollisionLayer.None, DrawEntity);
             DrawEntities(graphicsContext, viewBounds, CollisionLayer.Ground, DrawEntity);
@@ -127,7 +131,26 @@ namespace Orion.Game.Presentation.Renderers
         #region Miniature
         public void DrawMiniature(GraphicsContext context)
         {
-            buildingMemoryRenderer.DrawMiniature(context, miniatureUnitSize);
+            foreach (RememberedEntity entity in fogOfWarMemory.Entities)
+            {
+                Rectangle rectangle = new Rectangle(entity.Location, (Vector2)miniatureUnitSize);
+
+                ColorRgb color = Colors.White;
+                if (entity.Faction == null)
+                {
+                    Harvestable harvestable = entity.Prototype.Components.TryGet<Harvestable>();
+                    if (harvestable != null)
+                    {
+                        color = harvestable.Type == ResourceType.Aladdium ? miniatureAladdiumColor : miniatureAlageneColor;
+                    }
+                }
+                else
+                {
+                    color = entity.Faction.Color;
+                }
+
+                context.Fill(rectangle, color);
+            }
 
             foreach (Entity entity in World.Entities)
             {
@@ -141,9 +164,15 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Units
-        private void DrawRememberedBuildings(GraphicsContext graphics)
+        private void DrawRememberedEntities(GraphicsContext graphics)
         {
-            buildingMemoryRenderer.Draw(graphics);
+            foreach (RememberedEntity entity in fogOfWarMemory.Entities)
+            {
+                Texture texture = gameGraphics.GetEntityTexture(entity.Prototype);
+
+                ColorRgb color = entity.Faction == null ? Colors.White : entity.Faction.Color;
+                graphics.Fill(entity.GridRegion.ToRectangle(), texture, color);
+            }
         }
 
         private void DrawEntities(GraphicsContext graphicsContext, Rectangle viewBounds,
@@ -154,8 +183,7 @@ namespace Orion.Game.Presentation.Renderers
                 Spatial spatial = entity.Spatial;
                 if (spatial == null
                     || spatial.CollisionLayer != collisionLayer
-                    || !faction.CanSee(entity)
-                    || entity.Components.Has<Harvestable>())
+                    || !faction.CanSee(entity))
                 {
                     continue;
                 }

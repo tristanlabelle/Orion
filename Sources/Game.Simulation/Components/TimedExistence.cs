@@ -7,12 +7,12 @@ using Orion.Engine;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class TimedExistence : Component
+    public sealed class TimedExistence : Component
     {
         #region Fields
         public static readonly Stat LifeSpanStat = new Stat(typeof(TimedExistence), StatType.Real, "LifeSpan");
 
-        private float lifeSpan;
+        private float lifeSpan = 1;
         private float elapsedTime;
         #endregion
 

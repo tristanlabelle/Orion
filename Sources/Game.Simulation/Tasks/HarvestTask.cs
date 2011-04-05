@@ -168,10 +168,10 @@ namespace Orion.Game.Simulation.Tasks
 
             //adds the resources to the unit's faction
             Faction faction = FactionMembership.GetFaction(Entity);
-            Harvestable harvest = node.Components.Get<Harvestable>();
-            if (harvest.Type == ResourceType.Aladdium)
+            Harvestable harvestable = node.Components.Get<Harvestable>();
+            if (harvestable.Type == ResourceType.Aladdium)
                 faction.AladdiumAmount += amountCarrying;
-            else if (harvest.Type == ResourceType.Alagene)
+            else if (harvestable.Type == ResourceType.Alagene)
                 faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 

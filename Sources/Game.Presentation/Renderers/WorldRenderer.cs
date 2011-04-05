@@ -19,8 +19,7 @@ namespace Orion.Game.Presentation.Renderers
         private readonly GameGraphics gameGraphics;
 
         private readonly TerrainRenderer terrainRenderer;
-        private readonly ResourcesRenderer resourcesRenderer;
-        private readonly EntityRenderer unitsRenderer;
+        private readonly EntityRenderer entityRenderer;
         private readonly ExplosionRenderer explosionRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
         #endregion
@@ -42,8 +41,7 @@ namespace Orion.Game.Presentation.Renderers
             this.gameGraphics = gameGraphics;
 
             this.terrainRenderer = new TerrainRenderer(World.Terrain, gameGraphics);
-            this.resourcesRenderer = new ResourcesRenderer(faction, gameGraphics);
-            this.unitsRenderer = new EntityRenderer(faction, gameGraphics);
+            this.entityRenderer = new EntityRenderer(faction, gameGraphics);
             this.explosionRenderer = new ExplosionRenderer(faction.World, gameGraphics);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
         }
@@ -62,8 +60,8 @@ namespace Orion.Game.Presentation.Renderers
 
         public bool DrawHealthBars
         {
-            get { return unitsRenderer.DrawHealthBars; }
-            set { unitsRenderer.DrawHealthBars = value; }
+            get { return entityRenderer.DrawHealthBars; }
+            set { entityRenderer.DrawHealthBars = value; }
         }
 
         public World World
@@ -85,28 +83,16 @@ namespace Orion.Game.Presentation.Renderers
             terrainRenderer.DrawMiniature(graphicsContext);
         }
 
-        public void DrawResources(GraphicsContext graphicsContext, Rectangle viewBounds)
+        public void DrawEntities(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            resourcesRenderer.Draw(graphicsContext, viewBounds);
+            entityRenderer.Draw(graphicsContext, viewBounds);
         }
 
-        public void DrawMiniatureResources(GraphicsContext graphicsContext)
+        public void DrawMiniatureEntities(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            resourcesRenderer.DrawMiniature(graphicsContext);
-        }
-
-        public void DrawUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
-        {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            unitsRenderer.Draw(graphicsContext, viewBounds);
-        }
-
-        public void DrawMiniatureUnits(GraphicsContext graphicsContext)
-        {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            unitsRenderer.DrawMiniature(graphicsContext);
+            entityRenderer.DrawMiniature(graphicsContext);
         }
 
         public void DrawExplosions(GraphicsContext graphicsContext, Rectangle viewBounds)

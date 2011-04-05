@@ -190,14 +190,17 @@ namespace Orion.Game.Presentation.Gui
             }
             else if (harvestable != null)
             {
-                newMaxAmount = World.DefaultResourceAmount;
+                newMaxAmount = 0;
                 newAmount = harvestable.Amount;
             }
 
             if (newAmount != currentAmount || newMaxAmount != currentMaxAmount)
             {
-                healthLabel.VisibilityFlag = newMaxAmount == 0 ? Visibility.Hidden : Visibility.Visible;
-                healthLabel.Text = newAmount + "/" + newMaxAmount;
+                healthLabel.VisibilityFlag = newAmount == 0 ? Visibility.Hidden : Visibility.Visible;
+
+                healthLabel.Text = newAmount.ToStringInvariant();
+                if (newMaxAmount != 0) healthLabel.Text += "/" + newMaxAmount;
+
                 currentMaxAmount = newMaxAmount;
                 currentAmount = newAmount;
             }

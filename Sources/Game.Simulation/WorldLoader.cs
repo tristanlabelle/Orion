@@ -33,17 +33,25 @@ namespace Orion.Game.Simulation
             return worldData.Terrain;
         }
 
-        public override void PrepareWorld(World world, PrototypeRegistry unitTypes)
+        public override void PrepareWorld(World world, PrototypeRegistry prototypes)
         {
-            // create resource nodes
+            CreateResourceNodes(world, prototypes);
+            CreateUnits(world, prototypes);
+        }
+
+        private void CreateResourceNodes(World world, PrototypeRegistry prototypes)
+        {
             foreach (ResourceNodeTemplate node in worldData.AladdiumNodes)
             {
                 Point nodeLocation = node.Location;
-                Entity concreteNode = world.Entities.CreateResourceNode(node.ResourceType, nodeLocation);
+
+                Entity concreteNode = CreateResourceNode(world, prototypes, node.ResourceType, node.Location);
                 concreteNode.Components.Get<Harvestable>().Amount = node.RemainingAmount;
             }
+        }
 
-            // place units
+        private void CreateUnits(World world, PrototypeRegistry prototypes)
+        {
             Debug.Assert(world.Factions.Count() <= worldData.NumberOfFactions,
                 "There are more factions than this map supports.");
 
@@ -54,7 +62,7 @@ namespace Orion.Game.Simulation
                 Faction currentFaction = factionEnumerator.Current;
                 foreach (UnitTemplate unit in worldData.GetUnitsForFaction(i))
                 {
-                    Entity prototype = unitTypes.FromName(unit.UnitTypeName);
+                    Entity prototype = prototypes.FromName(unit.UnitTypeName);
                     currentFaction.CreateUnit(prototype, unit.Location);
                 }
             }

@@ -87,9 +87,8 @@ namespace Orion.Game.Presentation.Renderers
             using (context.PushTranslate(ShakeOffset))
             {
                 worldRenderer.DrawTerrain(context, visibleBounds);
-                worldRenderer.DrawResources(context, visibleBounds);
                 worldRenderer.DrawBlueprints(context, visibleBounds);
-                worldRenderer.DrawUnits(context, visibleBounds);
+                worldRenderer.DrawEntities(context, visibleBounds);
                 selectionRenderer.DrawSelectionMarkers(context);
 
                 if (inputManager.HoveredEntity != null && Faction.CanSee(inputManager.HoveredEntity))
@@ -110,8 +109,7 @@ namespace Orion.Game.Presentation.Renderers
         public void DrawMinimap()
         {
             worldRenderer.DrawMiniatureTerrain(graphics.Context);
-            worldRenderer.DrawMiniatureResources(graphics.Context);
-            worldRenderer.DrawMiniatureUnits(graphics.Context);
+            worldRenderer.DrawMiniatureEntities(graphics.Context);
             worldRenderer.DrawFogOfWar(graphics.Context, World.Bounds);
         }
 

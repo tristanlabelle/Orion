@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Aladdium</Name>
+	</Identity>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Harvestable>
+		<Type>Aladdium</Type>
+		<Amount>4000</Amount>
+	</Harvestable>
+</Entity>

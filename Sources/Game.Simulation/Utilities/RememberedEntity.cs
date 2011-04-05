@@ -11,10 +11,10 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Utilities
 {
     /// <summary>
-    /// Represents what is remembered of a building which has been seen but is now in the fog of war.
+    /// Represents what is remembered of an <see cref="Entity"/> which has been seen but is now in the fog of war.
     /// </summary>
     [ImmutableObject(true)]
-    public struct RememberedBuilding : IEquatable<RememberedBuilding>
+    public struct RememberedEntity : IEquatable<RememberedEntity>
     {
         #region Instance
         #region Fields
@@ -24,32 +24,44 @@ namespace Orion.Game.Simulation.Utilities
         #endregion
 
         #region Constructors
-        public RememberedBuilding(Entity building)
+        public RememberedEntity(Point location, Entity prototype, Faction faction)
         {
-            Argument.EnsureNotNull(building, "building");
+            Argument.EnsureNotNull(prototype, "prototype");
 
-            this.location = building.GridRegion.Min;
-            this.prototype = Identity.GetPrototype(building);
-            this.faction = FactionMembership.GetFaction(building);
+            this.location = location;
+            this.prototype = prototype;
+            this.faction = faction;
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the location of the remembered entity.
+        /// </summary>
         public Point Location
         {
             get { return location; }
         }
 
+        /// <summary>
+        /// Gets the grid region occupied by the remembered entity.
+        /// </summary>
         public Region GridRegion
         {
             get { return Entity.GetGridRegion(location, prototype.Size); }
         }
 
+        /// <summary>
+        /// Gets the prototype of the remembered entity.
+        /// </summary>
         public Entity Prototype
         {
             get { return prototype; }
         }
 
+        /// <summary>
+        /// Gets the faction of the remembered entity.
+        /// </summary>
         public Faction Faction
         {
             get { return faction; }
@@ -58,18 +70,21 @@ namespace Orion.Game.Simulation.Utilities
 
         #region Methods
         /// <summary>
-        /// Tests if a building matches this description.
+        /// Tests if an <see cref="Entity"/> matches this description.
         /// </summary>
-        /// <param name="building">The building to be tested.</param>
+        /// <param name="entity">The <see cref="Entity"/> to be tested.</param>
         /// <returns>A value indicating if it matches this description.</returns>
-        public bool Matches(Entity building)
+        public bool Matches(Entity entity)
         {
-            Argument.EnsureNotNull(building, "building");
+            Argument.EnsureNotNull(entity, "entity");
 
-            return new RememberedBuilding(building) == this;
+            Entity prototype = Identity.GetPrototype(entity);
+            return prototype != null
+                && entity.Spatial != null 
+                && new RememberedEntity(entity.Spatial.GridRegion.Min, prototype, FactionMembership.GetFaction(entity)) == this;
         }
 
-        public bool Equals(RememberedBuilding other)
+        public bool Equals(RememberedEntity other)
         {
             return location == other.location
                 && prototype == other.prototype
@@ -78,7 +93,7 @@ namespace Orion.Game.Simulation.Utilities
 
         public override bool Equals(object obj)
         {
-            return obj is RememberedBuilding && Equals((RememberedBuilding)obj);
+            return obj is RememberedEntity && Equals((RememberedEntity)obj);
         }
 
         public override int GetHashCode()
@@ -94,17 +109,17 @@ namespace Orion.Game.Simulation.Utilities
         #endregion
 
         #region Static
-        public static bool Equals(RememberedBuilding a, RememberedBuilding b)
+        public static bool Equals(RememberedEntity a, RememberedEntity b)
         {
             return a.Equals(b);
         }
 
-        public static bool operator ==(RememberedBuilding a, RememberedBuilding b)
+        public static bool operator ==(RememberedEntity a, RememberedEntity b)
         {
             return Equals(a, b);
         }
 
-        public static bool operator !=(RememberedBuilding a, RememberedBuilding b)
+        public static bool operator !=(RememberedEntity a, RememberedEntity b)
         {
             return !Equals(a, b);
         }

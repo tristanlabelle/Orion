@@ -15,7 +15,7 @@ namespace Orion.Game.Simulation.Utilities
     {
         #region Fields
         private readonly Faction faction;
-        private readonly HashSet<RememberedBuilding> buildings = new HashSet<RememberedBuilding>();
+        private readonly HashSet<RememberedEntity> entities = new HashSet<RememberedEntity>();
         private bool hasVisibilityChanged = false;
         #endregion
 
@@ -32,7 +32,7 @@ namespace Orion.Game.Simulation.Utilities
 
         #region Properties
         /// <summary>
-        /// Accesses the faction for which we're remembering objects.
+        /// Accesses the <see cref="Faction"/> for which we're remembering <see cref="Entity">entities</see>.
         /// </summary>
         public Faction Faction
         {
@@ -40,11 +40,11 @@ namespace Orion.Game.Simulation.Utilities
         }
 
         /// <summary>
-        /// Accesses the buildings remembered by the faction.
+        /// Accesses the <see cref="Entity">entities</see> remembered by the faction.
         /// </summary>
-        public IEnumerable<RememberedBuilding> Buildings
+        public IEnumerable<RememberedEntity> Entities
         {
-            get { return buildings; }
+            get { return entities; }
         }
         #endregion
 
@@ -55,32 +55,34 @@ namespace Orion.Game.Simulation.Utilities
 
             foreach (Entity entity in faction.World.Entities.Intersecting(region.ToRectangle()))
             {
-                if (entity == null
-                    || FactionMembership.GetFaction(entity) == faction
-                    || !entity.Identity.IsBuilding
-                    || Faction.CanSee(entity))
+                Faction entityFaction = FactionMembership.GetFaction(entity);
+                Entity prototype = Identity.GetPrototype(entity);
+                if (entityFaction == faction
+                    || prototype == null
+                    || (!entity.Identity.IsBuilding && !entity.Components.Has<Harvestable>())
+                    || faction.CanSee(entity))
                 {
                     continue;
                 }
 
-                RememberedBuilding building = new RememberedBuilding(entity);
-                buildings.Add(building);
+                entities.Add(new RememberedEntity(entity.Spatial.GridRegion.Min, prototype, entityFaction));
             }
 
             hasVisibilityChanged = true;
         }
 
         /// <summary>
-        /// Cleans the memory from buildings which are visible and are not what we thought they were.
+        /// Clears the memory of entities which are visible and are not what we thought they were.
         /// </summary>
-        private void RemoveDeprecatedBuildings()
+        private void RemoveDeprecatedEntities()
         {
-            buildings.RemoveWhere(rememberedBuilding =>
+            entities.RemoveWhere(rememberedEntity =>
             {
-                if (!faction.CanSee(rememberedBuilding.GridRegion)) return false;
+                if (!faction.CanSee(rememberedEntity.GridRegion)) return false;
 
-                Entity building = faction.World.Entities.GetEntityAt(rememberedBuilding.Location, CollisionLayer.Ground);
-                return building == null || !rememberedBuilding.Matches(building);
+                CollisionLayer collisionLayer = rememberedEntity.Prototype.Spatial.CollisionLayer;
+                Entity entity = faction.World.Entities.GetEntityAt(rememberedEntity.Location, collisionLayer);
+                return entity == null || !rememberedEntity.Matches(entity);
             });
         }
 
@@ -88,7 +90,7 @@ namespace Orion.Game.Simulation.Utilities
         {
             if (!hasVisibilityChanged) return;
 
-            RemoveDeprecatedBuildings();
+            RemoveDeprecatedEntities();
             hasVisibilityChanged = false;
         }
         #endregion

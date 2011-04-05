@@ -116,7 +116,7 @@
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="EntityUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />
-    <Compile Include="Utilities\RememberedBuilding.cs" />
+    <Compile Include="Utilities\RememberedEntity.cs" />
     <Compile Include="Utilities\UnderAttackMonitor.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="HitEventArgs.cs" />

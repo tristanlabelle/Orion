@@ -10,7 +10,10 @@ using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
-    public class RandomWorldGenerator : WorldGenerator
+    /// <summary>
+    /// A world generator which generates random topology using perlin noise.
+    /// </summary>
+    public sealed class RandomWorldGenerator : WorldGenerator
     {
         #region Fields
         private readonly double resourcesDensity;
@@ -35,12 +38,12 @@ namespace Orion.Game.Simulation
 
         #region Methods
         #region Overrides
-        public override void PrepareWorld(World world, PrototypeRegistry unitTypes)
+        public override void PrepareWorld(World world, PrototypeRegistry prototypes)
         {
             foreach (Faction faction in world.Factions)
-                GenerateFactionCamp(world, unitTypes, faction, random, createPyramids);
+                GenerateFactionCamp(world, prototypes, faction, createPyramids);
 
-            GenerateResourceNodes(world, random);
+            GenerateResourceNodes(world, prototypes);
         }
 
         public override Terrain GenerateTerrain()
@@ -70,32 +73,22 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Private
-        private void GenerateResourceNodes(World world, Random random)
+        private void GenerateResourceNodes(World world, PrototypeRegistry prototypes)
         {
             Argument.EnsureNotNull(world, "world");
-            Argument.EnsureNotNull(random, "random");
+            Argument.EnsureNotNull(prototypes, "prototypes");
 
-            GenerateResourceNodes(world, resourcesDensity, random);
-        }
-
-        private static void GenerateResourceNodes(World world, double density, Random random)
-        {
-            int resourceNodeCount = (int)(world.Size.Area * density) / 2;
-            GenerateResourceNodes(world, resourceNodeCount, resourceNodeCount, random);
-        }
-
-        private static void GenerateResourceNodes(World world,
-            int aladdiumNodeCount, int alageneNodeCount, Random random)
-        {
-            for (int i = 0; i < aladdiumNodeCount + alageneNodeCount; i++)
+            int count = (int)(world.Size.Area * resourcesDensity) / 2;
+            for (int i = 0; i < count * 2; i++)
             {
-                Point location = GetRandomFreeLocation(world, World.DefaultResourceNodeSize, random);
-                ResourceType resourceType = i < aladdiumNodeCount ? ResourceType.Aladdium : ResourceType.Alagene;
-                world.Entities.CreateResourceNode(resourceType, location);
+                ResourceType type = i % 2 == 0 ? ResourceType.Aladdium : ResourceType.Alagene;
+                Entity prototype = prototypes.FromResourceType(type);
+                Point location = GetRandomFreeLocation(world, prototype.Spatial.Size);
+                CreateResourceNode(world, prototypes, type, location);
             }
         }
 
-        private static Point GetRandomFreeLocation(World world, Size regionSize, Random random)
+        private Point GetRandomFreeLocation(World world, Size regionSize)
         {
             while (true)
             {
@@ -117,12 +110,12 @@ namespace Orion.Game.Simulation
             }
         }
 
-        private void GenerateFactionCamp(World world, PrototypeRegistry unitTypes,
-            Faction faction, Random random, bool placePyramid)
+        private void GenerateFactionCamp(World world, PrototypeRegistry prototypes,
+            Faction faction, bool placePyramid)
         {
             Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(prototypes, "prototypes");
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(random, "random");
 
             world.Entities.CommitDeferredChanges();
 
@@ -159,14 +152,14 @@ namespace Orion.Game.Simulation
                 break;
             }
 
-            CreateCamp(world, unitTypes, faction, campCenter, placePyramid);
+            CreateCamp(world, prototypes, faction, campCenter, placePyramid);
         }
 
-        private void CreateCamp(World world, PrototypeRegistry unitTypes,
+        private void CreateCamp(World world, PrototypeRegistry prototypes,
             Faction faction, Vector2 campCenter, bool placePyramid)
         {
             Region buildingRegion;
-            Entity commandCenterPrototype = unitTypes.FromName("Pyramid");
+            Entity commandCenterPrototype = prototypes.FromName("Pyramid");
             if (placePyramid)
             {
                 Entity building = faction.CreateUnit(commandCenterPrototype, (Point)campCenter);
@@ -177,16 +170,16 @@ namespace Orion.Game.Simulation
                 buildingRegion = new Region((Point)campCenter, commandCenterPrototype.Size);
             }
 
-            Entity workerPrototype = unitTypes.FromName("Smurf");
+            Entity workerPrototype = prototypes.FromName("Smurf");
             faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));
             faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY + 1));
             faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY));
             faction.CreateUnit(workerPrototype, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY + 1));
 
-            world.Entities.CreateResourceNode(ResourceType.Aladdium,
+            CreateResourceNode(world, prototypes, ResourceType.Aladdium,
                 (Point)(campCenter + new Vector2(campSize / -4f, campSize / -4f)));
 
-            world.Entities.CreateResourceNode(ResourceType.Alagene,
+            CreateResourceNode(world, prototypes, ResourceType.Alagene,
                 (Point)(campCenter + new Vector2(campSize / -4f, campSize / 4f)));
         }
         #endregion

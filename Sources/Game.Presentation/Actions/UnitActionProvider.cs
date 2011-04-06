@@ -202,6 +202,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = localizer.GetNoun(traineePrototype.Identity.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
+                    HotKey = traineePrototype.Identity.HotKey,
                     Texture = graphics.GetEntityTexture(traineePrototype),
                     Action = () => userInputManager.LaunchTrain(traineePrototypeForClosure)
                 };

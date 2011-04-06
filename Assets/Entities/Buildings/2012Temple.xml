@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>2012Temple</Name>
+		<HotKey>T</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

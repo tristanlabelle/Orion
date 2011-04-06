@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation.Components.Serialization;
 using Orion.Engine.Collections;
+using OpenTK.Input;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -18,6 +19,7 @@ namespace Orion.Game.Simulation.Components
         private string soundIdentity;
         private bool isBuilding;
         private bool isSelectable = true;
+        private Key hotKey = Key.Unknown;
         private readonly ICollection<EntityUpgrade> upgrades
             = new ValidatingCollection<EntityUpgrade>(upgrade => upgrade != null);
         private Entity prototype;
@@ -53,16 +55,26 @@ namespace Orion.Game.Simulation.Components
         }
 
         [Persistent]
-        public ICollection<EntityUpgrade> Upgrades
-        {
-            get { return upgrades; }
-        }
-
-        [Persistent]
         public bool IsSelectable
         {
             get { return isSelectable; }
             set { isSelectable = value; }
+        }
+
+        /// <summary>
+        /// Accesses the keyboard shortcut key which refers to this type of <see cref="Entity"/>.
+        /// </summary>
+        [Persistent]
+        public Key HotKey
+        {
+            get { return hotKey; }
+            set { hotKey = value; }
+        }
+
+        [Persistent]
+        public ICollection<EntityUpgrade> Upgrades
+        {
+            get { return upgrades; }
         }
 
         public Entity Prototype

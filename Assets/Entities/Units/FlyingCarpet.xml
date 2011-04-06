@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>FlyingCarpet</Name>
+		<HotKey>F</HotKey>
 		<Upgrades>
 			<Item>AladdinsCarpet</Item>
 		</Upgrades>

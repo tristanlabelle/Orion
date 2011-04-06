@@ -8,6 +8,7 @@ using Orion.Engine.Graphics;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
+using System.Diagnostics;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -29,6 +30,8 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
             this.prototype = prototype;
             this.texture = gameGraphics.GetEntityTexture(prototype);
+
+            Debug.Assert(prototype.Components.Has<Spatial>(), "Cannot position a building without a spatial component.");
         }
         #endregion
 
@@ -41,7 +44,8 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
                 int aladdiumCost = (int)LocalFaction.GetStat(prototype, Cost.AladdiumStat);
                 int alageneCost = (int)LocalFaction.GetStat(prototype, Cost.AlageneStat);
-                Region region = new Region(minLocation.Value, prototype.Size);
+
+                Region region = new Region(minLocation.Value, prototype.Spatial.Size);
                 if (aladdiumCost > LocalFaction.AladdiumAmount
                     || alageneCost > LocalFaction.AlageneAmount
                     || !LocalFaction.HasFullySeen(region))
@@ -52,17 +56,17 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
                 // Special case for alagene extractors:
                 // They can only be build on alagene nodes.
-                IEnumerable<Entity> alageneResourceNodes = World.Entities
-                    .Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One))
-                    .Where(e => e.Components.Has<Harvestable>())
-                    .Where(e => e.Components.Get<Harvestable>().Type == ResourceType.Alagene);
-
-                foreach (Entity entity in alageneResourceNodes)
+                foreach (Entity entity in World.Entities.Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One)))
                 {
-                    Spatial position = entity.Spatial;
-                    if (position.Position == minLocation.Value)
+                    Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+                    if (harvestable != null
+                        && harvestable.Type == ResourceType.Alagene
+                        && entity.Spatial.Position == minLocation.Value)
+                    {
                         return true;
+                    }
                 }
+                
                 return false;
             }
         }
@@ -84,18 +88,20 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
         private Point GetMinLocation(Vector2 location)
         {
-            int minX = (int)Math.Round(location.X - prototype.Size.Width * 0.5f);
-            int minY = (int)Math.Round(location.Y - prototype.Size.Height * 0.5f);
+            Size size = prototype.Spatial.Size;
+
+            int minX = (int)Math.Round(location.X - size.Width * 0.5f);
+            int minY = (int)Math.Round(location.Y - size.Height * 0.5f);
 
             if (minX < 0)
                 minX = 0;
-            else if (minX >= World.Width - prototype.Size.Width)
-                minX = World.Width - prototype.Size.Width;
+            else if (minX >= World.Width - size.Width)
+                minX = World.Width - size.Width;
 
             if (minY < 0)
                 minY = 0;
-            else if (minY >= World.Height - prototype.Size.Height)
-                minY = World.Height - prototype.Size.Height;
+            else if (minY >= World.Height - size.Height)
+                minY = World.Height - size.Height;
 
             return new Point(minX, minY);
         }
@@ -104,10 +110,11 @@ namespace Orion.Game.Presentation.Actions.UserCommands
         {
             if (!minLocation.HasValue) return;
 
+            Size size = prototype.Spatial.Size;
             ColorRgb tint = IsLocationValid ? Colors.LightBlue : Colors.Red;
             Rectangle rectangle = new Rectangle(
                 minLocation.Value.X, minLocation.Value.Y,
-                prototype.Size.Width, prototype.Size.Height);
+                size.Width, size.Height);
             context.Fill(rectangle, tint.ToRgba(0.4f));
             context.Fill(rectangle, texture, tint);
         }

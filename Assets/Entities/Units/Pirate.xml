@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Pirate</Name>
+		<HotKey>P</HotKey>
 		<Upgrades>
 			<Item>Bluebeard</Item>
 		</Upgrades>

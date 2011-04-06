@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>SauronsEye</Name>
+		<HotKey>E</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

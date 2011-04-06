@@ -98,6 +98,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 Name = localizer.GetNoun(buildingPrototype.Identity.Name),
                 Cost = new ResourceAmount(aladdiumCost, alageneCost),
+                HotKey = buildingPrototype.Identity.HotKey,
                 Texture = graphics.GetEntityTexture(buildingPrototype),
                 Action = () =>
                 {

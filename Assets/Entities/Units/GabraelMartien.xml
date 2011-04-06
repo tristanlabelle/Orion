@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>GabraelMartien</Name>
+		<HotKey>G</HotKey>
 	</Identity>
 	
 	<Cost>

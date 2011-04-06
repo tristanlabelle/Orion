@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>AlageneExtractor</Name>
+		<HotKey>A</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

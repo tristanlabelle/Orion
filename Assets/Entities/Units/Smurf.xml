@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Smurf</Name>
+		<HotKey>S</HotKey>
 		<Upgrades>
 			<Item>PapaSmurf</Item>
 			<Item>BlueCollarSmurf</Item>

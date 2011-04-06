@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Mentos</Name>
+		<HotKey>M</HotKey>
 	</Identity>
 	
 	<Cost>

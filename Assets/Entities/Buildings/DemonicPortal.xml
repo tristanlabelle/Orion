@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>DemonicPortal</Name>
+		<HotKey>D</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

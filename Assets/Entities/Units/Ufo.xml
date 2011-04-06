@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Ufo</Name>
+		<HotKey>U</HotKey>
 		<Upgrades>
 			<Item>Mothership</Item>
 		</Upgrades>

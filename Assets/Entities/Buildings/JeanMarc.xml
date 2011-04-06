@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>JeanMarc</Name>
+		<HotKey>J</HotKey>
 		<IsBuilding>True</IsBuilding>
 		<Upgrades>
 			<Item>

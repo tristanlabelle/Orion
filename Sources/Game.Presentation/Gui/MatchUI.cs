@@ -687,7 +687,7 @@ namespace Orion.Game.Presentation.Gui
             if (@event.Key == Key.Down) isDownPressed = @event.IsDown;
 
             UpdateScrollDirection();
-            HandleActionHotKey(@event);
+            if (@event.IsDown) HandleActionHotKey(@event);
 
             return true;
         }

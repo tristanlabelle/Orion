@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Ninja</Name>
+		<HotKey>N</HotKey>
 		<Upgrades>
 			<Item>Leonardo</Item>
 		</Upgrades>

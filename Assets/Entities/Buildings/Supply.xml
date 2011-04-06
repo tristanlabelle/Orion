@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Supply</Name>
+		<HotKey>S</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

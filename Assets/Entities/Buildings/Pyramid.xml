@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Pyramid</Name>
+		<HotKey>P</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

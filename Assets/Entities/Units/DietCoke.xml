@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>DietCoke</Name>
+		<HotKey>D</HotKey>
 	</Identity>
 	
 	<Cost>

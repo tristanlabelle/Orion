@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>HellsCostco</Name>
+		<HotKey>H</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

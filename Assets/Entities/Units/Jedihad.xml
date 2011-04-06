@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>Jedihad</Name>
+		<HotKey>J</HotKey>
 		<Upgrades>
 			<Item>Allah Skywalker</Item>
 		</Upgrades>

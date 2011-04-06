@@ -2,6 +2,7 @@
 <Entity>
 	<Identity>
 		<Name>TristansHouse</Name>
+		<HotKey>R</HotKey>
 		<IsBuilding>True</IsBuilding>
 	</Identity>
 	

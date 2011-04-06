@@ -219,13 +219,15 @@ namespace Orion.Game.Main
             actionPanel.Clear();
             ui.ClearActionButtons();
 
-            bool allSelectedUnitsControllable = Selection
+            bool allSelectedEntitiesControllable = Selection
                 .All(entity => 
                 {
                     Faction entityFaction = FactionMembership.GetFaction(entity);
-                    return entityFaction != null && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl);
+                    return entityFaction != null
+                        && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl)
+                        && entity.Components.Has<TaskQueue>();
                 });
-            if (SelectionManager.FocusedPrototype == null || !allSelectedUnitsControllable) return;
+            if (SelectionManager.FocusedPrototype == null || !allSelectedEntitiesControllable) return;
 
             var actionProvider = new UnitActionProvider(actionPanel, userInputManager,
                 Graphics, Localizer, SelectionManager.FocusedPrototype);

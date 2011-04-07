@@ -408,19 +408,25 @@ namespace Orion.Game.Simulation
             UsedFoodAmount -= (int)GetStat(oldPrototype, Cost.FoodStat);
             UsedFoodAmount += (int)GetStat(newPrototype, Cost.FoodStat);
 
+            Spatial entitySpatial = entity.Spatial;
+            if (entitySpatial == null) return;
+
+            Size oldPrototypeSize = oldPrototype.Spatial.Size;
+            Size newPrototypeSize = newPrototype.Spatial.Size;
+
             if (entity.Components.Has<BuildProgress>())
             {
-                Region oldRegion = Entity.GetGridRegion(entity.Position, oldPrototype.Size);
-                Region newRegion = Entity.GetGridRegion(entity.Position, newPrototype.Size);
+                Region oldRegion = Entity.GetGridRegion(entitySpatial.Position, oldPrototypeSize);
+                Region newRegion = Entity.GetGridRegion(entitySpatial.Position, newPrototypeSize);
                 localFogOfWar.RemoveRegion(oldRegion);
                 localFogOfWar.AddRegion(newRegion);
             }
             else
             {
-                Vector2 oldCenter = entity.Position + (Vector2)oldPrototype.Size * 0.5f;
+                Vector2 oldCenter = entitySpatial.Position + (Vector2)oldPrototypeSize * 0.5f;
                 int oldSightRange = (int)GetStat(oldPrototype, Vision.RangeStat);
-                
-                Vector2 newCenter = entity.Position + (Vector2)newPrototype.Size * 0.5f;
+
+                Vector2 newCenter = entitySpatial.Position + (Vector2)newPrototypeSize * 0.5f;
                 int newSightRange = (int)GetStat(newPrototype, Vision.RangeStat);
 
                 localFogOfWar.RemoveLineOfSight(new Circle(oldCenter, oldSightRange));

@@ -311,14 +311,17 @@ namespace Orion.Game.Presentation
 
         private void LaunchDefaultCommand(Entity target)
         {
+            Spatial targetSpatial = target.Spatial;
+            if (targetSpatial == null) return;
+
             if (target.Components.Has<Harvestable>())
             {
                 if (LocalFaction.CanHarvest(target) && Selection.Any(entity => entity.Components.Has<Harvester>()))
                     LaunchHarvest(target);
                 else if (Selection.Any(entity => entity.Components.Has<Mobile>()))
-                    LaunchMove(target.Position);
+                    LaunchMove(targetSpatial.Position);
                 else
-                    LaunchChangeRallyPoint(target.Center);
+                    LaunchChangeRallyPoint(targetSpatial.Center);
 
                 return;
             }
@@ -327,22 +330,22 @@ namespace Orion.Game.Presentation
             if (targetFaction == null || LocalFaction.GetDiplomaticStance(targetFaction) == DiplomaticStance.Enemy)
             {
                 if (target.Components.Has<Health>()) LaunchAttack(target);
-                else LaunchMove(target.Center);
+                else LaunchMove(targetSpatial.Center);
                 return;
             }
 
             if (Selection.All(entity => entity.Components.Has<Trainer>()))
             {
-                LaunchChangeRallyPoint(target.Center);
+                LaunchChangeRallyPoint(targetSpatial.Center);
                 return;
             }
 
             if (target.Components.Has<AlageneExtractor>())
             {
                 Entity alageneNode = World.Entities
-                    .Intersecting(Rectangle.FromCenterSize(target.Position, Vector2.One))
+                    .Intersecting(Rectangle.FromCenterSize(targetSpatial.Position, Vector2.One))
                     .Where(e => e.Components.Has<Harvestable>())
-                    .FirstOrDefault(node => node.Position == target.Position);
+                    .FirstOrDefault(node => node.Spatial.Position == targetSpatial.Position);
                 if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
                 {
                     LaunchHarvest(alageneNode);
@@ -368,8 +371,8 @@ namespace Orion.Game.Presentation
                     return;
                 }
             }
-            
-            LaunchMove(target.Position);
+
+            LaunchMove(targetSpatial.Position);
         }
         #endregion
 
@@ -405,7 +408,7 @@ namespace Orion.Game.Presentation
             ClearTasksIfNecessary();
             // Those who can attack do so, the others simply move to the target's position
             commander.LaunchAttack(selection.Where(entity => entity.Components.Has<Attacker>()), target);
-            commander.LaunchMove(selection.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Mobile>()), target.Position);
+            commander.LaunchMove(selection.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Mobile>()), target.Spatial.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
@@ -429,7 +432,7 @@ namespace Orion.Game.Presentation
             // Those who can harvest do so, the others simply move to the resource's position
             ClearTasksIfNecessary();
             commander.LaunchHarvest(movableEntities.Where(entity => entity.Components.Has<Harvester>()), node);
-            commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Harvester>()), node.Position);
+            commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Harvester>()), node.Spatial.Position);
         }
 
         public void LaunchMove(Vector2 destination)

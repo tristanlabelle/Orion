@@ -167,7 +167,7 @@ namespace Orion.Game.Simulation
             }
             else
             {
-                buildingRegion = new Region((Point)campCenter, commandCenterPrototype.Size);
+                buildingRegion = new Region((Point)campCenter, commandCenterPrototype.Spatial.Size);
             }
 
             Entity workerPrototype = prototypes.FromName("Smurf");

@@ -373,6 +373,13 @@ namespace Orion.Game.Simulation
 
         private void CreateRuinsForEntity(Entity entity)
         {
+            Spatial spatial = entity.Spatial;
+            if (spatial == null)
+            {
+                Debug.Fail("Cannot create ruins for an entity without a spatial component.");
+                return;
+            }
+
             Entity ruins = entities.CreateEmpty();
 
             ruins.Components.Add(new Identity(ruins)
@@ -393,9 +400,9 @@ namespace Orion.Game.Simulation
 
             ruins.Components.Add(new Spatial(ruins)
             {
-                Position = entity.Position,
+                Position = spatial.Position,
                 CollisionLayer = CollisionLayer.None,
-                Size = entity.Spatial.Size
+                Size = spatial.Size
             });
 
             if (entity.Components.Has<FactionMembership>())

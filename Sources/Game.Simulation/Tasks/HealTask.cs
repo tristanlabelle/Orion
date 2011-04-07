@@ -62,19 +62,20 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
+            Spatial targetSpatial = target.Spatial;
             if (!target.IsAliveInWorld)
             {
                 // If the target has died while we weren't yet in attack range,
                 // but were coming, complete the motion with a move task.
                 if (follow != null && !healer.IsInRange(target) && TaskQueue.Count == 1)
-                    TaskQueue.OverrideWith(new MoveTask(Entity, (Point)target.Center));
+                    TaskQueue.OverrideWith(new MoveTask(Entity, (Point)targetSpatial.Center));
                 MarkAsEnded();
                 return;
             }
 
             if (healer.IsInRange(target))
             {
-                spatial.LookAt(target.Center);
+                spatial.LookAt(targetSpatial.Center);
                 int speed = (int)Entity.GetStatValue(Healer.SpeedStat);
                 targetHealth.Damage -= speed * step.TimeDeltaInSeconds;
                 if (targetHealth.Value == (int)target.GetStatValue(Health.MaxValueStat)) MarkAsEnded();

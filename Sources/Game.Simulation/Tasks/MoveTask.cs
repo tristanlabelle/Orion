@@ -44,7 +44,8 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
             Debug.Assert(entity.Components.Has<Spatial>(), "Entity has no spatial component!");
-            Debug.Assert(entity.Spatial.CollisionLayer == CollisionLayer.Air || entity.Size.Area == 1, "Ground entities bigger than 1x1 are not supported.");
+            Debug.Assert(entity.Spatial.CollisionLayer != CollisionLayer.Ground || entity.Spatial.Size.Area == 1,
+                "Ground entities bigger than 1x1 are not supported.");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
             this.lastPathingTime = World.SimulationTime - timeBetweenRepathings;

@@ -45,7 +45,7 @@ namespace Orion.Game.Simulation.Tasks
 
         public Region GridRegion
         {
-            get { return new Region(Location, buildingPrototype.Size); }
+            get { return new Region(Location, buildingPrototype.Spatial.Size); }
         }
 
         public bool IsBuildingCreated

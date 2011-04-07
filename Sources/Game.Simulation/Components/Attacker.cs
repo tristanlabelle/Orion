@@ -229,7 +229,7 @@ namespace Orion.Game.Simulation.Components
 
                 Faction faction = FactionMembership.GetFaction(Entity);
 
-                Circle splashCircle = new Circle(target.Center, splashRadius);
+                Circle splashCircle = new Circle(target.Spatial.Center, splashRadius);
                 foreach (Entity splashedEntity in World.Entities.Intersecting(splashCircle))
                 {
                     if (splashedEntity == target) continue;

@@ -110,18 +110,20 @@ namespace Orion.Game.Simulation.Tasks
 
             Region trainerRegion = Entity.Spatial.GridRegion;
 
+            Size spawneePrototypeSize = spawneePrototype.Spatial.Size;
+
             Region spawnRegion = new Region(
-                trainerRegion.MinX - spawneePrototype.Size.Width,
-                trainerRegion.MinY - spawneePrototype.Size.Height,
-                trainerRegion.Size.Width + spawneePrototype.Size.Width,
-                trainerRegion.Size.Height + spawneePrototype.Size.Height);
+                trainerRegion.MinX - spawneePrototypeSize.Width,
+                trainerRegion.MinY - spawneePrototypeSize.Height,
+                trainerRegion.Size.Width + spawneePrototypeSize.Width,
+                trainerRegion.Size.Height + spawneePrototypeSize.Height);
             var potentialSpawnPoints = spawnRegion.InternalBorderPoints
                 .Where(point =>
                 {
-                    Region region = new Region(point, spawneePrototype.Size);
+                    Region region = new Region(point, spawneePrototypeSize);
                     CollisionLayer layer = spawneePrototype.Spatial.CollisionLayer;
                     return new Region(World.Size).Contains(region)
-                        && World.IsFree(new Region(point, spawneePrototype.Size), layer);
+                        && World.IsFree(new Region(point, spawneePrototypeSize), layer);
                 });
 
             Trainer trainer = Entity.Components.Get<Trainer>();

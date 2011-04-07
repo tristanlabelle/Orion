@@ -22,22 +22,21 @@ namespace Orion.Game.Simulation.Tasks
         /// Initializes a new <see cref="Follow"/> task from the <see cref="Entity"/>
         /// that follows, the one that is followed and the distance when to stop.
         /// </summary>
-        /// <param name="unit">The <see cref="Entity"/> that follows.</param>
-        /// <param name="followee">The <see cref="Entity"/> that gets followed.</param>
-        /// <param name="targetDistance">
-        /// The distance to reach between the <paramref name="follower"/> and the <see cref="followee"/>.
-        /// </param>
-        public FollowTask(Entity follower, Entity target)
-            : base(follower)
+        /// <param name="entity">The <see cref="Entity"/> that follows.</param>
+        /// <param name="target">The <see cref="Entity"/> that gets followed.</param>
+        public FollowTask(Entity entity, Entity target)
+            : base(entity)
         {
-            if (!follower.Components.Has<Mobile>())
-                throw new ArgumentException("Cannot follow without the move skill.", "follower");
+            if (!entity.Components.Has<Mobile>())
+                throw new ArgumentException("Cannot follow without the mobile component.", "entity");
             Argument.EnsureNotNull(target, "target");
-            if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
+            if (entity == target) throw new ArgumentException("Expected the follower and followee to be different.");
 
             this.target = target;
-            this.moveTask = new MoveTask(follower, (Point)target.Center);
-            this.oldTargetPosition = target.Position;
+
+            Spatial targetSpatial = target.Spatial;
+            this.moveTask = new MoveTask(entity, (Point)targetSpatial.Center);
+            this.oldTargetPosition = targetSpatial.Position;
         }
         #endregion
 
@@ -73,12 +72,12 @@ namespace Orion.Game.Simulation.Tasks
             if (Region.AreAdjacentOrIntersecting(spatial.GridRegion, targetSpatial.GridRegion))
                 return;
 
-            float targetDisplacementLength = (target.Position - oldTargetPosition).LengthFast;
-            float distanceToTarget = (target.Position - spatial.Position).LengthFast;
+            float targetDisplacementLength = (targetSpatial.Position - oldTargetPosition).LengthFast;
+            float distanceToTarget = (targetSpatial.Position - spatial.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)
             {
-                moveTask = new MoveTask(Entity, (Point)target.Center);
-                oldTargetPosition = target.Position;
+                moveTask = new MoveTask(Entity, (Point)targetSpatial.Center);
+                oldTargetPosition = targetSpatial.Position;
             }
 
             if (!moveTask.HasEnded) moveTask.Update(step);

@@ -202,8 +202,9 @@ namespace Orion.Game.Simulation
                 EntityGrid grid = GetGrid(entity.Spatial.CollisionLayer);
                 if (grid != null)
                 {
-                    Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
-                    Region newRegion = Entity.GetGridRegion(entity.Position, entity.Size);
+                    Size entitySize = entity.Spatial.Size;
+                    Region oldRegion = Entity.GetGridRegion(oldPosition, entitySize);
+                    Region newRegion = Entity.GetGridRegion(entity.Spatial.Position, entitySize);
                     if (newRegion != oldRegion)
                     {
                         grid.Remove(entity, oldRegion);

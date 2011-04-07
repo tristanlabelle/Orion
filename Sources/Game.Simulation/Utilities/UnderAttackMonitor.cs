@@ -81,7 +81,7 @@ namespace Orion.Game.Simulation.Utilities
             if (FactionMembership.GetFaction(args.Hitter) == faction) return;
             if (FactionMembership.GetFaction(args.Target) != faction) return;
 
-            AddWarning(args.Target.Center);
+            AddWarning(args.Target.Spatial.Center);
         }
 
         private void AddWarning(Vector2 position)

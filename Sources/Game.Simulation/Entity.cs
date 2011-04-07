@@ -118,28 +118,11 @@ namespace Orion.Game.Simulation
 
         #region Location/Size
         /// <summary>
-        /// Gets the size of this <see cref="Entity"/>, in tiles.
-        /// This value is garanteed to remain constant.
-        /// </summary>
-        public Size Size
-        {
-            get { return Spatial.Size; }
-        }
-
-        /// <summary>
-        /// Gets the position of the origin of this <see cref="Entity"/>.
-        /// </summary>
-        public Vector2 Position
-        {
-            get { return Spatial.Position; }
-        }
-
-        /// <summary>
         /// Gets the position of the center of this <see cref="Entity"/>.
         /// </summary>
         public Vector2 Center
         {
-            get { return new Vector2(Position.X + Size.Width * 0.5f, Position.Y + Size.Height * 0.5f); }
+            get { return Spatial.Center; }
         }
         #endregion
 

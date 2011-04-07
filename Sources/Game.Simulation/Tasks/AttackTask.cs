@@ -50,20 +50,20 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             Faction faction = FactionMembership.GetFaction(Entity);
-
+            Spatial targetSpatial = target.Spatial;
             if (!target.IsAliveInWorld || (faction != null && !faction.CanSee(target)))
             {
                 // If the target has died while we weren't yet in attack range,
                 // or if the unit moved out of sight,  but we're coming, complete the motion with a move task.
                 if (follow != null && !attacker.IsInRange(target) && TaskQueue.Count == 1)
-                    TaskQueue.OverrideWith(new MoveTask(Entity, (Point)target.Center));
+                    TaskQueue.OverrideWith(new MoveTask(Entity, (Point)targetSpatial.Center));
                 MarkAsEnded();
                 return;
             }
 
             if (attacker.IsInRange(target))
             {
-                spatial.LookAt(target.Center);
+                spatial.LookAt(targetSpatial.Center);
                 attacker.TryHit(target);
                 return;
             }

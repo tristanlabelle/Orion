@@ -103,7 +103,7 @@ namespace Orion.Game.Main
 
             // Center the camera on the player's largest unit, favoring buildings
             Entity cameraTargetEntity = localCommander.Faction.Entities
-                .WithMaxOrDefault(entity => (entity.Identity.IsBuilding ? 1000 : 0) + entity.Size.Area);
+                .WithMaxOrDefault(entity => (entity.Identity.IsBuilding ? 1000 : 0) + entity.Spatial.Size.Area);
             if (cameraTargetEntity != null) this.camera.Target = cameraTargetEntity.Spatial.Center;
 
             this.matchRenderer = new DeathmatchRenderer(userInputManager, Graphics);
@@ -177,7 +177,7 @@ namespace Orion.Game.Main
             if (ui.IsFollowingSelection && firstSelectedEntity != null)
             {
                 camera.ScrollDirection = Point.Zero;
-                camera.Target = firstSelectedEntity.Position;
+                camera.Target = firstSelectedEntity.Spatial.Center;
             }
             else
             {
@@ -315,7 +315,7 @@ namespace Orion.Game.Main
             if (all)
             {
                 Selection.Set(inactiveWorkers);
-                camera.Target = inactiveWorkers.First().Position;
+                camera.Target = inactiveWorkers.First().Spatial.Position;
             }
             else
             {
@@ -331,7 +331,7 @@ namespace Orion.Game.Main
                 }
 
                 Selection.Set(entityToSelect);
-                camera.Target = entityToSelect.Position;
+                camera.Target = entityToSelect.Spatial.Center;
             }
         }
 

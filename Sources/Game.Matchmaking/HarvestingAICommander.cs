@@ -250,18 +250,18 @@ namespace Orion.Game.Matchmaking
                     resourceNodesData.Add(node, nodeData);
                 }
 
-
+                Spatial nodeSpatial = node.Spatial;
                 if (nodeData.Node.Components.Get<Harvestable>().Type == ResourceType.Alagene
                     && (nodeData.Extractor == null || !nodeData.Extractor.IsAliveInWorld)
-                    && World.IsFree(node.Spatial.GridRegion, CollisionLayer.Ground))
+                    && World.IsFree(nodeSpatial.GridRegion, CollisionLayer.Ground))
                 {
                     var alageneExtractorCost = GetCost(alageneExtractorPrototype);
                     if (budget >= alageneExtractorCost)
                     {
-                        Entity builder = GetNearbyUnit(u => Builder.Supports(u, alageneExtractorPrototype), node.Center);
+                        Entity builder = GetNearbyUnit(u => Builder.Supports(u, alageneExtractorPrototype), nodeSpatial.Center);
                         if (builder != null)
                         {
-                            var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorPrototype.Handle, Point.Truncate(node.Position));
+                            var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorPrototype.Handle, Point.Truncate(nodeSpatial.Position));
                             IssueCommand(command);
                             assignedEntities.Add(builder);
                         }
@@ -427,17 +427,19 @@ namespace Orion.Game.Matchmaking
             return 2;
         }
 
-        private bool TryBuildNear(Entity builder, Entity buildingType, Vector2 location)
+        private bool TryBuildNear(Entity builder, Entity buildingPrototype, Vector2 location)
         {
             Point buildingLocation = new Point(
                             (int)location.X + Random.Next(-8, 9),
                             (int)location.Y + Random.Next(-8, 9));
+
+            Size foodSupplySize = foodSupplyPrototype.Spatial.Size;
             buildingLocation = new Region(
-                World.Width - foodSupplyPrototype.Size.Width,
-                World.Height - foodSupplyPrototype.Size.Height)
+                World.Width - foodSupplySize.Width,
+                World.Height - foodSupplySize.Height)
                 .Clamp(buildingLocation);
 
-            Region buildingRegion = new Region(buildingLocation, buildingType.Size);
+            Region buildingRegion = new Region(buildingLocation, buildingPrototype.Spatial.Size);
             if (!Faction.CanSee(buildingRegion) || !World.IsFree(buildingRegion, CollisionLayer.Ground))
                 return false;
 
@@ -445,7 +447,7 @@ namespace Orion.Game.Matchmaking
                 .Any(b => Region.Distance(b.Spatial.GridRegion, buildingRegion) < minimumBuildingDistance);
             if (isNearOtherBuilding) return false;
             
-            var command = new BuildCommand(Faction.Handle, builder.Handle, buildingType.Handle, buildingLocation);
+            var command = new BuildCommand(Faction.Handle, builder.Handle, buildingPrototype.Handle, buildingLocation);
             IssueCommand(command);
             return true;
         }

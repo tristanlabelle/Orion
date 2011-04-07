@@ -52,7 +52,7 @@ namespace Orion.Game.Simulation.IO
             foreach (Entity node in concreteResourceNodes)
             {
                 Harvestable harvestData = node.Components.Get<Harvestable>();
-                ResourceNodeTemplate template = new ResourceNodeTemplate(harvestData.Type, Point.Truncate(node.Position), harvestData.Amount);
+                ResourceNodeTemplate template = new ResourceNodeTemplate(harvestData.Type, Point.Truncate(node.Spatial.Position), harvestData.Amount);
                 resourceNodes.Add(template);
             }
 
@@ -61,7 +61,7 @@ namespace Orion.Game.Simulation.IO
                 List<UnitTemplate> units = new List<UnitTemplate>();
                 foreach (Entity entity in faction.Entities)
                 {
-                    UnitTemplate template = new UnitTemplate(Point.Truncate(entity.Position), entity.Identity.Name);
+                    UnitTemplate template = new UnitTemplate(Point.Truncate(entity.Spatial.Position), entity.Identity.Name);
                     units.Add(template);
                 }
                 unitsByFaction.Add(units);

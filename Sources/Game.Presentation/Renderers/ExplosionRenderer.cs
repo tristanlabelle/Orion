@@ -50,7 +50,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            for (int i = explosions.Count; i >= 0; --i)
+            for (int i = explosions.Count - 1; i >= 0; --i)
             {
                 Explosion explosion = explosions[i];
 

@@ -253,7 +253,7 @@ namespace Orion.Game.Matchmaking
 
                 if (nodeData.Node.Components.Get<Harvestable>().Type == ResourceType.Alagene
                     && (nodeData.Extractor == null || !nodeData.Extractor.IsAliveInWorld)
-                    && World.IsFree(node.GridRegion, CollisionLayer.Ground))
+                    && World.IsFree(node.Spatial.GridRegion, CollisionLayer.Ground))
                 {
                     var alageneExtractorCost = GetCost(alageneExtractorPrototype);
                     if (budget >= alageneExtractorCost)
@@ -328,7 +328,7 @@ namespace Orion.Game.Matchmaking
             {
                 var nodeData = resourceNodesData.Values
                     .Where(d => Faction.CanHarvest(d.Node) && d.HarvesterCount < maximumHarvestersPerResourceNode)
-                    .WithMinOrDefault(d => Region.Distance(entity.GridRegion, d.Node.GridRegion) + d.HarvesterCount * 2);
+                    .WithMinOrDefault(d => Region.Distance(entity.Spatial.GridRegion, d.Node.Spatial.GridRegion) + d.HarvesterCount * 2);
                 if (nodeData != null)
                 {
                     ++nodeData.HarvesterCount;
@@ -442,7 +442,7 @@ namespace Orion.Game.Matchmaking
                 return false;
 
             bool isNearOtherBuilding = buildings
-                .Any(b => Region.Distance(b.GridRegion, buildingRegion) < minimumBuildingDistance);
+                .Any(b => Region.Distance(b.Spatial.GridRegion, buildingRegion) < minimumBuildingDistance);
             if (isNearOtherBuilding) return false;
             
             var command = new BuildCommand(Faction.Handle, builder.Handle, buildingType.Handle, buildingLocation);

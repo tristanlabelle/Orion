@@ -34,7 +34,7 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(entity, "entity");
             Argument.EnsureNotNull(target, "target");
             if (!entity.Components.Has<Builder>())
-                throw new ArgumentException("Cannot repair without the build skill.", "entity");
+                throw new ArgumentException("Cannot repair without the builder component.", "entity");
             if (target == entity)
                 throw new ArgumentException("An entity cannot repair itself.", "entity");
 
@@ -44,7 +44,7 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot repair a non-mechanical entity.", "target");
 
             this.target = target;
-            this.move = MoveTask.ToNearRegion(entity, target.GridRegion);
+            this.move = MoveTask.ToNearRegion(entity, target.Spatial.GridRegion);
         }
         #endregion
 
@@ -148,12 +148,18 @@ namespace Orion.Game.Simulation.Tasks
             // If we just built an alagene extractor, start harvesting.
             if (Entity.Components.Has<Harvester>() && target.Components.Has<AlageneExtractor>())
             {
-                // Smells like a hack!
+                // HACK: Find the resource node from the alagene extractor position.
                 Entity node = World.Entities
                     .Intersecting(targetSpatial.BoundingRectangle)
-                    .Where(e => e.Components.Has<Harvestable>())
-                    .Where(e => !e.Components.Get<Harvestable>().IsEmpty)
-                    .First(n => Region.Intersects(n.GridRegion, targetSpatial.GridRegion));
+                    .First(entity =>
+                    { 
+                        Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+                        Spatial entitySpatial = entity.Spatial;
+                        return harvestable != null
+                            && !harvestable.IsEmpty
+                            && entitySpatial != null
+                            && Region.Intersects(entitySpatial.GridRegion, targetSpatial.GridRegion);
+                    });
 
                 if (TaskQueue.Count == 1)
                     TaskQueue.OverrideWith(new HarvestTask(Entity, node));

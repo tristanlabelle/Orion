@@ -20,6 +20,11 @@ namespace Orion.Game.Simulation
             private readonly Entity entity;
             private readonly Dictionary<Type, Component> components
                 = new Dictionary<Type, Component>();
+
+            /// <summary>
+            /// Cache for the <see cref="Spatial"/> component as it is queried very often.
+            /// </summary>
+            private Spatial spatial;
             #endregion
 
             #region Constructors
@@ -38,6 +43,11 @@ namespace Orion.Game.Simulation
             public int Count
             {
                 get { return components.Count; }
+            }
+
+            internal Spatial Spatial
+            {
+                get { return spatial; }
             }
             #endregion
 
@@ -61,6 +71,7 @@ namespace Orion.Game.Simulation
                 }
 
                 components.Add(componentType, component);
+                if (componentType == typeof(Spatial)) spatial = (Spatial)component;
             }
 
             /// <summary>
@@ -76,7 +87,7 @@ namespace Orion.Game.Simulation
                 Component actualComponent;
                 return components.TryGetValue(componentType, out actualComponent)
                     && actualComponent == component
-                    && components.Remove(componentType);
+                    && Remove(componentType);
             }
 
             /// <summary>
@@ -86,7 +97,9 @@ namespace Orion.Game.Simulation
             /// <returns>A value indicating if a <see cref="Component"/> with this type was found and removed.</returns>
             public bool Remove(Type componentType)
             {
-                return components.Remove(componentType);
+                bool removed = components.Remove(componentType);
+                if (removed && componentType == typeof(Spatial)) spatial = null;
+                return removed;
             }
 
             /// <summary>

@@ -103,7 +103,7 @@ namespace Orion.Game.Simulation
 
                 bool isFreeOfEntities = world.Entities
                     .Intersecting(region.ToRectangle())
-                    .None(entity => Region.Intersects(entity.GridRegion, region));
+                    .None(entity => Region.Intersects(entity.Spatial.GridRegion, region));
                 if (!isFreeOfEntities) continue;
 
                 return location;
@@ -163,7 +163,7 @@ namespace Orion.Game.Simulation
             if (placePyramid)
             {
                 Entity building = faction.CreateUnit(commandCenterPrototype, (Point)campCenter);
-                buildingRegion = building.GridRegion;
+                buildingRegion = building.Spatial.GridRegion;
             }
             else
             {

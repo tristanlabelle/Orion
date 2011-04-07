@@ -108,10 +108,11 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <remarks>
         /// This property is provided as a convenence because the spatial component is often needed.
+        /// It can be faster than using <see cref="ComponentCollection.TryGet"/>.
         /// </remarks>
         public Spatial Spatial
         {
-            get { return components.TryGet<Spatial>(); }
+            get { return components.Spatial; }
         }
         #endregion
 
@@ -140,14 +141,6 @@ namespace Orion.Game.Simulation
         {
             get { return new Vector2(Position.X + Size.Width * 0.5f, Position.Y + Size.Height * 0.5f); }
         }
-
-        /// <summary>
-        /// Gets the region of the world grid occupied by this <see cref="Entity"/>.
-        /// </summary>
-        public Region GridRegion
-        {
-            get { return GetGridRegion(Position, Size); }
-        }
         #endregion
 
         /// <summary>
@@ -161,7 +154,7 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Gets a value indicating if this entity is alive and in the world.
         /// An entity is out of the world when it has died or when it is temporarily
-        /// not interactible with (such as a unit being transported).
+        /// not interactible with (such as an entity being transported).
         /// </summary>
         public bool IsAliveInWorld
         {
@@ -218,11 +211,11 @@ namespace Orion.Game.Simulation
 
         internal void RaiseWarning(string warning)
         {
-            FactionMembership factionComponent = Components.TryGet<FactionComponent>();
-            if (factionComponent == null)
+            Faction faction = FactionMembership.GetFaction(this);
+            if (faction == null)
                 Debug.WriteLine(warning);
             else
-                factionComponent.Faction.RaiseWarning(warning);
+                faction.RaiseWarning(warning);
         }
 
         public void Die()
@@ -254,7 +247,6 @@ namespace Orion.Game.Simulation
         {
             if (isDead)
             {
-                // #if'd so the FormatInvariant is not executed in release.
                 Debug.Fail("{0} is dead and yet moves.".FormatInvariant(this));
             }
 

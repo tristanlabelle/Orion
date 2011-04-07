@@ -257,6 +257,19 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Adds resources to this <see cref="Faction"/>'s stored amount.
+        /// </summary>
+        /// <param name="type">The type of the resources to be added.</param>
+        /// <param name="amount">The amount of resources to add.</param>
+        public void AddResources(ResourceType type, int amount)
+        {
+            if (type == ResourceType.Aladdium)
+                AladdiumAmount += amount;
+            else
+                AlageneAmount += amount;
+        }
+
         #region Stats & Technologies
         /// <summary>
         /// Gets the value of a <see cref="Stat"/> which take researched technologies into account
@@ -342,7 +355,7 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Units
+        #region Entities
         /// <summary>
         /// Creates new <see cref="Entity"/> part of this <see cref="Faction"/>.
         /// </summary>
@@ -421,7 +434,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(entity != null);
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
-            localFogOfWar.RemoveRegion(entity.GridRegion);
+            localFogOfWar.RemoveRegion(entity.Spatial.GridRegion);
             localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
 
             TotalFoodAmount += (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);

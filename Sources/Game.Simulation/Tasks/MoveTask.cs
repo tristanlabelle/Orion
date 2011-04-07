@@ -38,13 +38,13 @@ namespace Orion.Game.Simulation.Tasks
         public MoveTask(Entity entity, Func<Point, float> destinationDistanceEvaluator)
             : base(entity)
         {
-            Argument.EnsureNotNull(entity, "unit");
+            Argument.EnsureNotNull(entity, "entity");
             if (!entity.Components.Has<Mobile>())
-                throw new ArgumentException("Cannot move without the move skill.", "unit");
+                throw new ArgumentException("Cannot move without the move skill.", "entity");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
-            Debug.Assert(entity.Components.Has<Spatial>(), "Unit has no spatial component!");
-            Debug.Assert(entity.Spatial.CollisionLayer == CollisionLayer.Air || entity.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
+            Debug.Assert(entity.Components.Has<Spatial>(), "Entity has no spatial component!");
+            Debug.Assert(entity.Spatial.CollisionLayer == CollisionLayer.Air || entity.Size.Area == 1, "Ground entities bigger than 1x1 are not supported.");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
             this.lastPathingTime = World.SimulationTime - timeBetweenRepathings;

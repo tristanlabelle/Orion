@@ -72,7 +72,7 @@ namespace Orion.Game.Simulation
         public void Add(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Add(entity, entity.GridRegion);
+            Add(entity, entity.Spatial.GridRegion);
         }
 
         public void Remove(Entity entity, Region region)
@@ -101,7 +101,7 @@ namespace Orion.Game.Simulation
         public void Remove(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Remove(entity, entity.GridRegion);
+            Remove(entity, entity.Spatial.GridRegion);
         }
         #endregion
         #endregion

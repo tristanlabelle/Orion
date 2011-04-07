@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation.Components
         private float range;
         private float delay = 1;
         private float splashRadius;
-        private TimeSpan timeElapsedSinceLastHit = TimeSpan.MaxValue;
+        private TimeSpan lastHitTime = TimeSpan.FromHours(-1); // Arbitrary long time in the past, MinValue can cause arythmetic problems
         private readonly List<DamageFilter> damageFilters = new List<DamageFilter>();
         #endregion
 
@@ -118,8 +118,7 @@ namespace Orion.Game.Simulation.Components
 
         public TimeSpan TimeElapsedSinceLastHit
         {
-            get { return timeElapsedSinceLastHit; }
-            set { timeElapsedSinceLastHit = value; }
+            get { return (World == null ? TimeSpan.Zero : World.SimulationTime) - lastHitTime; }
         }
         #endregion
 
@@ -132,6 +131,7 @@ namespace Orion.Game.Simulation.Components
                 if (filter.Applies(target))
                     finalDamage += filter.AdditionalDamage;
             }
+
             return finalDamage;
         }
 
@@ -204,7 +204,7 @@ namespace Orion.Game.Simulation.Components
             Argument.EnsureNotNull(target, "target");
 
             TimeSpan hitDelayInSeconds = TimeSpan.FromSeconds((float)Entity.GetStatValue(Attacker.DelayStat));
-            if (timeElapsedSinceLastHit < hitDelayInSeconds) return false;
+            if (TimeElapsedSinceLastHit < hitDelayInSeconds) return false;
 
             Hit(target);
             return true;
@@ -249,7 +249,7 @@ namespace Orion.Game.Simulation.Components
                 }
             }
 
-            timeElapsedSinceLastHit = TimeSpan.Zero;
+            lastHitTime = World.SimulationTime;
         }
 
         public float GetDamage(Health targetHealth)
@@ -266,11 +266,6 @@ namespace Orion.Game.Simulation.Components
             damage -= targetHealth.Armor;
 
             return Math.Max(0, damage);
-        }
-
-        public override void Update(SimulationStep step)
-        {
-            timeElapsedSinceLastHit += step.TimeDelta;
         }
         #endregion
     }

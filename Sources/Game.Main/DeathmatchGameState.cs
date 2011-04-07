@@ -39,7 +39,7 @@ namespace Orion.Game.Main
         private readonly Camera camera;
         private readonly IMatchRenderer matchRenderer;
         private readonly MatchAudioPresenter audioPresenter;
-        private SimulationStep lastSimulationStep;
+        private SimulationStep lastSimulationStep = new SimulationStep(-1, TimeSpan.Zero, TimeSpan.Zero);
         #endregion
 
         #region Constructors
@@ -108,7 +108,6 @@ namespace Orion.Game.Main
 
             this.matchRenderer = new DeathmatchRenderer(userInputManager, Graphics);
             this.audioPresenter = new MatchAudioPresenter(Audio, userInputManager);
-            this.lastSimulationStep = new SimulationStep(-1, 0, 0);
         }
         #endregion
 
@@ -152,14 +151,12 @@ namespace Orion.Game.Main
 
         protected internal override void Update(TimeSpan timeDelta)
         {
-            float secondsElapsed = (float)timeDelta.TotalSeconds;
-
             if (match.IsRunning)
             {
                 SimulationStep step = new SimulationStep(
                     lastSimulationStep.Number + 1,
-                    lastSimulationStep.TimeInSeconds + secondsElapsed,
-                    secondsElapsed);
+                    lastSimulationStep.Time + timeDelta,
+                    timeDelta);
 
                 match.World.Update(step);
 
@@ -175,7 +172,7 @@ namespace Orion.Game.Main
         }
 
         private void UpdateCamera(TimeSpan timeDelta)
-       { 
+        { 
             Entity firstSelectedEntity = Selection.FirstOrDefault();
             if (ui.IsFollowingSelection && firstSelectedEntity != null)
             {

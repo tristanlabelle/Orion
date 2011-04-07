@@ -15,10 +15,10 @@ namespace Orion.Game.Presentation.Renderers
         #region Nested Types
         private struct Explosion
         {
-            public readonly float SpawnTime;
+            public readonly TimeSpan SpawnTime;
             public readonly Circle Circle;
 
-            public Explosion(float spawnTime, Circle circle)
+            public Explosion(TimeSpan spawnTime, Circle circle)
             {
                 this.SpawnTime = spawnTime;
                 this.Circle = circle;
@@ -27,11 +27,10 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Fields
-        private const float lifeTime = 0.6f;
+        private static readonly TimeSpan lifeTime = TimeSpan.FromSeconds(0.6);
         private readonly World world;
         private readonly Texture texture;
         private readonly List<Explosion> explosions = new List<Explosion>();
-        private float time;
         #endregion
 
         #region Constructors
@@ -42,8 +41,6 @@ namespace Orion.Game.Presentation.Renderers
 
             this.world = world;
             this.texture = gameGraphics.GetMiscTexture("ExplosionFlash");
-
-            this.world.Updated += OnWorldUpdated;
             this.world.ExplosionOccured += OnExplosionOccured;
         }
         #endregion
@@ -52,10 +49,18 @@ namespace Orion.Game.Presentation.Renderers
         public void Draw(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            foreach (Explosion explosion in explosions)
+
+            for (int i = explosions.Count; i >= 0; --i)
             {
-                float age = time - explosion.SpawnTime;
-                float lifePhase = age / lifeTime;
+                Explosion explosion = explosions[i];
+
+                double lifePhase = (world.SimulationTime - explosion.SpawnTime).TotalSeconds / lifeTime.TotalSeconds;
+                if (lifePhase > 1)
+                {
+                    explosions.RemoveAt(i);
+                    continue;
+                }
+
                 float radius = explosion.Circle.Radius * (float)Math.Pow(lifePhase, 0.3);
                 float alpha = (float)Math.Pow(1 - lifePhase, 0.3);
 
@@ -67,20 +72,9 @@ namespace Orion.Game.Presentation.Renderers
             }
         }
 
-        private void Update(SimulationStep step)
-        {
-            this.time = step.TimeInSeconds;
-            explosions.RemoveAll(explosion => (step.TimeInSeconds - explosion.SpawnTime) > lifeTime);
-        }
-
-        private void OnWorldUpdated(World sender, SimulationStep step)
-        {
-            Update(step);
-        }
-
         private void OnExplosionOccured(World sender, Circle circle)
         {
-            explosions.Add(new Explosion(time, new Circle(circle.Center, circle.Radius * 3)));
+            explosions.Add(new Explosion(world.SimulationTime, new Circle(circle.Center, circle.Radius * 3)));
         }
         #endregion
     }

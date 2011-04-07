@@ -118,6 +118,22 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
+        /// Gets the current game time.
+        /// </summary>
+        public TimeSpan SimulationTime
+        {
+            get { return lastSimulationStep.Time; }
+        }
+
+        /// <summary>
+        /// Gets the current game time, in seconds.
+        /// </summary>
+        public float SimulationTimeInSeconds
+        {
+            get { return lastSimulationStep.TimeInSeconds; }
+        }
+
+        /// <summary>
         /// Gets the random number generator used within this world.
         /// </summary>
         internal Random Random

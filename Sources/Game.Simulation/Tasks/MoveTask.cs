@@ -16,14 +16,14 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Instance
         #region Fields
-        private const float maxPathingFailureTime = 1.3f;
-        private const float timeBetweenRepathings = 0.4f;
+        private static readonly TimeSpan maxPathingFailureTime = TimeSpan.FromSeconds(1.3);
+        private static readonly TimeSpan timeBetweenRepathings = TimeSpan.FromSeconds(0.4);
 
         private readonly Func<Point, float> destinationDistanceEvaluator;
         private Path path;
         private int targetPathPointIndex;
-        private float timeSinceLastPathing = float.PositiveInfinity;
-        private float timeSinceLastSuccessfulPathing;
+        private TimeSpan timeSinceLastPathing = TimeSpan.MaxValue;
+        private TimeSpan timeSinceLastSuccessfulPathing;
         #endregion
 
         #region Constructors
@@ -87,8 +87,8 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            timeSinceLastPathing += step.TimeDeltaInSeconds;
-            timeSinceLastSuccessfulPathing += step.TimeDeltaInSeconds;
+            timeSinceLastPathing += step.TimeDelta;
+            timeSinceLastSuccessfulPathing += step.TimeDelta;
 
             if (HasReachedDestination
                 || (path == null && timeSinceLastSuccessfulPathing >= maxPathingFailureTime))
@@ -156,12 +156,12 @@ namespace Orion.Game.Simulation.Tasks
 
             path = Entity.World.FindPath(spatial.GridRegion.Min, destinationDistanceEvaluator, GetWalkabilityTester());
             targetPathPointIndex = (path.PointCount > 1) ? 1 : 0;
-            timeSinceLastPathing = 0;
+            timeSinceLastPathing = TimeSpan.Zero;
 
             if (!path.IsComplete && path.Source == path.End)
                 return false;
 
-            timeSinceLastSuccessfulPathing = 0;
+            timeSinceLastSuccessfulPathing = TimeSpan.Zero;
 
             return true;
         }

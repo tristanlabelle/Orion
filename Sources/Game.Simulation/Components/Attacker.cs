@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation.Components
         private float range;
         private float delay = 1;
         private float splashRadius;
-        private float timeElapsedSinceLastHit = float.PositiveInfinity;
+        private TimeSpan timeElapsedSinceLastHit = TimeSpan.MaxValue;
         private readonly List<DamageFilter> damageFilters = new List<DamageFilter>();
         #endregion
 
@@ -116,7 +116,7 @@ namespace Orion.Game.Simulation.Components
             get { return damageFilters; }
         }
 
-        public float TimeElapsedSinceLastHit
+        public TimeSpan TimeElapsedSinceLastHit
         {
             get { return timeElapsedSinceLastHit; }
             set { timeElapsedSinceLastHit = value; }
@@ -203,9 +203,8 @@ namespace Orion.Game.Simulation.Components
         {
             Argument.EnsureNotNull(target, "target");
 
-            float hitDelayInSeconds = (float)Entity.GetStatValue(Attacker.DelayStat);
-            if (timeElapsedSinceLastHit < hitDelayInSeconds)
-                return false;
+            TimeSpan hitDelayInSeconds = TimeSpan.FromSeconds((float)Entity.GetStatValue(Attacker.DelayStat));
+            if (timeElapsedSinceLastHit < hitDelayInSeconds) return false;
 
             Hit(target);
             return true;
@@ -250,7 +249,7 @@ namespace Orion.Game.Simulation.Components
                 }
             }
 
-            timeElapsedSinceLastHit = 0;
+            timeElapsedSinceLastHit = TimeSpan.Zero;
         }
 
         public float GetDamage(Health targetHealth)
@@ -271,7 +270,7 @@ namespace Orion.Game.Simulation.Components
 
         public override void Update(SimulationStep step)
         {
-            timeElapsedSinceLastHit += step.TimeDeltaInSeconds;
+            timeElapsedSinceLastHit += step.TimeDelta;
         }
         #endregion
     }

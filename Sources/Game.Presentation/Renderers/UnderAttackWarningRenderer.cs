@@ -13,18 +13,21 @@ using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Renderers
 {
+    /// <summary>
+    /// Displays warning indications on the minimap when under attack.
+    /// </summary>
     public sealed class UnderAttackWarningRenderer
     {
         #region AttackWarning
         private struct AttackWarning
         {
             #region Fields
-            public readonly float SpawnTime;
+            public readonly TimeSpan SpawnTime;
             public readonly Vector2 Position;
             #endregion
 
             #region Constructors
-            public AttackWarning(float spawnTime, Vector2 position)
+            public AttackWarning(TimeSpan spawnTime, Vector2 position)
             {
                 this.SpawnTime = spawnTime;
                 this.Position = position;
@@ -36,12 +39,11 @@ namespace Orion.Game.Presentation.Renderers
         #region Fields
         private const float warningCircleRadius = 16;
         private const int warningCircleCount = 3;
-        private const float warningCircleDuration = 0.3f;
+        private static readonly TimeSpan warningCircleDuration = TimeSpan.FromSeconds(0.3);
         private static readonly ColorRgb warningCircleColor = Colors.Red;
 
         private readonly UnderAttackMonitor provider;
         private readonly List<AttackWarning> warnings = new List<AttackWarning>();
-        private float time;
         #endregion
 
         #region Constructors
@@ -51,7 +53,13 @@ namespace Orion.Game.Presentation.Renderers
 
             this.provider = new UnderAttackMonitor(faction);
             this.provider.Warning += OnWarning;
-            faction.World.Updated += OnWorldUpdated;
+        }
+        #endregion
+
+        #region Properties
+        private TimeSpan SimulationTime
+        {
+            get { return provider.Faction.World.SimulationTime; }
         }
         #endregion
 
@@ -64,10 +72,11 @@ namespace Orion.Game.Presentation.Renderers
             {
                 AttackWarning warning = warnings[i];
 
-                float age = time - warning.SpawnTime;
-                if (age < warningCircleCount * warningCircleDuration)
+                TimeSpan age = SimulationTime - warning.SpawnTime;
+                if (age.TotalSeconds < warningCircleCount * warningCircleDuration.TotalSeconds)
                 {
-                    float radius = (age % warningCircleDuration) / warningCircleDuration * warningCircleRadius;
+                    float radius = (float)((age.TotalSeconds % warningCircleDuration.TotalSeconds)
+                        / warningCircleDuration.TotalSeconds * warningCircleRadius);
                     Circle circle = new Circle(warning.Position, radius);
                     context.Stroke(circle, warningCircleColor);
                 }
@@ -80,13 +89,7 @@ namespace Orion.Game.Presentation.Renderers
 
         private void OnWarning(UnderAttackMonitor sender, Vector2 position)
         {
-            AttackWarning warning = new AttackWarning(time, position);
-            warnings.Add(warning);
-        }
-
-        private void OnWorldUpdated(World sender, SimulationStep step)
-        {
-            time = step.TimeInSeconds;
+            warnings.Add(new AttackWarning(SimulationTime, position));
         }
         #endregion
     }

@@ -21,7 +21,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             public Entity Shooter;
             public Entity Target;
-            public float Time;
+            public TimeSpan Time;
         }
 
         #region Fields
@@ -39,7 +39,7 @@ namespace Orion.Game.Presentation.Renderers
         private static readonly float fireHealthRatio = 0.5f;
 
         private const float maxRuinAlpha = 0.8f;
-        private const float ruinFadeDurationInSeconds = 1;
+        private static readonly TimeSpan ruinFadeDuration = TimeSpan.FromSeconds(1);
 
         private static readonly Size miniatureUnitSize = new Size(3, 3);
 
@@ -47,8 +47,8 @@ namespace Orion.Game.Presentation.Renderers
         private static readonly float shadowDistance = 0.7f;
         private static readonly float shadowScaling = 0.6f;
 
-        private static readonly float meleeHitSpinTimeInSeconds = 0.25f;
-        private static readonly float rangedShootTimeInSeconds = 0.25f;
+        private static readonly TimeSpan meleeHitSpinTime = TimeSpan.FromSeconds(0.25f);
+        private static readonly TimeSpan rangedShootTime = TimeSpan.FromSeconds(0.25f);
         private static readonly float laserLength = 0.8f;
         #endregion
 
@@ -57,7 +57,6 @@ namespace Orion.Game.Presentation.Renderers
         private readonly SpriteAnimation fireAnimation;
         private readonly FogOfWarMemory fogOfWarMemory;
         private readonly List<Laser> lasers = new List<Laser>();
-        private float simulationTimeInSeconds;
         private bool drawHealthBars;
         #endregion
 
@@ -72,7 +71,6 @@ namespace Orion.Game.Presentation.Renderers
             this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
             this.fogOfWarMemory = new FogOfWarMemory(faction);
 
-            World.Updated += OnWorldUpdated;
             World.HitOccured += OnUnitHitting;
         }
         #endregion
@@ -96,11 +94,6 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Methods
-        private void OnWorldUpdated(World sender, SimulationStep args)
-        {
-            simulationTimeInSeconds = args.TimeInSeconds;
-        }
-
         private void OnUnitHitting(World sender, HitEventArgs args)
         {
             if (!args.Hitter.Components.Get<Attacker>().IsRanged) return;
@@ -109,7 +102,7 @@ namespace Orion.Game.Presentation.Renderers
             {
                 Shooter = args.Hitter,
                 Target = args.Target,
-                Time = sender.LastSimulationStep.TimeInSeconds
+                Time = sender.LastSimulationStep.Time
             };
             lasers.Add(laser);
         }
@@ -225,6 +218,7 @@ namespace Orion.Game.Presentation.Renderers
                     && health.Constitution == Constitution.Mechanical
                     && health.Value / (float)entity.GetStatValue(Health.MaxValueStat) < fireHealthRatio)
                 {
+                    float simulationTimeInSeconds = World.SimulationTimeInSeconds;
                     float fireTime = simulationTimeInSeconds + (entity.Handle.Value * fireSecondsPerFrame);
                     Texture fireTexture = fireAnimation.GetTextureFromTime(simulationTimeInSeconds);
                     Rectangle fireRectangle = Rectangle.FromCenterSize(spatial.Center, new Vector2(fireSize, fireSize));
@@ -244,7 +238,7 @@ namespace Orion.Game.Presentation.Renderers
             TimedExistence timeout = entity.Components.TryGet<TimedExistence>();
             if (timeout != null)
             {
-                alpha = timeout.TimeLeft / ruinFadeDurationInSeconds;
+                alpha = timeout.TimeLeft / (float)ruinFadeDuration.TotalSeconds;
                 if (alpha < 0) alpha = 0;
                 if (alpha > maxRuinAlpha) alpha = maxRuinAlpha;
             }
@@ -278,7 +272,7 @@ namespace Orion.Game.Presentation.Renderers
 
             float period = 3 + entity.Size.Area / 4.0f;
             float offset = (entity.Handle.Value % 8) / 8.0f * period;
-            float progress = ((simulationTimeInSeconds + offset) % period) / period;
+            float progress = ((World.SimulationTimeInSeconds + offset) % period) / period;
             float sineAngle = (float)Math.PI * 2 * progress;
             float sine = (float)Math.Sin(sineAngle);
 
@@ -295,10 +289,10 @@ namespace Orion.Game.Presentation.Renderers
             float baseAngle = angle + (float)Math.PI * 0.5f;
 
             Attacker attacker = entity.Components.TryGet<Attacker>();
-            if (attacker == null || attacker.IsRanged || attacker.TimeElapsedSinceLastHit > meleeHitSpinTimeInSeconds)
+            if (attacker == null || attacker.IsRanged || attacker.TimeElapsedSinceLastHit > meleeHitSpinTime)
                 return baseAngle;
 
-            float spinProgress = attacker.TimeElapsedSinceLastHit / meleeHitSpinTimeInSeconds;
+            float spinProgress = (float)attacker.TimeElapsedSinceLastHit.TotalSeconds / (float)meleeHitSpinTime.TotalSeconds;
             float spinAngle = spinProgress * (float)Math.PI * 2;
 
             return baseAngle + spinAngle;
@@ -306,7 +300,7 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawLasers(GraphicsContext graphics, Rectangle bounds, CollisionLayer layer)
         {
-            for (int i = lasers.Count() - 1; i >= 0; i--)
+            for (int i = lasers.Count - 1; i >= 0; i--)
             {
                 Laser laser = lasers[i];
 
@@ -314,7 +308,7 @@ namespace Orion.Game.Presentation.Renderers
                 Spatial shooterSpatial = shooter.Spatial;
                 if (shooterSpatial.CollisionLayer != layer) continue;
 
-                float laserProgress = (World.LastSimulationStep.TimeInSeconds - laser.Time) / rangedShootTimeInSeconds;
+                float laserProgress = (float)(World.LastSimulationStep.Time - laser.Time).TotalSeconds / (float)rangedShootTime.TotalSeconds;
 
                 Vector2 delta = laser.Target.Center - shooterSpatial.Center;
                 if (laserProgress > 1)

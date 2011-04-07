@@ -20,11 +20,11 @@ namespace Orion.Engine
         #endregion
 
         #region Constructors
-        public SimulationStep(int number, float timeInSeconds, float timeDeltaInSeconds)
+        public SimulationStep(int number, TimeSpan time, TimeSpan timeDelta)
         {
             this.number = number;
-            this.timeInSeconds = timeInSeconds;
-            this.timeDeltaInSeconds = timeDeltaInSeconds;
+            this.timeInSeconds = (float)time.TotalSeconds;
+            this.timeDeltaInSeconds = (float)timeDelta.TotalSeconds;
         }
         #endregion
 
@@ -60,12 +60,20 @@ namespace Orion.Engine
         {
             get { return timeDeltaInSeconds; }
         }
+
+        /// <summary>
+        /// Obtains the game time elapsed since the last simulation step.
+        /// </summary>
+        public TimeSpan TimeDelta
+        {
+            get { return TimeSpan.FromSeconds(timeDeltaInSeconds); }
+        }
         #endregion
 
         #region Methods
         public override string ToString()
         {
-            return "Update {0} at {1:F3} with time delta of {2:F3} seconds"
+            return "Update {0} at {1} with time delta of {2:F3} seconds"
                 .FormatInvariant(number, Time, timeDeltaInSeconds);
         }
         #endregion

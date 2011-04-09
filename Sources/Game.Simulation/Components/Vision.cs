@@ -6,6 +6,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Components.Serialization;
 using OpenTK;
+using System.Diagnostics;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -18,6 +19,7 @@ namespace Orion.Game.Simulation.Components
         public static readonly Stat RangeStat = new Stat(typeof(Vision), StatType.Integer, "Range");
 
         private int range = 1;
+        private FogOfWarToken fogOfWarToken;
         #endregion
 
         #region Constructors
@@ -60,7 +62,7 @@ namespace Orion.Game.Simulation.Components
         /// </summary>
         /// <param name="point">The point to be tested.</param>
         /// <returns><c>True</c> if the <see cref="point"/> can be seen, <c>false</c> if not.</returns>
-        public bool CanSee(Vector2 point)
+        public bool IsInRange(Vector2 point)
         {
             Spatial spatial = Entity.Spatial;
             if (spatial == null) return false;
@@ -76,12 +78,52 @@ namespace Orion.Game.Simulation.Components
         /// <returns>
         /// <c>True</c> if it is within the line of sight of this <see cref="Entity"/>, <c>false</c> if not.
         /// </returns>
-        public bool CanSee(Entity other)
+        public bool IsInRange(Entity other)
         {
             Argument.EnsureNotNull(other, "other");
 
             Spatial spatial = Entity.Spatial;
             return spatial != null && spatial.IsInRange(other, range);
+        }
+
+        protected override void Update(SimulationStep step)
+        {
+            Spatial spatial = Entity.Spatial;
+            Faction faction = FactionMembership.GetFaction(Entity);
+            FogOfWarRegionType regionType = Entity.Components.Has<BuildProgress>()
+                ? FogOfWarRegionType.Glow : FogOfWarRegionType.LineOfSight;
+
+            if (fogOfWarToken != null)
+            {
+                if (spatial == null || faction == null || fogOfWarToken.FogOfWar != faction.LocalFogOfWar)
+                {
+                    fogOfWarToken.Dispose();
+                    fogOfWarToken = null;
+                }
+                else
+                {
+                    // NOPs if unchanged
+                    fogOfWarToken.Center = spatial.Center;
+                    fogOfWarToken.SightRange = (float)Entity.GetStatValue(RangeStat);
+                    fogOfWarToken.RegionType = regionType;
+                    Debug.Assert(fogOfWarToken.Size == spatial.Size, "The size of the entity changed unexpectedly.");
+                }
+            }
+
+            if (fogOfWarToken == null && spatial != null && faction != null)
+            {
+                fogOfWarToken = new FogOfWarToken(faction.LocalFogOfWar, regionType,
+                    spatial.Center, spatial.Size, (float)Entity.GetStatValue(RangeStat));
+            }
+        }
+
+        protected override void OnRemoved()
+        {
+            if (fogOfWarToken != null)
+            {
+                fogOfWarToken.Dispose();
+                fogOfWarToken = null;
+            }
         }
         #endregion
     }

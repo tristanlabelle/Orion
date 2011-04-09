@@ -77,7 +77,7 @@ namespace Orion.Game.Simulation.Components
                 && targets.Contains(entityIdentity.Name);
         }
 
-        public override void Update(SimulationStep step)
+        protected override void Update(SimulationStep step)
         {
             if (!Entity.CanPerformHeavyOperation) return;
 

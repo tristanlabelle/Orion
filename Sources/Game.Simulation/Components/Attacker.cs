@@ -180,7 +180,7 @@ namespace Orion.Game.Simulation.Components
                 Spatial targetSpatial = target.Spatial;
                 if (target == Entity
                     || targetSpatial == null
-                    || !vision.CanSee(target)
+                    || !vision.IsInRange(target)
                     || !IsInRange(target)
                     || !target.Components.Has<Health>()
                     || FactionMembership.IsAlliedTo(Entity, target))

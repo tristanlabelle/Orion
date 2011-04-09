@@ -17,8 +17,7 @@ namespace Orion.Game.Simulation.Components
         public static readonly Stat CapacityStat = new Stat(typeof(Transporter), StatType.Integer, "Capacity");
 
         private int capacity = 1;
-        private readonly List<Entity> passengers = new List<Entity>();
-        private readonly List<Spatial> positionComponents = new List<Spatial>();
+        private readonly Dictionary<Entity, Spatial> passengers = new Dictionary<Entity, Spatial>();
         #endregion
 
         #region Constructors
@@ -40,19 +39,19 @@ namespace Orion.Game.Simulation.Components
         [Transient]
         public int LoadSize
         {
-            get { return passengers.Sum(entity => Cost.GetResourceAmount(entity).Food); }
+            get { return passengers.Keys.Sum(entity => Cost.GetResourceAmount(entity).Food); }
         }
 
         [Transient]
         public int RemainingSpace
         {
-            get { return capacity - LoadSize; }
+            get { return (int)Entity.GetStatValue(CapacityStat) - LoadSize; }
         }
 
         [Transient]
         public IEnumerable<Entity> Passengers
         {
-            get { return passengers; }
+            get { return passengers.Keys; }
         }
         #endregion
 
@@ -101,36 +100,36 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Embarks a given <see cref="Entity"/> in this transport.
         /// </summary>
-        /// <param name="entity">The <see cref="Entity"/> to be embarked.</param>
-        public void Embark(Entity entity)
+        /// <param name="passenger">The <see cref="Entity"/> to be embarked.</param>
+        public void Embark(Entity passenger)
         {
-            Argument.EnsureNotNull(entity, "entity");
+            Argument.EnsureNotNull(passenger, "passenger");
 
-            if (!CanEmbark(entity))
-                throw new ArgumentException("entity");
+            if (!CanEmbark(passenger))
+                throw new ArgumentException("Cannot embark passenger.", "passenger");
 
-            Spatial embarkeePosition = entity.Spatial;
-            entity.Components.Remove<Spatial>();
-            TaskQueue queue = entity.Components.TryGet<TaskQueue>();
-            if (queue != null) queue.Clear();
+            TaskQueue passengerTaskQueue = passenger.Components.TryGet<TaskQueue>();
+            if (passengerTaskQueue != null) passengerTaskQueue.Clear();
 
-            positionComponents.Add(embarkeePosition);
-            passengers.Add(entity);
+            Spatial passengerSpatial = passenger.Spatial;
+            passenger.Components.Remove<Spatial>();
+
+            passengers.Add(passenger, passengerSpatial);
         }
 
         /// <summary>
         /// Disembarks a given <see cref="Entity"/> from this transport.
         /// </summary>
-        /// <param name="entity">The <see cref="Entity"/> to be disembarked.</param>
-        public void Disembark(Entity entity)
+        /// <param name="passenger">The <see cref="Entity"/> to be disembarked.</param>
+        public void Disembark(Entity passenger)
         {
-            Argument.EnsureNotNull(entity, "entity");
+            Argument.EnsureNotNull(passenger, "passenger");
 
-            if (!passengers.Contains(entity))
-                throw new ArgumentException("entity");
+            Spatial passengerSpatial;
+            if (!passengers.TryGetValue(passenger, out passengerSpatial))
+                throw new KeyNotFoundException("Passenger is not being transported.");
 
             Spatial transporterSpatial = Entity.Spatial;
-            Spatial passengerSpatial = GetSpatialComponentOfPassenger(entity);
             Point? location = transporterSpatial
                 .GridRegion.Points
                 .Concat(transporterSpatial.GridRegion.GetAdjacentPoints())
@@ -142,28 +141,10 @@ namespace Orion.Game.Simulation.Components
                 return;
             }
 
-            passengers.Remove(entity);
-            positionComponents.Remove(passengerSpatial);
+            passengers.Remove(passenger);
 
-            entity.Components.Add(passengerSpatial);
+            passenger.Components.Add(passengerSpatial);
             passengerSpatial.Position = location.Value;
-        }
-
-        /// <summary>
-        /// Accesses the <see cref="Spatial"/> component of a passenger <see cref="Entity"/>.
-        /// This is particularly useful to know the size of a passenger before dropping it to the
-        /// ground.
-        /// </summary>
-        /// <param name="target">The passenger <see cref="Entity"/></param>
-        /// <returns>The <see cref="Spatial"/> component of the passenger</returns>
-        /// <exception cref="ArgumentException">If the passenger does not belong to this component</exception>
-        private Spatial GetSpatialComponentOfPassenger(Entity target)
-        {
-            int index = passengers.IndexOf(target);
-            if (index == -1)
-                throw new ArgumentException("Target does not belong to this transporter", "target");
-
-            return positionComponents[index];
         }
         #endregion
     }

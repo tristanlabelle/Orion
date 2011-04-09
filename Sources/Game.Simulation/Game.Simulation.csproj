@@ -107,6 +107,8 @@
     <Compile Include="Components\Vision.cs" />
     <Compile Include="Entity.ComponentCollection.cs" />
     <Compile Include="DiplomaticStanceChange.cs" />
+    <Compile Include="FogOfWarToken.cs" />
+    <Compile Include="Faction.FoodToken.cs" />
     <Compile Include="IO\ResourceNodeTemplate.cs" />
     <Compile Include="IO\UnitTemplate.cs" />
     <Compile Include="IO\WorldData.cs" />

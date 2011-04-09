@@ -15,17 +15,8 @@ namespace Orion.Game.Simulation
     /// Represents a faction, a group of allied units sharing resources and sharing a goal.
     /// </summary>
     [Serializable]
-    public sealed class Faction
+    public sealed partial class Faction
     {
-    	#region Static
-    	public static bool HaveAlliedVictory(Faction a, Faction b)
-    	{
-    		return a.GetDiplomaticStance(b).HasFlag(DiplomaticStance.AlliedVictory)
-    			&& b.GetDiplomaticStance(a).HasFlag(DiplomaticStance.AlliedVictory);
-    	}
-    	#endregion
-    	
-    	#region Instance
         #region Fields
         private const int minimumFoodAmount = 10;
 
@@ -77,7 +68,6 @@ namespace Orion.Game.Simulation
 
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
-            this.world.EntityAdded += OnWorldEntityAdded;
             this.world.EntityRemoved += OnWorldEntityRemoved;
         }
         #endregion
@@ -251,7 +241,7 @@ namespace Orion.Game.Simulation
                 if (value == usedFoodAmount) return;
                 usedFoodAmount = value;
                 UsedFoodAmountChanged.Raise(this);
-        }
+            }
         }
         #endregion
         #endregion
@@ -268,6 +258,17 @@ namespace Orion.Game.Simulation
                 AladdiumAmount += amount;
             else
                 AlageneAmount += amount;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="FoodToken"/> which uses or provides food to this <see cref="Faction"/>.
+        /// </summary>
+        /// <param name="type">The type of the food token.</param>
+        /// <param name="amount">The amount of food involved.</param>
+        /// <returns>A new <see cref="FoodToken"/>.</returns>
+        public FoodToken CreateFoodToken(FoodTokenType type, int amount)
+        {
+            return new FoodToken(this, type, amount);
         }
 
         #region Stats & Technologies
@@ -367,81 +368,16 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(prototype, "prototype");
 
             Entity entity = world.Entities.CreateUnit(prototype, this, point);
-            entity.Spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
-            UsedFoodAmount += (int)GetStat(prototype, Cost.FoodStat);
 
             return entity;
         }
 
         #region Entity notifications
-        /// <remarks>Invoked by <see cref="Spatial"/>.</remarks>
-        internal void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
-        {
-            Debug.Assert(entity != null);
-            Debug.Assert(FactionMembership.GetFaction(entity) == this);
-
-            int sightRange = (int)entity.GetStatValue(Vision.RangeStat);
-            Vector2 extent = entity.Spatial.BoundingRectangle.Extent;
-            Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
-            Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
-            localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
-        }
-
-        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
-        internal void OnEntityDied(Entity entity)
-        {
-            Debug.Assert(entity != null);
-            Debug.Assert(FactionMembership.GetFaction(entity) == this);
-
-            UsedFoodAmount -= (int)GetStat(entity, Cost.FoodStat);
-        }
-
-        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
-        internal void OnUnitTypeChanged(Entity entity, Entity oldPrototype, Entity newPrototype)
-        {
-            Debug.Assert(entity != null);
-            Debug.Assert(FactionMembership.GetFaction(entity) == this);
-            Debug.Assert(oldPrototype != null);
-            Debug.Assert(newPrototype != null);
-            Debug.Assert(oldPrototype != newPrototype);
-
-            UsedFoodAmount -= (int)GetStat(oldPrototype, Cost.FoodStat);
-            UsedFoodAmount += (int)GetStat(newPrototype, Cost.FoodStat);
-
-            Spatial entitySpatial = entity.Spatial;
-            if (entitySpatial == null) return;
-
-            Size oldPrototypeSize = oldPrototype.Spatial.Size;
-            Size newPrototypeSize = newPrototype.Spatial.Size;
-
-            if (entity.Components.Has<BuildProgress>())
-            {
-                Region oldRegion = Entity.GetGridRegion(entitySpatial.Position, oldPrototypeSize);
-                Region newRegion = Entity.GetGridRegion(entitySpatial.Position, newPrototypeSize);
-                localFogOfWar.RemoveRegion(oldRegion);
-                localFogOfWar.AddRegion(newRegion);
-            }
-            else
-            {
-                Vector2 oldCenter = entitySpatial.Position + (Vector2)oldPrototypeSize * 0.5f;
-                int oldSightRange = (int)GetStat(oldPrototype, Vision.RangeStat);
-
-                Vector2 newCenter = entitySpatial.Position + (Vector2)newPrototypeSize * 0.5f;
-                int newSightRange = (int)GetStat(newPrototype, Vision.RangeStat);
-
-                localFogOfWar.RemoveLineOfSight(new Circle(oldCenter, oldSightRange));
-                localFogOfWar.AddLineOfSight(new Circle(newCenter, newSightRange));
-            }
-        }
-
         /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
         internal void OnBuildingConstructionCompleted(Entity entity)
         {
             Debug.Assert(entity != null);
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
-
-            localFogOfWar.RemoveRegion(entity.Spatial.GridRegion);
-            localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
 
             TotalFoodAmount += (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);
         }
@@ -451,25 +387,10 @@ namespace Orion.Game.Simulation
         {
             if (FactionMembership.GetFaction(entity) != this) return;
 
-            if (entity.Components.Has<BuildProgress>())
-            {
-                localFogOfWar.RemoveRegion(entity.Spatial.GridRegion);
-            }
-            else
+            if (!entity.Components.Has<BuildProgress>())
             {
                 TotalFoodAmount -= (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);
-                localFogOfWar.RemoveLineOfSight(entity.Components.Get<Vision>().LineOfSight);
             }
-        }
-
-        private void OnWorldEntityAdded(World world, Entity entity)
-        {
-            if (FactionMembership.GetFaction(entity) != this) return;
-
-            if (entity.Components.Has<BuildProgress>())
-                localFogOfWar.AddRegion(entity.Spatial.GridRegion);
-            else if (entity.Components.Has<Vision>())
-                localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
         }
 
         /// <summary>
@@ -565,6 +486,12 @@ namespace Orion.Game.Simulation
             DiplomaticStance diplomaticStance;
             return diplomaticStances.TryGetValue(faction, out diplomaticStance)
                 ? diplomaticStance : DiplomaticStance.Enemy;
+        }
+
+        public static bool HaveAlliedVictory(Faction a, Faction b)
+        {
+            return a.GetDiplomaticStance(b).HasFlag(DiplomaticStance.AlliedVictory)
+                && b.GetDiplomaticStance(a).HasFlag(DiplomaticStance.AlliedVictory);
         }
 
         private void OnOtherFactionDiplomaticStanceChanged(Faction source, DiplomaticStance stance)
@@ -730,9 +657,15 @@ namespace Orion.Game.Simulation
 
         private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)
         {
-            foreach (Point point in region.Points)
-                if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
-                    localFogOfWar.RevealWithoutRaisingEvent(point);
+            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+            {
+                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                {
+                    Point point = new Point(x, y);
+                    if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
+                        localFogOfWar.RevealWithoutRaisingEvent(point);
+                }
+            }
         }
         #endregion
 
@@ -740,7 +673,6 @@ namespace Orion.Game.Simulation
         {
             return name;
         }
-        #endregion
         #endregion
     }
 }

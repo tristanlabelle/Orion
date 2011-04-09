@@ -17,7 +17,7 @@ namespace Orion.Game.Simulation
     /// including units, resource nodes, fauna, etc.
     /// </summary>
     [Serializable]
-    public partial class Entity
+    public sealed partial class Entity
     {
         #region Instance
         #region Fields
@@ -210,23 +210,18 @@ namespace Orion.Game.Simulation
             }
 
             isDead = true;
-            OnDied();
-        }
-
-        protected virtual void OnDied()
-        {
-            TaskQueue taskQueue = Components.TryGet<TaskQueue>();
-            if (taskQueue != null) taskQueue.Clear();
 
             Died.Raise(this);
-
-            Faction faction = FactionMembership.GetFaction(this);
-            if (faction != null) faction.OnEntityDied(this);
-
             World.OnEntityDied(this);
+
+            // HACK: Some components need to release resources,
+            // but we can't actually remove them from the collection
+            // because they can still be referred to.
+            foreach (Component component in components)
+                component.NotifyRemoved();
         }
 
-        protected virtual void OnMoved(Vector2 oldPosition, Vector2 newPosition)
+        protected void OnMoved(Vector2 oldPosition, Vector2 newPosition)
         {
             if (isDead)
             {
@@ -247,7 +242,7 @@ namespace Orion.Game.Simulation
         /// </remarks>
         internal void Update(SimulationStep step)
         {
-            if (!IsAliveInWorld)
+            if (!IsAlive)
             {
                 Debug.Fail("{0} was updated when it wasn't alive and in the world.".FormatInvariant(this));
                 return;
@@ -265,7 +260,10 @@ namespace Orion.Game.Simulation
             try
             {
                 foreach (Component component in tempComponents)
-                    component.Update(step);
+                {
+                    component.DoUpdate(step);
+                    if (isDead) break;
+                }
             }
             finally
             {

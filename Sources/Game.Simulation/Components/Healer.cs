@@ -91,7 +91,7 @@ namespace Orion.Game.Simulation.Components
                     || targetHealth == null
                     || targetHealth.Constitution != Constitution.Biological
                     || targetHealth.Damage == 0
-                    || !vision.CanSee(target)
+                    || !vision.IsInRange(target)
                     || !IsInRange(target)
                     || !FactionMembership.IsAlliedTo(Entity, target))
                 {

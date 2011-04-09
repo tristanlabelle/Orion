@@ -103,7 +103,7 @@ namespace Orion.Game.Simulation.Components
         /// Updates the current task for a frame.
         /// </summary>
         /// <param name="info">Information on the update.</param>
-        public override void Update(SimulationStep step)
+        protected override void Update(SimulationStep step)
         {
             if (IsEmpty)
             {
@@ -134,6 +134,11 @@ namespace Orion.Game.Simulation.Components
                     }
                 }
             }
+        }
+
+        protected override void OnRemoved()
+        {
+            Clear();
         }
 
         /// <summary>

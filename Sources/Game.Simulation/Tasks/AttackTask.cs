@@ -43,14 +43,14 @@ namespace Orion.Game.Simulation.Tasks
         {
             Spatial spatial = Entity.Spatial;
             Attacker attacker = Entity.Components.TryGet<Attacker>();
-            if (spatial == null || attacker == null)
+            Spatial targetSpatial = target.Spatial;
+            if (spatial == null || attacker == null || targetSpatial == null)
             {
                 MarkAsEnded();
                 return;
             }
 
             Faction faction = FactionMembership.GetFaction(Entity);
-            Spatial targetSpatial = target.Spatial;
             if (!target.IsAliveInWorld || (faction != null && !faction.CanSee(target)))
             {
                 // If the target has died while we weren't yet in attack range,

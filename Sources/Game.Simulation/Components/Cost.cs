@@ -22,6 +22,7 @@ namespace Orion.Game.Simulation.Components
         private int alagene;
         private int food;
         private float spawnTime = 1;
+        private Faction.FoodToken foodToken;
         #endregion
 
         #region Constructors
@@ -100,6 +101,38 @@ namespace Orion.Game.Simulation.Components
             return cost == null
                 ? ResourceAmount.Zero
                 : new ResourceAmount(cost.aladdium, cost.alagene, cost.food);
+        }
+
+        protected override void Update(SimulationStep step)
+        {
+            Faction faction = FactionMembership.GetFaction(Entity);
+
+            if (foodToken != null)
+            {
+                if (faction != foodToken.Faction)
+                {
+                    foodToken.Dispose();
+                    foodToken = null;
+                }
+                else
+                {
+                    foodToken.Amount = (int)Entity.GetStatValue(FoodStat);
+                }
+            }
+
+            if (foodToken == null && faction != null)
+            {
+                foodToken = faction.CreateFoodToken(Faction.FoodTokenType.Use, (int)Entity.GetStatValue(FoodStat));
+            }
+        }
+
+        protected override void OnRemoved()
+        {
+            if (foodToken != null)
+            {
+                foodToken.Dispose();
+                foodToken = null;
+            }
         }
         #endregion
     }

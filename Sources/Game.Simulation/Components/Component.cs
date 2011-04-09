@@ -11,35 +11,9 @@ namespace Orion.Game.Simulation.Components
     /// Abstract base class for <see cref="Entity"/> components.
     /// Components provide behavior and/or state to the <see cref="Entity"/> to which they are attached.
     /// </summary>
+    [Serializable]
     public abstract class Component
     {
-        #region Static
-        #region Methods
-        public static T Clone<T>(T component, Entity entity) where T : Component
-        {
-            return (T)component.Clone(entity);
-        }
-
-        /// <summary>
-        /// Helper method to copy items between two collections
-        /// </summary>
-        /// <remarks>
-        /// Used via reflection by <see cref="M:Clone"/>.
-        /// </remarks>
-        private static void CopyCollection<T>(ICollection<T> from, ICollection<T> to)
-        {
-            foreach (T item in from) to.Add(item);
-        }
-
-        private static bool IsGenericCollection(Type type, bool checkInterfaces)
-        {
-            if (type.IsGenericTypeDefinition) return type == typeof(ICollection<>);
-            if (type.IsGenericType) return type.GetGenericTypeDefinition() == typeof(ICollection<>);
-            return checkInterfaces && type.GetInterfaces().Any(interfaceType => IsGenericCollection(interfaceType, false));
-        }
-        #endregion
-        #endregion
-
         #region Fields
         private static readonly Type[] constructorArguments = new Type[] { typeof(Entity) };
         private readonly Entity entity;
@@ -68,8 +42,23 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public virtual void Update(SimulationStep step) { }
+        /// <summary>
+        /// Allows this <see cref="Component"/> to update its logic for a frame.
+        /// </summary>
+        /// <param name="step">The frame's simulation step.</param>
+        protected virtual void Update(SimulationStep step) { }
 
+        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
+        internal void DoUpdate(SimulationStep step)
+        {
+            Update(step);
+        }
+
+        /// <summary>
+        /// Gets the bonus this <see cref="Component"/> provides to a given <see cref="Stat"/>.
+        /// </summary>
+        /// <param name="stat">The <see cref="Stat"/> for which the bonus is to be computed.</param>
+        /// <returns>The value of the bonus for that <see cref="Stat"/>.</returns>
         public virtual StatValue GetStatBonus(Stat stat)
         {
             Type type = GetType();
@@ -89,8 +78,32 @@ namespace Orion.Game.Simulation.Components
                 return StatValue.CreateReal((float)property.GetValue(this, null));
         }
 
+        /// <summary>
+        /// Invoked after this <see cref="Component"/> has been added to its host <see cref="T:Entity"/>.
+        /// </summary>
+        protected virtual void OnAdded() { }
+
+        /// <remarks>Invoked by <see cref="T:Entity"/>.</remarks>
+        internal void NotifyAdded()
+        {
+            OnAdded();
+        }
+
+        /// <summary>
+        /// Invoked after this <see cref="Component"/> has been removed from its host <see cref="T:Entity"/>.
+        /// </summary>
+        protected virtual void OnRemoved() { }
+
+        /// <remarks>Invoked by <see cref="T:Entity"/>.</remarks>
+        internal void NotifyRemoved()
+        {
+            OnRemoved();
+        }
+
         public Component Clone(Entity entity)
         {
+            Argument.EnsureNotNull(entity, "entity");
+
             Type type = GetType();
             Component newInstance = type
                 .GetConstructor(constructorArguments)
@@ -125,6 +138,33 @@ namespace Orion.Game.Simulation.Components
             }
             return newInstance;
         }
+        #endregion
+
+        #region Static
+        #region Methods
+        public static T Clone<T>(T component, Entity entity) where T : Component
+        {
+            return (T)component.Clone(entity);
+        }
+
+        /// <summary>
+        /// Helper method to copy items between two collections
+        /// </summary>
+        /// <remarks>
+        /// Used via reflection by <see cref="M:Clone"/>.
+        /// </remarks>
+        private static void CopyCollection<T>(ICollection<T> from, ICollection<T> to)
+        {
+            foreach (T item in from) to.Add(item);
+        }
+
+        private static bool IsGenericCollection(Type type, bool checkInterfaces)
+        {
+            if (type.IsGenericTypeDefinition) return type == typeof(ICollection<>);
+            if (type.IsGenericType) return type.GetGenericTypeDefinition() == typeof(ICollection<>);
+            return checkInterfaces && type.GetInterfaces().Any(interfaceType => IsGenericCollection(interfaceType, false));
+        }
+        #endregion
         #endregion
     }
 }

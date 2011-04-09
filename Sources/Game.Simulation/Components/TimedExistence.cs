@@ -50,7 +50,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public override void Update(SimulationStep step)
+        protected override void Update(SimulationStep step)
         {
             elapsedTime += step.TimeDeltaInSeconds;
             if (elapsedTime >= lifeSpan)

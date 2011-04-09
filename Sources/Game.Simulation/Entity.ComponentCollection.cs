@@ -72,6 +72,8 @@ namespace Orion.Game.Simulation
 
                 components.Add(componentType, component);
                 if (componentType == typeof(Spatial)) spatial = (Spatial)component;
+
+                component.NotifyAdded();
             }
 
             /// <summary>
@@ -95,11 +97,21 @@ namespace Orion.Game.Simulation
             /// </summary>
             /// <param name="componentType">The type of the <see cref="Component"/> to be removed.</param>
             /// <returns>A value indicating if a <see cref="Component"/> with this type was found and removed.</returns>
+            /// <remarks>
+            /// All remove methods delegate to this one, so this is the proper place for bookkeeping.
+            /// </remarks>
             public bool Remove(Type componentType)
             {
-                bool removed = components.Remove(componentType);
-                if (removed && componentType == typeof(Spatial)) spatial = null;
-                return removed;
+                Component component;
+                if (!components.TryGetValue(componentType, out component))
+                    return false;
+
+                components.Remove(componentType);
+                if (componentType == typeof(Spatial)) spatial = null;
+
+                component.NotifyRemoved();
+
+                return true;
             }
 
             /// <summary>
@@ -119,8 +131,8 @@ namespace Orion.Game.Simulation
             {
                 while (components.Count > 0)
                 {
-                    Component component = components.Values.First();
-                    Remove(component);
+                    Type componentType = components.Keys.First();
+                    Remove(componentType);
                 }
             }
 

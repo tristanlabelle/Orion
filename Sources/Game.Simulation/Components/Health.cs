@@ -153,7 +153,7 @@ namespace Orion.Game.Simulation.Components
             Damage = (int)Entity.GetStatValue(MaxValueStat) - value;
         }
 
-        public override void Update(SimulationStep step)
+        protected override void Update(SimulationStep step)
         {
             if (damage >= (int)Entity.GetStatValue(MaxValueStat))
             {

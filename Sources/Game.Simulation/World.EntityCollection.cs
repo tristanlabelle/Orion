@@ -291,8 +291,12 @@ namespace Orion.Game.Simulation
 
             private void CommitMove(Entity entity, Vector2 oldPosition)
             {
-                Vector2 oldCenter = oldPosition + entity.Spatial.BoundingRectangle.Extent;
-                zoneManager.UpdateZone(entity, oldCenter);
+                Spatial spatial = entity.Spatial;
+                if (spatial != null)
+                {
+                    Vector2 oldCenter = oldPosition + spatial.BoundingRectangle.Extent;
+                    zoneManager.UpdateZone(entity, oldCenter);
+                }
             }
 
             private void CommitRemove(Entity entity)

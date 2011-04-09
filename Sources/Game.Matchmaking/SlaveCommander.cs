@@ -145,6 +145,12 @@ namespace Orion.Game.Matchmaking
                 IssueCommand(new LoadCommand(Faction.Handle, transporter.Handle, target.Handle));
         }
 
+        public void LaunchUnload(IEnumerable<Entity> transporters)
+        {
+            IEnumerable<Handle> transporterHandles = transporters.Select(entity => entity.Handle);
+            IssueCommand(new UnloadCommand(Faction.Handle, transporterHandles));
+        }
+
         public void LaunchUpgrade(IEnumerable<Entity> entities, Entity targetPrototype)
         {
             if (entities.Any())

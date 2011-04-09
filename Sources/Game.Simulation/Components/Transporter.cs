@@ -83,6 +83,11 @@ namespace Orion.Game.Simulation.Components
                 && RemainingSpace >= embarkeeCost.Food;
         }
 
+        /// <summary>
+        /// Tests if the receiver's <see cref="Entity"/> is within sqrt(2) squares of the argument entity.
+        /// </summary>
+        /// <param name="target">The entity whose proximity needs verification</param>
+        /// <returns>True if the target is within sqrt(2) squares distance of the receiver's <see cref="Entity"/></returns>
         public bool IsInRange(Entity target)
         {
             Spatial targetSpatial = target.Components.TryGet<Spatial>();
@@ -90,7 +95,7 @@ namespace Orion.Game.Simulation.Components
 
             Spatial selfSpatial = Entity.Components.TryGet<Spatial>();
             if (selfSpatial == null) return false;
-            return selfSpatial.IsInRange(target, 1);
+            return selfSpatial.IsInRange(target, (float)Math.Sqrt(2));
         }
 
         /// <summary>
@@ -106,6 +111,8 @@ namespace Orion.Game.Simulation.Components
 
             Spatial embarkeePosition = entity.Spatial;
             entity.Components.Remove<Spatial>();
+            TaskQueue queue = entity.Components.TryGet<TaskQueue>();
+            if (queue != null) queue.Clear();
 
             positionComponents.Add(embarkeePosition);
             passengers.Add(entity);
@@ -122,12 +129,12 @@ namespace Orion.Game.Simulation.Components
             if (!passengers.Contains(entity))
                 throw new ArgumentException("entity");
 
-            Spatial embarkerPosition = Entity.Spatial;
-            Spatial embarkeePosition = entity.Spatial;
-            Point? location = embarkerPosition
+            Spatial transporterSpatial = Entity.Spatial;
+            Spatial passengerSpatial = GetSpatialComponentOfPassenger(entity);
+            Point? location = transporterSpatial
                 .GridRegion.Points
-                .Concat(embarkerPosition.GridRegion.GetAdjacentPoints())
-                .FirstOrNull(point => Entity.World.IsFree(point, embarkeePosition.CollisionLayer));
+                .Concat(transporterSpatial.GridRegion.GetAdjacentPoints())
+                .FirstOrNull(point => Entity.World.IsFree(point, passengerSpatial.CollisionLayer));
 
             if (!location.HasValue)
             {
@@ -135,13 +142,28 @@ namespace Orion.Game.Simulation.Components
                 return;
             }
 
-            int embarkeeIndex = passengers.IndexOf(entity);
-            Spatial position = positionComponents[embarkeeIndex];
-            passengers.RemoveAt(embarkeeIndex);
-            positionComponents.RemoveAt(embarkeeIndex);
+            passengers.Remove(entity);
+            positionComponents.Remove(passengerSpatial);
 
-            position.Position = location.Value;
-            entity.Components.Add(position);
+            entity.Components.Add(passengerSpatial);
+            passengerSpatial.Position = location.Value;
+        }
+
+        /// <summary>
+        /// Accesses the <see cref="Spatial"/> component of a passenger <see cref="Entity"/>.
+        /// This is particularly useful to know the size of a passenger before dropping it to the
+        /// ground.
+        /// </summary>
+        /// <param name="target">The passenger <see cref="Entity"/></param>
+        /// <returns>The <see cref="Spatial"/> component of the passenger</returns>
+        /// <exception cref="ArgumentException">If the passenger does not belong to this component</exception>
+        private Spatial GetSpatialComponentOfPassenger(Entity target)
+        {
+            int index = passengers.IndexOf(target);
+            if (index == -1)
+                throw new ArgumentException("Target does not belong to this transporter", "target");
+
+            return positionComponents[index];
         }
         #endregion
     }

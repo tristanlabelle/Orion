@@ -64,9 +64,12 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
 
             Entity transporter = match.World.Entities.FromHandle(this.transporter);
-            Entity transportee = match.World.Entities.FromHandle(this.transportee);
-            transporter.Components.Get<TaskQueue>().Enqueue(new LoadTask(transporter, transportee));
-            transportee.Components.Get<TaskQueue>().Enqueue(new FollowTask(transportee, transporter));
+            Entity passenger = match.World.Entities.FromHandle(this.transportee);
+            if (passenger.Spatial != null)
+            {
+                transporter.Components.Get<TaskQueue>().Enqueue(new LoadTask(transporter, passenger));
+                passenger.Components.Get<TaskQueue>().OverrideWith(new FollowTask(passenger, transporter));
+            }
         }
 
         public override string ToString()

@@ -404,13 +404,23 @@ namespace Orion.Game.Presentation
         public void LaunchLoad(Entity target)
         {
             Entity transporter = Selection
+                .Where(e => IsControllable(e))
                 .Where(e => Identity.GetPrototype(e) == SelectionManager.FocusedPrototype)
                 .Where(e => e.Components.Has<Transporter>())
                 .Where(e => e.Components.Get<Transporter>().RemainingSpace >= target.Components.Get<Cost>().Food)
                 .FirstOrDefault();
 
-            ClearTasksIfNecessary();
             commander.LaunchLoad(transporter, target);
+        }
+
+        public void LaunchUnload()
+        {
+            IEnumerable<Entity> transporters = Selection
+                .Where(e => IsControllable(e))
+                .Where(e => Identity.GetPrototype(e) == SelectionManager.FocusedPrototype)
+                .Where(e => e.Components.Has<Transporter>());
+
+            commander.LaunchUnload(transporters);
         }
 
         public void LaunchAttack(Entity target)

@@ -158,7 +158,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Removes an entity to the zone it belonged to when its center was at a given position.
+        /// Removes an entity from the zone it belonged to when its center was at a given position.
         /// </summary>
         /// <param name="entity">The entity to be removed.</param>
         /// <param name="center">The center of the entity to be removed.</param>
@@ -171,15 +171,10 @@ namespace Orion.Game.Simulation
         private void Remove(Entity entity, Point zonePoint)
         {
             var zone = zones[zonePoint.X, zonePoint.Y];
-            bool wasRemoved = zone.Remove(entity);
+            zone.Remove(entity);
 
-#if DEBUG
-            if (!wasRemoved)
-            {
-                Debug.Fail("The zone did not contain the entity to be removed, {0}."
-                    .FormatInvariant(entity));
-            }
-#endif
+            // Here there used to be an assert about zones not containing entities
+            // but it was triggered by a legit use of the Transporter component.
         }
 
         /// <summary>

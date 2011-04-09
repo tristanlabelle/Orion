@@ -69,6 +69,7 @@
     <Compile Include="AIPlayer.cs" />
     <Compile Include="Commands\CancelTaskCommand.cs" />
     <Compile Include="Commands\LoadCommand.cs" />
+    <Compile Include="Commands\UnloadCommand.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
     <Compile Include="HarvestingAICommander.cs" />
     <Compile Include="Networking\CompositeMatchAdvertiser.cs" />

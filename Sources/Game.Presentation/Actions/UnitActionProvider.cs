@@ -141,6 +141,13 @@ namespace Orion.Game.Presentation.Actions
                         userInputManager.SelectedCommand = new LoadUserCommand(userInputManager);
                     }
                 };
+                actions[2, 3] = new ActionDescriptor()
+                {
+                    Name = localizer.GetNoun("Unload"),
+                    Texture = graphics.GetActionTexture("Unload"),
+                    HotKey = Key.K,
+                    Action = () => userInputManager.LaunchUnload()
+                };
             }
 
             if (prototype.Components.Has<Mobile>())

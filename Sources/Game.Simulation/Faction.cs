@@ -68,7 +68,6 @@ namespace Orion.Game.Simulation
 
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
-            this.world.EntityRemoved += OnWorldEntityRemoved;
         }
         #endregion
 
@@ -370,27 +369,6 @@ namespace Orion.Game.Simulation
             Entity entity = world.Entities.CreateUnit(prototype, this, point);
 
             return entity;
-        }
-
-        #region Entity notifications
-        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
-        internal void OnBuildingConstructionCompleted(Entity entity)
-        {
-            Debug.Assert(entity != null);
-            Debug.Assert(FactionMembership.GetFaction(entity) == this);
-
-            TotalFoodAmount += (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);
-        }
-        #endregion
-
-        private void OnWorldEntityRemoved(World world, Entity entity)
-        {
-            if (FactionMembership.GetFaction(entity) != this) return;
-
-            if (!entity.Components.Has<BuildProgress>())
-            {
-                TotalFoodAmount -= (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);
-            }
         }
 
         /// <summary>

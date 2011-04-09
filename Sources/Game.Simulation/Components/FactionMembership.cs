@@ -21,6 +21,7 @@ namespace Orion.Game.Simulation.Components
         private Faction faction;
         private bool isKeepAlive = true;
         private int providedFood;
+        private Faction.FoodToken providedFoodToken;
         #endregion
 
         #region Constructors
@@ -36,7 +37,9 @@ namespace Orion.Game.Simulation.Components
             get { return faction; }
             set
             {
-                Debug.Assert(faction == null || value == faction,
+                if (value == faction) return;
+
+                Debug.Assert(faction == null,
                     "Warning: an entity is changing faction membership, "
                     + "this might cause lots of issues with technologies, fog of war, etc. "
                     + "If the feature has been properly implemented, this assert can be removed.");
@@ -69,9 +72,41 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public override StatValue GetStatBonus(Stat stat)
         {
-            return faction == null
+            StatValue technologyBonuses = faction == null
                 ? StatValue.CreateZero(stat.Type)
                 : faction.GetTechnologyBonuses(Entity, stat);
+            return base.GetStatBonus(stat) + technologyBonuses;
+        }
+
+        protected override void Update(SimulationStep step)
+        {
+            bool underConstruction = Entity.Components.Has<BuildProgress>();
+            if (providedFoodToken != null)
+            {
+                if (faction != providedFoodToken.Faction || underConstruction)
+                {
+                    providedFoodToken.Dispose();
+                    providedFoodToken = null;
+                }
+                else
+                {
+                    providedFoodToken.Amount = (int)Entity.GetStatValue(ProvidedFoodStat);
+                }
+            }
+
+            if (providedFoodToken == null && faction != null && !underConstruction)
+            {
+                providedFoodToken = faction.CreateFoodToken(Faction.FoodTokenType.Provide, (int)Entity.GetStatValue(ProvidedFoodStat));
+            }
+        }
+
+        protected override void OnRemoved()
+        {
+            if (providedFoodToken != null)
+            {
+                providedFoodToken.Dispose();
+                providedFoodToken = null;
+            }
         }
 
         /// <summary>

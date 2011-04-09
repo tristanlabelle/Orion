@@ -99,8 +99,6 @@ namespace Orion.Game.Simulation.Components
             Entity.Components.Add(new TaskQueue(Entity));
             Entity.Components.Remove(this);
 
-            Faction faction = FactionMembership.GetFaction(Entity);
-            if (faction != null) faction.OnBuildingConstructionCompleted(Entity);
             World.RaiseBuildingConstructed(Entity);
         }
         #endregion

@@ -129,6 +129,20 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
+            if (prototype.Components.Has<Transporter>())
+            {
+                actions[2, 2] = new ActionDescriptor()
+                {
+                    Name = localizer.GetNoun("Load"),
+                    Texture = graphics.GetActionTexture("Load"),
+                    HotKey = Key.L,
+                    Action = () =>
+                    {
+                        userInputManager.SelectedCommand = new LoadUserCommand(userInputManager);
+                    }
+                };
+            }
+
             if (prototype.Components.Has<Mobile>())
             {
                 actions[0, 3] = new ActionDescriptor()

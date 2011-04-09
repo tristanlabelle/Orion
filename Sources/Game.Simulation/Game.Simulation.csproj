@@ -113,6 +113,7 @@
     <Compile Include="PlainWorldGenerator.cs" />
     <Compile Include="RandomWorldGenerator.cs" />
     <Compile Include="ResourceAmount.cs" />
+    <Compile Include="Tasks\LoadTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="EntityUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />

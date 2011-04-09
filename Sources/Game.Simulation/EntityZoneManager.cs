@@ -7,6 +7,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -100,7 +101,8 @@ namespace Orion.Game.Simulation
                     for (int i = 0; i < zone.Count; ++i)
                     {
                         Entity entity = zone[i];
-                        if (Rectangle.Intersects(area, entity.Spatial.BoundingRectangle))
+                        Spatial spatial = entity.Spatial;
+                        if (spatial != null && Rectangle.Intersects(area, entity.Spatial.BoundingRectangle))
                             yield return entity;
                     }
                 }

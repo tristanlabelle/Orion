@@ -139,6 +139,12 @@ namespace Orion.Game.Matchmaking
                 IssueCommand(new StandGuardCommand(Faction.Handle, entities.Select(entity => entity.Handle)));
         }
 
+        public void LaunchLoad(Entity transporter, Entity target)
+        {
+            if (!target.Components.Has<Transporter>())
+                IssueCommand(new LoadCommand(Faction.Handle, transporter.Handle, target.Handle));
+        }
+
         public void LaunchUpgrade(IEnumerable<Entity> entities, Entity targetPrototype)
         {
             if (entities.Any())

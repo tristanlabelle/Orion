@@ -78,6 +78,7 @@
     <Compile Include="Actions\UserCommands\HealUserCommand.cs" />
     <Compile Include="Actions\UserCommands\HarvestUserCommand.cs" />
     <Compile Include="Actions\UserCommands\IRenderableUserCommand.cs" />
+    <Compile Include="Actions\UserCommands\LoadUserCommand.cs" />
     <Compile Include="Actions\UserCommands\MoveUserCommand.cs" />
     <Compile Include="Actions\UserCommands\RepairUserCommand.cs" />
     <Compile Include="Actions\UserCommands\AttackUserCommand.cs" />

@@ -77,10 +77,20 @@ namespace Orion.Game.Simulation.Components
             FactionMembership embarkerMembership = entity.Components.TryGet<FactionMembership>();
             ResourceAmount embarkeeCost = Cost.GetResourceAmount(entity);
             if (embarkerMembership == null)
-                return RemainingSpace <= embarkeeCost.Food;
+                return RemainingSpace >= embarkeeCost.Food;
 
             return (embarkerMembership == null || embarkerMembership.Faction == embarkeeMembership.Faction)
-                && RemainingSpace <= embarkeeCost.Food;
+                && RemainingSpace >= embarkeeCost.Food;
+        }
+
+        public bool IsInRange(Entity target)
+        {
+            Spatial targetSpatial = target.Components.TryGet<Spatial>();
+            if (targetSpatial == null) return false;
+
+            Spatial selfSpatial = Entity.Components.TryGet<Spatial>();
+            if (selfSpatial == null) return false;
+            return selfSpatial.IsInRange(target, 1);
         }
 
         /// <summary>

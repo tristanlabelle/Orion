@@ -150,8 +150,12 @@ namespace Orion.Game.Presentation.Renderers
                 Faction entityFaction = FactionMembership.GetFaction(entity);
                 if (entityFaction == null || !faction.CanSee(entity)) continue;
 
-                Rectangle rectangle = Rectangle.FromCenterSize(entity.Spatial.Center, (Vector2)miniatureUnitSize);
-                context.Fill(rectangle, entityFaction.Color);
+                Spatial spatial = entity.Spatial;
+                if (spatial != null)
+                {
+                    Rectangle rectangle = Rectangle.FromCenterSize(spatial.Center, (Vector2)miniatureUnitSize);
+                    context.Fill(rectangle, entityFaction.Color);
+                }
             }
         }
         #endregion

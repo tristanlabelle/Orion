@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Chocobo</Name>
+		<HotKey>C</HotKey>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>50</Aladdium>
+		<Alagene>50</Alagene>
+		<Food>1</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Transporter>
+		<Capacity>4</Capacity>
+	</Transporter>
+	
+	<Health>
+		<MaxValue>75</MaxValue>
+		<ArmorType>Light</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	
+	<Mobile>
+		<Speed>10</Speed>
+	</Mobile>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite/>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
+</Entity>

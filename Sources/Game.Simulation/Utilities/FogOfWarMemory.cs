@@ -53,8 +53,9 @@ namespace Orion.Game.Simulation.Utilities
         {
             Debug.Assert(sender == faction);
 
-            foreach (Entity entity in faction.World.Entities.Intersecting(region.ToRectangle()))
+            foreach (Spatial entitySpatial in faction.World.SpatialManager.Intersecting(region.ToRectangle()))
             {
+                Entity entity = entitySpatial.Entity;
                 Faction entityFaction = FactionMembership.GetFaction(entity);
                 Entity prototype = Identity.GetPrototype(entity);
                 if (entityFaction == faction
@@ -65,7 +66,7 @@ namespace Orion.Game.Simulation.Utilities
                     continue;
                 }
 
-                entities.Add(new RememberedEntity(entity.Spatial.GridRegion.Min, prototype, entityFaction));
+                entities.Add(new RememberedEntity(entitySpatial.GridRegion.Min, prototype, entityFaction));
             }
 
             hasVisibilityChanged = true;
@@ -81,8 +82,8 @@ namespace Orion.Game.Simulation.Utilities
                 if (!faction.CanSee(rememberedEntity.GridRegion)) return false;
 
                 CollisionLayer collisionLayer = rememberedEntity.Prototype.Spatial.CollisionLayer;
-                Entity entity = faction.World.Entities.GetEntityAt(rememberedEntity.Location, collisionLayer);
-                return entity == null || !rememberedEntity.Matches(entity);
+                Spatial spatial = faction.World.SpatialManager.GetGridObstacleAt(rememberedEntity.Location, collisionLayer);
+                return spatial == null || !rememberedEntity.Matches(spatial.Entity);
             });
         }
 

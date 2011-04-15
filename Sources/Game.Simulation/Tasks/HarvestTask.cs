@@ -51,6 +51,15 @@ namespace Orion.Game.Simulation.Tasks
             get { return resourceNode; }
         }
 
+        /// <summary>
+        /// Gets a value indicating if the <see cref="Entity"/> is currently extracting
+        /// resources from the resource node.
+        /// </summary>
+        public bool IsExtracting
+        {
+            get { return move == null && mode == Mode.Extracting; }
+        }
+
         public override string Description
         {
             get { return "harvesting " + resourceType; }
@@ -61,7 +70,8 @@ namespace Orion.Game.Simulation.Tasks
             get
             {
                 Faction faction = FactionMembership.GetFaction(Entity);
-                return resourceNode.IsAliveInWorld
+                return resourceNode.IsAlive
+                    && resourceNode.Spatial != null
                     && faction != null
                     && faction.CanHarvest(resourceNode);
             }
@@ -132,7 +142,7 @@ namespace Orion.Game.Simulation.Tasks
             while (amountAccumulator >= 1)
             {
                 Harvestable harvestable = resourceNode.Components.Get<Harvestable>();
-                if (!resourceNode.IsAliveInWorld)
+                if (!resourceNode.IsAlive)
                 {
                     faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvestable.Type));
                     TransitionToDelivering();
@@ -201,7 +211,8 @@ namespace Orion.Game.Simulation.Tasks
         {
 #warning The resource depot component should not be present while the build is in progress
             return entity.Components.Has<ResourceDepot>()
-                && entity.IsAliveInWorld
+                && entity.IsAlive
+                && entity.Spatial != null
                 && !entity.Components.Has<BuildProgress>();
         }
 

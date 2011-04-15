@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
 using OpenTK;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation
 {
@@ -61,6 +64,15 @@ namespace Orion.Game.Presentation
         /// This is the place to cause an action as the command is discarded after the call.
         /// </remarks>
         public abstract void OnClick(Vector2 location);
+
+        protected Entity GetTopmostEntityWhere(Vector2 point, Func<Entity, bool> predicate)
+        {
+             Spatial targetSpatial = World.SpatialManager
+                .Intersecting(point)
+                .Where(spatial => predicate(spatial.Entity))
+                .WithMaxOrDefault(spatial => spatial.CollisionLayer);
+             return targetSpatial == null ? null : targetSpatial.Entity;
+        }
         #endregion
     }
 }

@@ -115,6 +115,9 @@
     <Compile Include="PlainWorldGenerator.cs" />
     <Compile Include="RandomWorldGenerator.cs" />
     <Compile Include="ResourceAmount.cs" />
+    <Compile Include="SpatialGrid.cs" />
+    <Compile Include="SpatialHashTable.cs" />
+    <Compile Include="SpatialManager.cs" />
     <Compile Include="Tasks\LoadTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="EntityUpgrade.cs" />
@@ -128,8 +131,6 @@
     <Compile Include="CollisionLayer.cs" />
     <Compile Include="DiplomaticStance.cs" />
     <Compile Include="Entity.cs" />
-    <Compile Include="EntityGrid.cs" />
-    <Compile Include="EntityZoneManager.cs" />
     <Compile Include="FactionStatus.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="FogOfWar.cs" />

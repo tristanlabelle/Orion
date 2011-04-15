@@ -76,10 +76,12 @@ namespace Orion.Game.Simulation.Tasks
         {
             Spatial spatial = Entity.Spatial;
             Faction faction = FactionMembership.GetFaction(Entity);
+            Spatial targetSpatial = target.Spatial;
             if (spatial == null
                 || !Entity.Components.Has<Builder>()
                 || faction == null
-                || !target.IsAliveInWorld)
+                || !target.IsAlive
+                || targetSpatial == null)
             {
                 Debug.Assert(faction != null, "Repairing without a faction is unimplemented.");
                 MarkAsEnded();
@@ -94,7 +96,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            spatial.LookAt(target.Center);
+            spatial.LookAt(targetSpatial.Center);
 
             BuildProgress buildProgress = target.Components.TryGet<BuildProgress>();
             if (buildProgress == null)
@@ -149,20 +151,18 @@ namespace Orion.Game.Simulation.Tasks
             if (Entity.Components.Has<Harvester>() && target.Components.Has<AlageneExtractor>())
             {
                 // HACK: Find the resource node from the alagene extractor position.
-                Entity node = World.Entities
+                Spatial nodeSpatial = World.SpatialManager
                     .Intersecting(targetSpatial.BoundingRectangle)
-                    .First(entity =>
-                    { 
-                        Harvestable harvestable = entity.Components.TryGet<Harvestable>();
-                        Spatial entitySpatial = entity.Spatial;
+                    .First(entitySpatial =>
+                    {
+                        Harvestable harvestable = entitySpatial.Entity.Components.TryGet<Harvestable>();
                         return harvestable != null
                             && !harvestable.IsEmpty
-                            && entitySpatial != null
                             && Region.Intersects(entitySpatial.GridRegion, targetSpatial.GridRegion);
                     });
 
                 if (TaskQueue.Count == 1)
-                    TaskQueue.OverrideWith(new HarvestTask(Entity, node));
+                    TaskQueue.OverrideWith(new HarvestTask(Entity, nodeSpatial.Entity));
             }
 
             MarkAsEnded();

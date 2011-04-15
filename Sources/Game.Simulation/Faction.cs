@@ -391,17 +391,20 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(node, "node");
 
+            Spatial nodeSpatial = node.Spatial;
             Harvestable harvestable = node.Components.TryGet<Harvestable>();
-            if (harvestable == null
-                || harvestable.Type == ResourceType.Aladdium) return true;
+            if (!node.IsAlive || nodeSpatial == null || harvestable == null) return false;
+            if (harvestable.Type == ResourceType.Aladdium) return true;
 
-            Vector2 location = node.Spatial.Position;
-            Entity extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location));
-            if (extractor == null) return false;
+            Vector2 location = nodeSpatial.Position;
+            Spatial extractorSpatial = world.SpatialManager.GetGroundGridObstacleAt(Point.Truncate(location));
+            if (extractorSpatial == null) return false;
 
+            Entity extractor = extractorSpatial.Entity;
             Faction extractorFaction = FactionMembership.GetFaction(extractor);
-            return extractor != null
-                && extractor.Components.Has<AlageneExtractor>()
+
+#warning The AlageneExtractor component should not be present while the BuildProgress component is
+            return extractor.Components.Has<AlageneExtractor>()
                 && !extractor.Components.Has<BuildProgress>()
                 && extractorFaction != null
                 && GetDiplomaticStance(extractorFaction).HasFlag(DiplomaticStance.AlliedVictory);

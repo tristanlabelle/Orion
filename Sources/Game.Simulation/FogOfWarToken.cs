@@ -5,6 +5,7 @@ using System.Text;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -165,7 +166,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Region Region
         {
-            get { return Entity.GetGridRegion(center - (Vector2)size * 0.5f, size); }
+            get { return Spatial.GetGridRegion(center - (Vector2)size * 0.5f, size); }
         }
         #endregion
 

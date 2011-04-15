@@ -24,6 +24,7 @@ namespace Orion.Game.Simulation
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
         private readonly EntityCollection entities;
+        private readonly SpatialManager spatialManager;
         private readonly Pathfinder pathfinder;
         private readonly Random random;
         private readonly int maxFoodAmount;
@@ -35,6 +36,8 @@ namespace Orion.Game.Simulation
         /// Initializes a new <see cref="World"/>.
         /// </summary>
         /// <param name="terrain">The <see cref="Terrain"/> of this world.</param>
+        /// <param name="random">The random number generator that can be used within the simulation.</param>
+        /// <param name="maxFood">The maximum allowed amount of food per faction.</param>
         public World(Terrain terrain, Random random, int maxFood)
         {
             Argument.EnsureNotNull(terrain, "terrain");
@@ -42,6 +45,7 @@ namespace Orion.Game.Simulation
             this.maxFoodAmount = maxFood;
             this.terrain = terrain;
             this.entities = new EntityCollection(this);
+            this.spatialManager = new SpatialManager(terrain.Size, maxFood * 5);
             this.pathfinder = new Pathfinder(terrain.Size);
             this.random = random;
         }
@@ -71,9 +75,6 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Raised when an <see cref="Entity"/> has died.
         /// </summary>
-        /// <remarks>
-        /// Convenience aggregator of the <see cref="Entity.Died"/> event.
-        /// </remarks>
         public event Action<World, Entity> EntityDied;
 
         /// <summary>
@@ -157,6 +158,15 @@ namespace Orion.Game.Simulation
             get { return entities; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="SpatialManager"/> which allows optimized spatial queries
+        /// within this world's <see cref="Entity">entities</see> with a <see cref="Spatial"/> component.
+        /// </summary>
+        public SpatialManager SpatialManager
+        {
+            get { return spatialManager; }
+        }
+
         #region Size/Bounds
         /// <summary>
         /// Gets the size of this <see cref="World"/>, in tiles.
@@ -201,7 +211,7 @@ namespace Orion.Game.Simulation
                 return false;
             }
             if (layer == CollisionLayer.Ground && !terrain.IsWalkable(point)) return false;
-            return entities.GetEntityAt(point, layer) == null;
+            return spatialManager.GetGridObstacleAt(point, layer) == null;
         }
 
         public bool IsFree(Region region, CollisionLayer layer)
@@ -335,10 +345,6 @@ namespace Orion.Game.Simulation
         /// <remarks>Invoked by World.EntityCollection.</remarks>
         private void OnEntityAdded(Entity entity)
         {
-            Debug.Assert(entity.Components.Has<Spatial>(), "Entity has no Spatial component!");
-            Spatial spatial = entity.Spatial;
-            spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
-
             EntityAdded.Raise(this, entity);
         }
 
@@ -346,12 +352,6 @@ namespace Orion.Game.Simulation
         private void OnEntityRemoved(Entity entity)
         {
             EntityRemoved.Raise(this, entity);
-        }
-
-        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
-        internal void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
-        {
-            entities.MoveFrom(entity, oldPosition);
         }
 
         /// <remarks>Invoked by <see cref="Entity"/>.</remarks>

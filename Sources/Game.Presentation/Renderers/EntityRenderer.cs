@@ -9,6 +9,7 @@ using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Utilities;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -175,15 +176,11 @@ namespace Orion.Game.Presentation.Renderers
         private void DrawEntities(GraphicsContext graphicsContext, Rectangle viewBounds,
             CollisionLayer collisionLayer, Action<GraphicsContext, Entity> drawDelegate)
         {
-            foreach (Entity entity in World.Entities.Intersecting(viewBounds))
+            foreach (Spatial spatial in World.SpatialManager.Intersecting(viewBounds))
             {
-                Spatial spatial = entity.Spatial;
-                if (spatial == null
-                    || spatial.CollisionLayer != collisionLayer
-                    || !faction.CanSee(entity))
-                {
+                Entity entity = spatial.Entity;
+                if (spatial.CollisionLayer != collisionLayer || !faction.CanSee(entity))
                     continue;
-                }
 
                 DrawEntity(graphicsContext, entity);
             }
@@ -192,23 +189,20 @@ namespace Orion.Game.Presentation.Renderers
         private void DrawEntity(GraphicsContext graphics, Entity entity)
         {
             Spatial spatial = entity.Spatial;
-            if (spatial == null) return;
-
             Sprite sprite = entity.Components.TryGet<Sprite>();
-            if (sprite != null)
+            if (sprite == null) return;
+            
+            Texture texture = gameGraphics.GetEntityTexture(sprite.Name);
+
+            Vector2 center = spatial.Center;
+            center.Y += GetOscillation(entity) * 0.15f;
+
+            float drawingAngle = GetDrawingAngle(entity);
+            using (graphics.PushTransform(center, drawingAngle))
             {
-                Texture texture = gameGraphics.GetEntityTexture(sprite.Name);
-
-                Vector2 center = spatial.Center;
-                center.Y += GetOscillation(entity, spatial) * 0.15f;
-
-                float drawingAngle = GetDrawingAngle(entity, sprite);
-                using (graphics.PushTransform(center, drawingAngle))
-                {
-                    Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, spatial.Size.Width, spatial.Size.Height);
-                    ColorRgba color = GetEntitySpriteColor(entity);
-                    graphics.Fill(localRectangle, texture, color);
-                }
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, spatial.Size.Width, spatial.Size.Height);
+                ColorRgba color = GetEntitySpriteColor(entity);
+                graphics.Fill(localRectangle, texture, color);
             }
 
             if (entity.Components.Has<BuildProgress>())
@@ -259,8 +253,8 @@ namespace Orion.Game.Presentation.Renderers
             Texture texture = gameGraphics.GetEntityTexture(sprite.Name);
             ColorRgba tint = new ColorRgba(Colors.Black, shadowAlpha);
 
-            float drawingAngle = GetDrawingAngle(entity, sprite);
-            float oscillation = GetOscillation(entity, spatial);
+            float drawingAngle = GetDrawingAngle(entity);
+            float oscillation = GetOscillation(entity);
             float distance = shadowDistance - oscillation * 0.1f;
             Vector2 center = spatial.Center + new Vector2(-distance, distance);
             float scaling = shadowScaling + oscillation * 0.1f;
@@ -271,8 +265,9 @@ namespace Orion.Game.Presentation.Renderers
             }
         }
 
-        private float GetOscillation(Entity entity, Spatial spatial)
+        private float GetOscillation(Entity entity)
         {
+            Spatial spatial = entity.Spatial;
             if (spatial.CollisionLayer != CollisionLayer.Air) return 0;
 
             float period = 3 + spatial.Size.Area / 4.0f;
@@ -284,21 +279,28 @@ namespace Orion.Game.Presentation.Renderers
             return sine;
         }
 
-        private static float GetDrawingAngle(Entity entity, Sprite sprite)
+        private static float GetDrawingAngle(Entity entity)
         {
+            Sprite sprite = entity.Components.Get<Sprite>();
             if (!sprite.Rotates) return 0;
 
-            float angle = entity.Spatial.Angle;
-            float baseAngle = angle + (float)Math.PI * 0.5f;
+            float angle = entity.Spatial.Angle + (float)Math.PI * 0.5f;
 
+            // Wiggle if harvesting, healing or building/repairing
+            Task task = TaskQueue.GetCurrentTask(entity);
+            HarvestTask harvestTask = task as HarvestTask;
+            if ((harvestTask != null && harvestTask.IsExtracting) || task is HealTask || task is RepairTask)
+                return angle + (float)Math.Sin(entity.World.SimulationTime.TotalSeconds * 10 + entity.Handle.Value) * 0.15f;
+
+            // Rotate after attacks
             Attacker attacker = entity.Components.TryGet<Attacker>();
             if (attacker == null || attacker.IsRanged || attacker.TimeElapsedSinceLastHit > meleeHitSpinTime)
-                return baseAngle;
+                return angle;
 
             float spinProgress = (float)attacker.TimeElapsedSinceLastHit.TotalSeconds / (float)meleeHitSpinTime.TotalSeconds;
             float spinAngle = spinProgress * (float)Math.PI * 2;
 
-            return baseAngle + spinAngle;
+            return angle + spinAngle;
         }
 
         private void DrawLasers(GraphicsContext graphics, Rectangle bounds, CollisionLayer layer)

@@ -72,7 +72,8 @@ namespace Orion.Game.Simulation.Components
 
             Identity entityIdentity = entity.Identity;
             return entity != Entity
-                && entity.IsAliveInWorld
+                && entity.IsAlive
+                && entity.Spatial != null
                 && entityIdentity != null
                 && targets.Contains(entityIdentity.Name);
         }
@@ -85,12 +86,11 @@ namespace Orion.Game.Simulation.Components
             if (spatial == null) return;
 
             Rectangle broadPhaseIntersectionRectangle = Rectangle.FromCenterSize(spatial.Center, (Vector2)spatial.Size + Vector2.One * 2);
-            foreach (Entity target in World.Entities.Intersecting(broadPhaseIntersectionRectangle))
+            foreach (Spatial targetSpatial in World.SpatialManager.Intersecting(broadPhaseIntersectionRectangle))
             {
-                Spatial targetSpatial = target.Spatial;
+                Entity target = targetSpatial.Entity;
                 if (target == Entity
                     || !IsTarget(target)
-                    || targetSpatial == null
                     || !Region.AreAdjacentOrIntersecting(spatial.GridRegion, targetSpatial.GridRegion))
                 {
                     continue;
@@ -125,10 +125,12 @@ namespace Orion.Game.Simulation.Components
             World.OnExplosionOccured(explosionCircle);
             Entity.Components.Get<Health>().Suicide();
 
-            var damagedEntities = World.Entities
+            var damagedEntities = World.SpatialManager
                 .Intersecting(explosionCircle)
+                .Select(s => s.Entity)
                 .Where(entity => entity != Entity
-                    && entity.IsAliveInWorld
+                    && entity.IsAlive
+                    && entity.Spatial != null
                     && entity.Components.Has<Health>())
                 .NonDeferred();
 
@@ -137,7 +139,7 @@ namespace Orion.Game.Simulation.Components
             {
                 if (damagedEntity.Components.Has<Kamikaze>()) continue;
 
-                float distanceFromCenter = (explosionCircle.Center - damagedEntity.Center).LengthFast;
+                float distanceFromCenter = (explosionCircle.Center - damagedEntity.Spatial.Center).LengthFast;
                 float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
                     * explosionDamage;
                 damagedEntity.Components.Get<Health>().Damage += damage;

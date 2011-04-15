@@ -56,12 +56,13 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
                 // Special case for alagene extractors:
                 // They can only be build on alagene nodes.
-                foreach (Entity entity in World.Entities.Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One)))
+                foreach (Spatial entitySpatial in World.SpatialManager.Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One)))
                 {
+                    Entity entity = entitySpatial.Entity;
                     Harvestable harvestable = entity.Components.TryGet<Harvestable>();
                     if (harvestable != null
                         && harvestable.Type == ResourceType.Alagene
-                        && entity.Spatial.Position == minLocation.Value)
+                        && entitySpatial.Position == minLocation.Value)
                     {
                         return true;
                     }

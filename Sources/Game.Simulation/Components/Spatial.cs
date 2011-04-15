@@ -24,10 +24,6 @@ namespace Orion.Game.Simulation.Components
         public Spatial(Entity entity) : base(entity) { }
         #endregion
 
-        #region Events
-        public event Action<Spatial, Vector2, Vector2> Moved;
-        #endregion
-
         #region Properties
         /// <summary>
         /// Accesses the position of this <see cref="Entity"/>, in world units.
@@ -37,15 +33,17 @@ namespace Orion.Game.Simulation.Components
             get { return position; }
             set
             {
+                if (value == position) return;
+
                 World world = Entity.World;
                 if (world != null && !world.Bounds.ContainsPoint(value))
                 {
                     Debug.Fail("Position out of bounds.");
                     value = world.Bounds.Clamp(value);
                 }
-                var oldPosition = position;
+
+                if (IsAwake) SpatialManager.UpdatePosition(this, position, value);
                 position = value;
-                Moved.Raise(this, oldPosition, position);
             }
         }
 
@@ -58,20 +56,41 @@ namespace Orion.Game.Simulation.Components
             set { angle = value; }
         }
 
+        /// <summary>
+        /// Accesses the <see cref="CollisionLayer"/> on which this <see cref="Entity"/> lies.
+        /// </summary>
         [Mandatory]
         public CollisionLayer CollisionLayer
         {
             get { return collisionLayer; }
-            set { collisionLayer = value; }
+            set
+            {
+                if (value == collisionLayer) return;
+
+                if (IsAwake) SpatialManager.UpdateCollisionLayer(this, collisionLayer, value);
+                collisionLayer = value;
+            }
         }
 
+        /// <summary>
+        /// Accesses the size of this <see cref="Entity"/>, in tiles.
+        /// </summary>
         [Mandatory]
         public Size Size
         {
             get { return size; }
-            set { size = value; }
+            set
+            {
+                if (value == size) return;
+
+                size = value;
+                Debug.Assert(!IsAwake, "Cannot modify the size of an entity while it's awake.");
+            }
         }
 
+        /// <summary>
+        /// Accesses the width of this <see cref="Entity"/>, in tiles.
+        /// </summary>
         [Transient]
         public int Width
         {
@@ -79,6 +98,9 @@ namespace Orion.Game.Simulation.Components
             set { size = new Size(value, size.Height); }
         }
 
+        /// <summary>
+        /// Accesses the height of this <see cref="Entity"/>, in tiles.
+        /// </summary>
         [Transient]
         public int Height
         {
@@ -112,11 +134,12 @@ namespace Orion.Game.Simulation.Components
         [Transient]
         public Region GridRegion
         {
-            get
-            {
-                Point min = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
-                return new Region(min, size);
-            }
+            get { return GetGridRegion(position, size); }
+        }
+
+        private SpatialManager SpatialManager
+        {
+            get { return World.SpatialManager; }
         }
         #endregion
 
@@ -146,6 +169,34 @@ namespace Orion.Game.Simulation.Components
             Spatial targetSpatial = target.Spatial;
             return targetSpatial != null
                 && Region.SquaredDistance(GridRegion, targetSpatial.GridRegion) <= radius * radius + 0.001f;
+        }
+
+        protected override void Wake()
+        {
+            SpatialManager.Add(this);
+        }
+
+        protected override void Sleep()
+        {
+            SpatialManager.Remove(this);
+        }
+        #endregion
+
+        #region Static
+        /// <summary>
+        /// The maximum size (in width or height) of entities.
+        /// This limitation exists to optimize the EntityZoneManager.
+        /// </summary>
+        public static readonly int MaxSize = 4;
+
+        public static Point GetGridRegionMinPoint(Vector2 position)
+        {
+            return new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
+        }
+
+        public static Region GetGridRegion(Vector2 position, Size size)
+        {
+            return new Region(GetGridRegionMinPoint(position), size);
         }
         #endregion
     }

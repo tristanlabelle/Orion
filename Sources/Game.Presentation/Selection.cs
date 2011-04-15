@@ -239,10 +239,10 @@ namespace Orion.Game.Presentation
             Faction faction = FactionMembership.GetFaction(entity);
             Circle circle = new Circle(entity.Center, nearbyRadius);
 
-            var entities = world.Entities
+            var entities = world.SpatialManager
                 .Intersecting(circle)
-                .Where(e => Identity.HaveSamePrototype(e, entity)
-                    && FactionMembership.GetFaction(e) == faction);
+                .Select(spatial => spatial.Entity)
+                .Where(e => Identity.HaveSamePrototype(e, entity) && FactionMembership.GetFaction(e) == faction);
 
             Set(entities);
         }
@@ -296,8 +296,9 @@ namespace Orion.Game.Presentation
         {
             Rectangle rectangle = Rectangle.FromPoints(rectangleStart, rectangleEnd);
 
-            List<Entity> entities = world.Entities
+            List<Entity> entities = world.SpatialManager
                 .Intersecting(rectangle)
+                .Select(spatial => spatial.Entity)
                 .Where(entity => entity.Identity.IsSelectable)
                 .ToList();
 

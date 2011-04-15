@@ -163,10 +163,14 @@ namespace Orion.Game.Simulation.Tasks
             Harvester harvester = entity.Components.TryGet<Harvester>();
             if (harvester != null)
             {
-                Entity resourceNode = World.Entities
+                Entity resourceNode = World.SpatialManager
                     .Intersecting(rallyPoint)
-                    .Where(e => e.Components.Has<Harvestable>())
-                    .FirstOrDefault(e => !e.Components.Get<Harvestable>().IsEmpty);
+                    .Select(s => s.Entity)
+                    .FirstOrDefault(e => 
+                    {
+                        Harvestable harvestable = e.Components.TryGet<Harvestable>();
+                        return harvestable != null && !harvestable.IsEmpty;
+                    });
 
                 if (resourceNode != null && harvester.CanHarvest(resourceNode))
                     rallyPointTask = new HarvestTask(entity, resourceNode);

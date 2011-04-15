@@ -17,6 +17,7 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private static readonly Type[] constructorArguments = new Type[] { typeof(Entity) };
         private readonly Entity entity;
+        private bool isAwake;
         #endregion
 
         #region Constructors
@@ -39,6 +40,16 @@ namespace Orion.Game.Simulation.Components
         {
             get { return entity.World; }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Component"/> is awake,
+        /// meaning that it is part of an <see cref="T:Entity"/> which is itself
+        /// part of the <see cref="T:World"/>.
+        /// </summary>
+        protected bool IsAwake
+        {
+            get { return isAwake; }
+        }
         #endregion
 
         #region Methods
@@ -48,8 +59,11 @@ namespace Orion.Game.Simulation.Components
         /// <param name="step">The frame's simulation step.</param>
         protected virtual void Update(SimulationStep step) { }
 
-        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
-        internal void DoUpdate(SimulationStep step)
+        /// <remarks>
+        /// Proxy to the <see cref="Update"/> method invoked by <see cref="T:Entity"/>
+        /// so the method can have protected visibility.
+        /// </remarks>
+        internal void InvokeUpdate(SimulationStep step)
         {
             Update(step);
         }
@@ -79,37 +93,52 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
-        /// Invoked after this <see cref="Component"/> has been added to its host <see cref="T:Entity"/>.
+        /// Performs <see cref="Component"/>-specific initialization logic.
+        /// This gets called once the <see cref="Component"/> is part of an <see cref="T:Entity"/>
+        /// which is itself part of a <see cref="T:World"/>.
         /// </summary>
-        protected virtual void OnAdded() { }
+        protected virtual void Wake() { }
 
-        /// <remarks>Invoked by <see cref="T:Entity"/>.</remarks>
-        internal void NotifyAdded()
+        /// <remarks>
+        /// Proxy to the <see cref="Wake"/> method invoked by <see cref="T:Entity"/>
+        /// so the method can have protected visibility.
+        /// </remarks>
+        internal void InvokeWake()
         {
-            OnAdded();
+            Debug.Assert(!isAwake, "Waking an already awake component.");
+            Wake();
+            isAwake = true;
         }
 
         /// <summary>
-        /// Invoked after this <see cref="Component"/> has been removed from its host <see cref="T:Entity"/>.
+        /// Performs <see cref="Component"/>-specific clean up logic.
+        /// This gets called once the <see cref="Component"/> is removed from its <see cref="T:Entity"/>,
+        /// or when its <see cref="T:Entity"/> is removed from the  <see cref="T:World"/>.
         /// </summary>
-        protected virtual void OnRemoved() { }
+        protected virtual void Sleep() { }
 
-        /// <remarks>Invoked by <see cref="T:Entity"/>.</remarks>
-        internal void NotifyRemoved()
+        /// <remarks>
+        /// Proxy to the <see cref="Sleep"/> method invoked by <see cref="T:Entity"/>
+        /// so the method can have protected visibility.
+        /// </remarks>
+        internal void InvokeSleep()
         {
-            OnRemoved();
+            Debug.Assert(isAwake, "Putting to sleep an already sleeping component.");
+            Sleep();
+            isAwake = false;
         }
 
-        public Component Clone(Entity entity)
+        /// <summary>
+        /// Copies the state of a given <see cref="Component"/>
+        /// to this instance.
+        /// </summary>
+        /// <param name="other">The <see cref="Component"/> from which state should be copied.</param>
+        public void CopyFrom(Component other)
         {
-            Argument.EnsureNotNull(entity, "entity");
+            Argument.EnsureNotNull(other, "other");
+            if (other.GetType() != GetType()) throw new ArgumentException("Cannot copy the state of a component of another type.");
 
-            Type type = GetType();
-            Component newInstance = type
-                .GetConstructor(constructorArguments)
-                .Invoke(new object[] { entity }) as Component;
-
-            PropertyInfo[] properties = type.GetProperties();
+            PropertyInfo[] properties = GetType().GetProperties();
             foreach (PropertyInfo property in properties)
             {
                 MethodInfo getter = property.GetGetMethod();
@@ -118,25 +147,39 @@ namespace Orion.Game.Simulation.Components
 
                 Type propertyType = property.PropertyType;
                 bool isGenericCollection = IsGenericCollection(propertyType, true);
-                object currentValue = property.GetValue(this, null);
+                object value = property.GetValue(other, null);
 
                 if (isGenericCollection)
                 {
                     // if it's a collection, copy the contents
-                    object newCollection = property.GetValue(newInstance, null);
+                    object newCollection = property.GetValue(this, null);
                     Type typeArgument = propertyType.GetGenericArguments()[0];
                     MethodInfo copyCollection = typeof(Component)
                         .GetMethod("CopyCollection", BindingFlags.NonPublic | BindingFlags.Static)
                         .MakeGenericMethod(typeArgument);
-                    copyCollection.Invoke(null, new object[] { currentValue, newCollection });
+                    copyCollection.Invoke(null, new object[] { value, newCollection });
                 }
                 else if (property.GetSetMethod() != null)
                 {
                     // otherwise, set the value
-                    property.SetValue(newInstance, currentValue, null);
+                    property.SetValue(this, value, null);
                 }
             }
-            return newInstance;
+        }
+
+        /// <summary>
+        /// Clones this <see cref="Component"/> for another <see cref="T:Entity"/>.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Component"/>'s host <see cref="T:Entity"/>.</param>
+        /// <returns>The newly cloned <see cref="Component"/>.</returns>
+        public Component Clone(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            Component clone = (Component)Activator.CreateInstance(GetType(), new object[] { entity });
+            clone.CopyFrom(this);
+
+            return clone;
         }
         #endregion
 

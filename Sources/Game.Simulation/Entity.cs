@@ -23,9 +23,9 @@ namespace Orion.Game.Simulation
         #region Fields
         private readonly World world;
         private readonly Handle handle;
-        private bool isDead;
-
         private readonly ComponentCollection components;
+        private bool isAwake;
+        private bool isDead;
         #endregion
 
         #region Constructors
@@ -47,18 +47,6 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(world, "world");
             this.world = world;
         }
-        #endregion
-
-        #region Events
-        /// <summary>
-        /// Raised when this <see cref="Entity"/> dies.
-        /// </summary>
-        public event Action<Entity> Died;
-
-        /// <summary>
-        /// Raised when the <see cref="Entity"/> moves.
-        /// </summary>
-        public event ValueChangedEventHandler<Entity, Vector2> Moved;
         #endregion
 
         #region Properties
@@ -116,7 +104,6 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Location/Size
         /// <summary>
         /// Gets the position of the center of this <see cref="Entity"/>.
         /// </summary>
@@ -124,7 +111,6 @@ namespace Orion.Game.Simulation
         {
             get { return Spatial.Center; }
         }
-        #endregion
 
         /// <summary>
         /// Gets a value indicating if this <see cref="Entity"/> is alive.
@@ -135,13 +121,15 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets a value indicating if this entity is alive and in the world.
-        /// An entity is out of the world when it has died or when it is temporarily
-        /// not interactible with (such as an entity being transported).
+        /// Gets a value indicating if this <see cref="Entity"/> is "awake",
+        /// meaning that it has been added to its <see cref="T:World"/>'s collection
+        /// and has not yet died. When an <see cref="Entity"/> is awake,
+        /// each of its <see cref="Component">components</see> should also be awake,
+        /// and vice-versa.
         /// </summary>
-        public bool IsAliveInWorld
+        internal bool IsAwake
         {
-            get { return IsAlive && Components.Has<Spatial>(); }
+            get { return isAwake; }
         }
 
         /// <summary>
@@ -149,7 +137,7 @@ namespace Orion.Game.Simulation
         /// to attack within a range, can be performed during this frame.
         /// This property is <c>true</c> every few frames, allowing to distribute computational work in time.
         /// </summary>
-        public bool CanPerformHeavyOperation
+        internal bool CanPerformHeavyOperation
         {
             get
             {
@@ -210,27 +198,26 @@ namespace Orion.Game.Simulation
             }
 
             isDead = true;
-
-            Died.Raise(this);
             World.OnEntityDied(this);
-
-            // HACK: Some components need to release resources,
-            // but we can't actually remove them from the collection
-            // because they can still be referred to.
-            foreach (Component component in components)
-                component.NotifyRemoved();
+            Sleep();
         }
 
-        protected void OnMoved(Vector2 oldPosition, Vector2 newPosition)
+        internal void Wake()
         {
-            if (isDead)
-            {
-                Debug.Fail("{0} is dead and yet moves.".FormatInvariant(this));
-            }
+            if (isAwake) return;
 
-            var handler = Moved;
-            if (handler != null) handler(this, oldPosition, newPosition);
-            world.OnEntityMoved(this, oldPosition, newPosition);
+            isAwake = true;
+            foreach (Component component in components)
+                component.InvokeWake();
+        }
+
+        internal void Sleep()
+        {
+            if (!isAwake) return;
+
+            foreach (Component component in components)
+                component.InvokeSleep();
+            isAwake = false;
         }
 
         /// <summary>
@@ -261,7 +248,7 @@ namespace Orion.Game.Simulation
             {
                 foreach (Component component in tempComponents)
                 {
-                    component.DoUpdate(step);
+                    component.InvokeUpdate(step);
                     if (isDead) break;
                 }
             }
@@ -309,22 +296,8 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Static
-        #region Methods
         [ThreadStatic]
         private static List<Component> tempComponents;
-
-        /// <summary>
-        /// The maximum size (in width or height) of entities.
-        /// This limitation exists to optimize the EntityZoneManager.
-        /// </summary>
-        public static readonly int MaxSize = 4;
-
-        public static Region GetGridRegion(Vector2 position, Size size)
-        {
-            Point min = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
-            return new Region(min, size);
-        }
-        #endregion
         #endregion
     }
 }

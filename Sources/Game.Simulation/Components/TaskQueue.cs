@@ -136,7 +136,7 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        protected override void OnRemoved()
+        protected override void Sleep()
         {
             Clear();
         }
@@ -338,6 +338,14 @@ namespace Orion.Game.Simulation.Components
 
             TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
             return taskQueue != null && taskQueue.IsEmpty;
+        }
+
+        public static Task GetCurrentTask(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+            return taskQueue == null ? null : taskQueue.FirstOrDefault();
         }
         #endregion
         #endregion

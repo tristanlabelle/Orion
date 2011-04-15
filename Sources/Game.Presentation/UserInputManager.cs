@@ -169,10 +169,13 @@ namespace Orion.Game.Presentation
         private void HandleMouseClick(Vector2 position)
         {
             Point point = (Point)position;
-            Entity clickedEntity = World.IsWithinBounds(point)
-                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.Spatial.CollisionLayer)
-                : null;
+            if (!World.IsWithinBounds(point)) return;
 
+            Spatial clickedEntitySpatial = World.SpatialManager
+                .Intersecting(position)
+                .WithMaxOrDefault(spatial => spatial.CollisionLayer);
+
+            Entity clickedEntity = clickedEntitySpatial == null ? null : clickedEntitySpatial.Entity;
             if (clickedEntity == null || !clickedEntity.Identity.IsSelectable)
             {
                 if (!shiftKeyPressed) Selection.Clear();
@@ -199,17 +202,18 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            Entity clickedUnit = World.Entities.GetTopmostGridEntityAt(point);
-            if (clickedUnit == null)
+            Spatial clickedEntitySpatial = World.SpatialManager.GetTopmostAt(point);
+            if (clickedEntitySpatial == null)
             {
                 Selection.Clear();
                 return;
             }
 
-            if (FactionMembership.GetFaction(clickedUnit) == LocalFaction)
-                Selection.SetToNearbySimilar(clickedUnit);
+            Entity clickedEntity = clickedEntitySpatial.Entity;
+            if (FactionMembership.GetFaction(clickedEntity) == LocalFaction)
+                Selection.SetToNearbySimilar(clickedEntity);
             else
-                Selection.Set(clickedUnit);
+                Selection.Set(clickedEntity);
         }
 
         public void HandleMouseMove(MouseEventArgs args)
@@ -224,7 +228,9 @@ namespace Orion.Game.Presentation
             else
             {
                 Point point = (Point)args.Position;
-                hoveredEntity = World.IsWithinBounds(point) ? World.Entities.GetTopmostGridEntityAt(point) : null;
+
+                Spatial hoveredSpatial = World.SpatialManager.GetTopmostAt(args.Position);
+                hoveredEntity = hoveredSpatial == null ? null : hoveredSpatial.Entity;
             }
         }
 
@@ -292,20 +298,18 @@ namespace Orion.Game.Presentation
             }
 
             bool anyCanMove = Selection.Any(entity => entity.Components.Has<Mobile>());
-            Entity targetEntity = World.Entities.GetTopmostEntityAt(point);
+            Spatial targetEntitySpatial = World.SpatialManager.GetTopmostAt(target);
             if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered
-                || targetEntity == null)
+                || targetEntitySpatial == null)
             {
                 if (anyCanMove)
                     LaunchMove(target);
                 else
                     LaunchChangeRallyPoint(target);
-
-                return;
             }
             else
             {
-                LaunchDefaultCommand(targetEntity);
+                LaunchDefaultCommand(targetEntitySpatial.Entity);
             }
         }
 
@@ -342,14 +346,13 @@ namespace Orion.Game.Presentation
 
             if (target.Components.Has<AlageneExtractor>())
             {
-                Entity alageneNode = World.Entities
-                    .Intersecting(Rectangle.FromCenterSize(targetSpatial.Position, Vector2.One))
-                    .Where(e => e.Components.Has<Harvestable>())
-                    .FirstOrDefault(node => node.Spatial.Position == targetSpatial.Position);
-                if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
+                foreach (Spatial spatial in World.SpatialManager.Intersecting(Rectangle.FromCenterSize(targetSpatial.Position, Vector2.One)))
                 {
-                    LaunchHarvest(alageneNode);
-                    return;
+                    if (spatial.Position == targetSpatial.Position && LocalFaction.CanHarvest(spatial.Entity))
+                    {
+                        LaunchHarvest(spatial.Entity);
+                        return;
+                    }
                 }
             }
             else

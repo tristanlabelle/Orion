@@ -175,11 +175,10 @@ namespace Orion.Game.Simulation.Components
 
             Entity bestTarget = null;
             float bestScore = float.NegativeInfinity;
-            foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
+            foreach (Spatial targetSpatial in World.SpatialManager.Intersecting(vision.LineOfSight))
             {
-                Spatial targetSpatial = target.Spatial;
+                Entity target = targetSpatial.Entity;
                 if (target == Entity
-                    || targetSpatial == null
                     || !vision.IsInRange(target)
                     || !IsInRange(target)
                     || !target.Components.Has<Health>()
@@ -230,8 +229,9 @@ namespace Orion.Game.Simulation.Components
                 Faction faction = FactionMembership.GetFaction(Entity);
 
                 Circle splashCircle = new Circle(target.Spatial.Center, splashRadius);
-                foreach (Entity splashedEntity in World.Entities.Intersecting(splashCircle))
+                foreach (Spatial splashedEntitySpatial in World.SpatialManager.Intersecting(splashCircle))
                 {
+                    Entity splashedEntity = splashedEntitySpatial.Entity;
                     if (splashedEntity == target) continue;
 
                     Faction splashedEntityFaction = FactionMembership.GetFaction(splashedEntity);
@@ -241,7 +241,7 @@ namespace Orion.Game.Simulation.Components
 
                     Health splashedEntityHealth = splashedEntity.Components.TryGet<Health>();
 
-                    float distance = (splashCircle.Center - splashedEntity.Spatial.Center).LengthFast;
+                    float distance = (splashCircle.Center - splashedEntitySpatial.Center).LengthFast;
                     if (distance > splashRadius) continue;
 
                     int splashedTargetArmor = (int)splashedEntity.GetStatValue(Health.ArmorStat);

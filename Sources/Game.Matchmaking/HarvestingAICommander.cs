@@ -252,7 +252,7 @@ namespace Orion.Game.Matchmaking
 
                 Spatial nodeSpatial = node.Spatial;
                 if (nodeData.Node.Components.Get<Harvestable>().Type == ResourceType.Alagene
-                    && (nodeData.Extractor == null || !nodeData.Extractor.IsAliveInWorld)
+                    && (nodeData.Extractor == null || !nodeData.Extractor.IsAlive)
                     && World.IsFree(nodeSpatial.GridRegion, CollisionLayer.Ground))
                 {
                     var alageneExtractorCost = GetCost(alageneExtractorPrototype);
@@ -270,14 +270,15 @@ namespace Orion.Game.Matchmaking
                     budget -= alageneExtractorCost;
                 }
                 
-                if (nodeData.HarvesterCount == 0 || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAliveInWorld))
+                if (nodeData.HarvesterCount == 0 || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAlive))
                     continue;
 
                 // Find a nearby depot;
-                nodeData.NearbyDepot = World.Entities
+                nodeData.NearbyDepot = World.SpatialManager
                     .Intersecting(new Circle(node.Center, maximumResourceDepotDistance))
-                    .Where(u => FactionMembership.GetFaction(u) == Faction && u.Components.Has<ResourceDepot>())
-                    .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
+                    .Select(s => s.Entity)
+                    .Where(e => FactionMembership.GetFaction(e) == Faction && e.Components.Has<ResourceDepot>())
+                    .WithMinOrDefault(e => (e.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;
                 
                 // Build a nearby depot or pyramid
@@ -466,7 +467,9 @@ namespace Orion.Game.Matchmaking
                 buildings.Add(entity);
                 if (prototype == alageneExtractorPrototype)
                 {
-                    Entity node = World.Entities.Intersecting(entity.Center)
+                    Entity node = World.SpatialManager
+                        .Intersecting(entity.Center)
+                        .Select(s => s.Entity)
                         .First(e => e.Components.Has<Harvestable>());
 
                     var nodeData = resourceNodesData[node];

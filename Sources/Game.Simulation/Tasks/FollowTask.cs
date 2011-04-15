@@ -62,7 +62,8 @@ namespace Orion.Game.Simulation.Tasks
             Spatial targetSpatial = Target.Spatial;
             Faction faction = FactionMembership.GetFaction(Entity);
             if (spatial == null
-                || !target.IsAliveInWorld
+                || !target.IsAlive
+                || targetSpatial == null
                 || (faction != null && !faction.CanSee(target)))
             {
                 MarkAsEnded();

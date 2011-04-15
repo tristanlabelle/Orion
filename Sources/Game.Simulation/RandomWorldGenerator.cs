@@ -101,9 +101,9 @@ namespace Orion.Game.Simulation
                 bool isWalkable = world.Terrain.IsWalkable(region);
                 if (!isWalkable) continue;
 
-                bool isFreeOfEntities = world.Entities
+                bool isFreeOfEntities = world.SpatialManager
                     .Intersecting(region.ToRectangle())
-                    .None(entity => Region.Intersects(entity.Spatial.GridRegion, region));
+                    .None(spatial => Region.Intersects(spatial.GridRegion, region));
                 if (!isFreeOfEntities) continue;
 
                 return location;

@@ -1,7 +1,11 @@
+using System;
+using System.Linq;
 using OpenTK;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -15,15 +19,18 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             Point point = (Point)location;
             if (!World.IsWithinBounds(point)) return;
 
-            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
-            {
-                Entity target = World.Entities.GetTopmostGridEntityAt(point);
-                if (target != null) InputManager.LaunchRepair(target);
-            }
+            Entity target = GetTopmostEntityWhere(location, entity =>
+                {
+                    Health health = entity.Components.TryGet<Health>();
+                    return health != null
+                        && health.Constitution == Constitution.Mechanical
+                        && FactionMembership.GetFaction(entity) == LocalFaction;
+                });
+
+            if (target != null && LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+                InputManager.LaunchRepair(target);
             else
-            {
                 InputManager.LaunchMove(location);
-            }
         }
     }
 }

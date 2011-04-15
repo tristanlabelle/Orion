@@ -51,7 +51,7 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             Faction faction = FactionMembership.GetFaction(Entity);
-            if (!target.IsAliveInWorld || (faction != null && !faction.CanSee(target)))
+            if (!target.IsAlive || (faction != null && !faction.CanSee(target)))
             {
                 // If the target has died while we weren't yet in attack range,
                 // or if the unit moved out of sight,  but we're coming, complete the motion with a move task.

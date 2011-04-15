@@ -29,7 +29,7 @@ namespace Orion.Game.Simulation.Tasks
 
             Health targetHealth = target.Components.TryGet<Health>();
             if (targetHealth == null) throw new ArgumentException("Cannot heal an entity without a health component.", "target");
-            if (targetHealth.Constitution == Constitution.Biological)
+            if (targetHealth.Constitution != Constitution.Biological)
                 throw new ArgumentException("Cannot heal a non-biological entity.", "target");
 
             this.target = target;
@@ -50,11 +50,13 @@ namespace Orion.Game.Simulation.Tasks
             Spatial spatial = Entity.Spatial;
             Healer healer = Entity.Components.TryGet<Healer>();
             Faction faction = FactionMembership.GetFaction(Entity);
+            Spatial targetSpatial = target.Spatial;
             Health targetHealth = target.Components.TryGet<Health>();
             if (spatial == null
                 || healer == null
                 || faction == null
                 || !faction.CanSee(target)
+                || targetSpatial == null
                 || targetHealth == null
                 || targetHealth.Constitution != Constitution.Biological)
             {
@@ -62,8 +64,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            Spatial targetSpatial = target.Spatial;
-            if (!target.IsAliveInWorld)
+            if (!target.IsAlive)
             {
                 // If the target has died while we weren't yet in attack range,
                 // but were coming, complete the motion with a move task.
@@ -76,7 +77,7 @@ namespace Orion.Game.Simulation.Tasks
             if (healer.IsInRange(target))
             {
                 spatial.LookAt(targetSpatial.Center);
-                int speed = (int)Entity.GetStatValue(Healer.SpeedStat);
+                float speed = (float)Entity.GetStatValue(Healer.SpeedStat);
                 targetHealth.Damage -= speed * step.TimeDeltaInSeconds;
                 if (targetHealth.Value == (int)target.GetStatValue(Health.MaxValueStat)) MarkAsEnded();
                 return;

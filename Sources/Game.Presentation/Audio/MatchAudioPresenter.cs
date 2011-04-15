@@ -221,9 +221,9 @@ namespace Orion.Game.Presentation.Audio
 
         private void OnUnderAttackWarning(UnderAttackMonitor sender, Vector2 position)
         {
-            bool isNearBase = World.Entities
+            bool isNearBase = World.SpatialManager
                 .Intersecting(new Circle(position, 6))
-                .Any(entity => entity.Identity.IsBuilding && FactionMembership.GetFaction(entity) == LocalFaction);
+                .Any(spatial => spatial.Entity.Identity.IsBuilding && FactionMembership.GetFaction(spatial.Entity) == LocalFaction);
 
             string soundName = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
             audio.PlayUISound(soundName);

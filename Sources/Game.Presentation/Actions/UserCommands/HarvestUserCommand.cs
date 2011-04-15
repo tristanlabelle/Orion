@@ -19,13 +19,12 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
             if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
             {
-                Entity resourceNode = World.Entities
+                Spatial resourceNodeSpatial = World.SpatialManager
                     .Intersecting(location)
-                    .Where(e => e.Components.Has<Harvestable>())
-                    .FirstOrDefault(node => LocalFaction.CanHarvest(node));
-                if (resourceNode == null) return;
+                    .FirstOrDefault(spatial => LocalFaction.CanHarvest(spatial.Entity));
+                if (resourceNodeSpatial == null) return;
 
-                InputManager.LaunchHarvest(resourceNode);
+                InputManager.LaunchHarvest(resourceNodeSpatial.Entity);
             }
             else
             {

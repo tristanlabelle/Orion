@@ -46,7 +46,8 @@ namespace Orion.Game.Simulation.Tasks
                 || transporter == null
                 || targetSpatial == null
                 || faction == null
-                || !target.IsAliveInWorld
+                || !target.IsAlive
+                || targetSpatial == null
                 || !transporter.CanEmbark(target)
                 || !faction.CanSee(target))
             {

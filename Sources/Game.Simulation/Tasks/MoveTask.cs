@@ -121,7 +121,7 @@ namespace Orion.Game.Simulation.Tasks
             // Prevents floating point inaccuracies, we've had values of -0.0000001f
             targetPosition = World.Bounds.Clamp(targetPosition);
 
-            Region targetRegion = Entity.GetGridRegion(targetPosition, spatial.Size);
+            Region targetRegion = Spatial.GetGridRegion(targetPosition, spatial.Size);
             if (CanMoveOn(spatial, targetRegion))
             {
                 spatial.Position = targetPosition;
@@ -141,8 +141,8 @@ namespace Orion.Game.Simulation.Tasks
                 if (Entity.Spatial.CollisionLayer == CollisionLayer.Ground
                     && !World.Terrain.IsWalkable(point)) return false;
 
-                Entity entity = World.Entities.GetEntityAt(point, spatial.CollisionLayer);
-                if (entity != null && entity != Entity) return false;
+                Spatial obstacleSpatial = World.SpatialManager.GetGridObstacleAt(point, spatial.CollisionLayer);
+                if (obstacleSpatial != null && obstacleSpatial.Entity != Entity) return false;
             }
 
             return true;
@@ -179,7 +179,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             Faction faction = FactionMembership.GetFaction(Entity);
             if (faction != null && !faction.HasSeen(point)) return true;
-            return Entity.World.Terrain.IsWalkable(point) && World.Entities.GetGroundEntityAt(point) == null;
+            return Entity.World.Terrain.IsWalkable(point) && World.SpatialManager.GetGroundGridObstacleAt(point) == null;
         }
 
         private bool IsAirPathable(Point minPoint)
@@ -193,9 +193,9 @@ namespace Orion.Game.Simulation.Tasks
             {
                 for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
                 {
-                    Point occupied = new Point(x, y);
-                    Entity entity = World.Entities.GetAirEntityAt(occupied);
-                    if (entity != null && entity != Entity) return false;
+                    Point point = new Point(x, y);
+                    Spatial obstacleSpatial = World.SpatialManager.GetAirGridObstacleAt(point);
+                    if (obstacleSpatial != null && obstacleSpatial.Entity != Entity) return false;
                 }
             }
 

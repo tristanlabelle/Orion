@@ -19,25 +19,25 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             Point point = (Point)location;
             if (!World.IsWithinBounds(point)) return;
 
-            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
-            {
-                Entity target = World.Entities.GetTopmostGridEntityAt(point);
-                if (target == null
-                    || !target.Components.Has<FactionMembership>()
-                    || target.Components.Get<FactionMembership>().Faction != InputManager.LocalFaction)
-                {
-                    // can't load this kind of thing
-                    return;
-                }
+            Entity target = GetTopmostEntityWhere(location, entity =>
+                FactionMembership.GetFaction(entity) == LocalFaction
+                && !entity.Identity.IsBuilding
+                && !entity.Components.Has<Transporter>());
 
+            if (target != null && LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+            {
                 Entity transporter = InputManager.Selection
-                    .Where(e => Identity.GetPrototype(e) == InputManager.SelectionManager.FocusedPrototype)
-                    .Where(e => e.Components.Has<Transporter>())
-                    .Where(e => e.Components.Get<Transporter>().RemainingSpace >= target.Components.Get<Cost>().Food)
-                    .FirstOrDefault();
+                    .FirstOrDefault(e =>
+                        Identity.GetPrototype(e) == InputManager.SelectionManager.FocusedPrototype
+                        && e.Components.Has<Transporter>()
+                        && e.Components.Get<Transporter>().RemainingSpace >= target.Components.Get<Cost>().Food);
                 if (transporter == null) return;
 
                 InputManager.LaunchLoad(target);
+            }
+            else
+            {
+                InputManager.LaunchMove(location);
             }
         }
     }

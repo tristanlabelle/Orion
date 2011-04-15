@@ -100,7 +100,7 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        protected override void OnRemoved()
+        protected override void Sleep()
         {
             if (providedFoodToken != null)
             {

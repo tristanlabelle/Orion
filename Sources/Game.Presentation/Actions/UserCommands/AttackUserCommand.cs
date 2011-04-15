@@ -4,6 +4,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -34,16 +35,12 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             Point point = (Point)location;
             if (!World.IsWithinBounds(point)) return;
 
-            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
-            {
-                Entity target = World.Entities.GetTopmostGridEntityAt(point);
-                if (target == null) InputManager.LaunchZoneAttack(location);
-                else InputManager.LaunchAttack(target);
-            }
+            Entity target = GetTopmostEntityWhere(location, entity => entity.Components.Has<Health>());
+
+            if (target != null && LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+                InputManager.LaunchAttack(target);
             else
-            {
                 InputManager.LaunchZoneAttack(location);
-            }
 
             cursorPosition = new Vector2(float.NaN, float.NaN);
         }

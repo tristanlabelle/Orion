@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation.Utilities
         /// </summary>
         public Region GridRegion
         {
-            get { return Entity.GetGridRegion(location, prototype.Spatial.Size); }
+            get { return Spatial.GetGridRegion(location, prototype.Spatial.Size); }
         }
 
         /// <summary>

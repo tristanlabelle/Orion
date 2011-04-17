@@ -40,7 +40,7 @@ namespace Orion.Game.Simulation.Tasks
 
             Health targetHealth = target.Components.TryGet<Health>();
             if (targetHealth == null) throw new ArgumentException("Cannot heal an entity without a health component.", "target");
-            if (targetHealth.Constitution != Constitution.Mechanical)
+            if (!target.Identity.IsBuilding && targetHealth.Constitution != Constitution.Mechanical)
                 throw new ArgumentException("Cannot repair a non-mechanical entity.", "target");
 
             this.target = target;

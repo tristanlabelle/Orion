@@ -244,7 +244,6 @@ namespace Orion.Game.Simulation.Components
                     float distance = (splashCircle.Center - splashedEntitySpatial.Center).LengthFast;
                     if (distance > splashRadius) continue;
 
-                    int splashedTargetArmor = (int)splashedEntity.GetStatValue(Health.ArmorStat);
                     splashedEntityHealth.Damage += GetDamage(splashedEntityHealth) * (1 - distance / splashRadius);
                 }
             }

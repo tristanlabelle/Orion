@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation
         private readonly World world;
         private readonly Handle handle;
         private readonly ComponentCollection components;
-        private bool isAwake;
+        private bool isActive;
         private bool isDead;
         #endregion
 
@@ -121,15 +121,14 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="Entity"/> is "awake",
-        /// meaning that it has been added to its <see cref="T:World"/>'s collection
-        /// and has not yet died. When an <see cref="Entity"/> is awake,
-        /// each of its <see cref="Component">components</see> should also be awake,
-        /// and vice-versa.
+        /// Gets a value indicating if this <see cref="Entity"/> has been added
+        /// to its <see cref="T:World"/>'s collection and has not yet died.
+        /// When an <see cref="Entity"/> is active, each of its <see cref="Component">components</see>
+        /// should also be active, and vice-versa.
         /// </summary>
-        internal bool IsAwake
+        public bool IsActive
         {
-            get { return isAwake; }
+            get { return isActive; }
         }
 
         /// <summary>
@@ -189,6 +188,9 @@ namespace Orion.Game.Simulation
                 faction.RaiseWarning(warning);
         }
 
+        /// <summary>
+        /// Causes this <see cref="Entity"/> to be marked as dead and removed from the <see cref="World"/>.
+        /// </summary>
         public void Die()
         {
             if (isDead)
@@ -198,26 +200,35 @@ namespace Orion.Game.Simulation
             }
 
             isDead = true;
+            if (isActive) Deactivate();
+
             World.OnEntityDied(this);
-            Sleep();
         }
 
-        internal void Wake()
+        internal void Activate()
         {
-            if (isAwake) return;
+            if (isActive)
+            {
+                Debug.Fail("Attempted to activate an already active entity.");
+                return;
+            }
 
-            isAwake = true;
+            isActive = true;
             foreach (Component component in components)
-                component.InvokeWake();
+                component.InvokeActivate();
         }
 
-        internal void Sleep()
+        internal void Deactivate()
         {
-            if (!isAwake) return;
+            if (!isActive)
+            {
+                Debug.Fail("Attempted to deactivate an already inactive entity.");
+                return;
+            }
 
             foreach (Component component in components)
-                component.InvokeSleep();
-            isAwake = false;
+                component.InvokeDeactivate();
+            isActive = false;
         }
 
         /// <summary>

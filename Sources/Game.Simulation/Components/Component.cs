@@ -17,7 +17,7 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private static readonly Type[] constructorArguments = new Type[] { typeof(Entity) };
         private readonly Entity entity;
-        private bool isAwake;
+        private bool isActive;
         #endregion
 
         #region Constructors
@@ -42,13 +42,13 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="Component"/> is awake,
+        /// Gets a value indicating if this <see cref="Component"/> is active,
         /// meaning that it is part of an <see cref="T:Entity"/> which is itself
         /// part of the <see cref="T:World"/>.
         /// </summary>
-        protected bool IsAwake
+        protected bool IsActive
         {
-            get { return isAwake; }
+            get { return isActive; }
         }
         #endregion
 
@@ -97,17 +97,22 @@ namespace Orion.Game.Simulation.Components
         /// This gets called once the <see cref="Component"/> is part of an <see cref="T:Entity"/>
         /// which is itself part of a <see cref="T:World"/>.
         /// </summary>
-        protected virtual void Wake() { }
+        protected virtual void Activate() { }
 
         /// <remarks>
-        /// Proxy to the <see cref="Wake"/> method invoked by <see cref="T:Entity"/>
+        /// Proxy to the <see cref="Activate"/> method invoked by <see cref="T:Entity"/>
         /// so the method can have protected visibility.
         /// </remarks>
-        internal void InvokeWake()
+        internal void InvokeActivate()
         {
-            Debug.Assert(!isAwake, "Waking an already awake component.");
-            Wake();
-            isAwake = true;
+            if (isActive)
+            {
+                Debug.Fail("Attempted to activate an already active component.");
+                return;
+            }
+
+            Activate();
+            isActive = true;
         }
 
         /// <summary>
@@ -115,17 +120,22 @@ namespace Orion.Game.Simulation.Components
         /// This gets called once the <see cref="Component"/> is removed from its <see cref="T:Entity"/>,
         /// or when its <see cref="T:Entity"/> is removed from the  <see cref="T:World"/>.
         /// </summary>
-        protected virtual void Sleep() { }
+        protected virtual void Deactivate() { }
 
         /// <remarks>
-        /// Proxy to the <see cref="Sleep"/> method invoked by <see cref="T:Entity"/>
+        /// Proxy to the <see cref="Deactivate"/> method invoked by <see cref="T:Entity"/>
         /// so the method can have protected visibility.
         /// </remarks>
-        internal void InvokeSleep()
+        internal void InvokeDeactivate()
         {
-            Debug.Assert(isAwake, "Putting to sleep an already sleeping component.");
-            Sleep();
-            isAwake = false;
+            if (!isActive)
+            {
+                Debug.Fail("Attempted to deactivate an already inactive component.");
+                return;
+            }
+
+            Deactivate();
+            isActive = false;
         }
 
         /// <summary>

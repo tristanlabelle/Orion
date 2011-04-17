@@ -117,7 +117,7 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        protected override void Sleep()
+        protected override void Deactivate()
         {
             if (fogOfWarToken != null)
             {

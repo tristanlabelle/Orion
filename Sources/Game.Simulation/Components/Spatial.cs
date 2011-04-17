@@ -42,7 +42,7 @@ namespace Orion.Game.Simulation.Components
                     value = world.Bounds.Clamp(value);
                 }
 
-                if (IsAwake) SpatialManager.UpdatePosition(this, position, value);
+                if (IsActive) SpatialManager.UpdatePosition(this, position, value);
                 position = value;
             }
         }
@@ -67,7 +67,7 @@ namespace Orion.Game.Simulation.Components
             {
                 if (value == collisionLayer) return;
 
-                if (IsAwake) SpatialManager.UpdateCollisionLayer(this, collisionLayer, value);
+                if (IsActive) SpatialManager.UpdateCollisionLayer(this, collisionLayer, value);
                 collisionLayer = value;
             }
         }
@@ -84,7 +84,7 @@ namespace Orion.Game.Simulation.Components
                 if (value == size) return;
 
                 size = value;
-                Debug.Assert(!IsAwake, "Cannot modify the size of an entity while it's awake.");
+                Debug.Assert(!IsActive, "Cannot modify the size of an entity while it's awake.");
             }
         }
 
@@ -171,12 +171,12 @@ namespace Orion.Game.Simulation.Components
                 && Region.SquaredDistance(GridRegion, targetSpatial.GridRegion) <= radius * radius + 0.001f;
         }
 
-        protected override void Wake()
+        protected override void Activate()
         {
             SpatialManager.Add(this);
         }
 
-        protected override void Sleep()
+        protected override void Deactivate()
         {
             SpatialManager.Remove(this);
         }

@@ -122,21 +122,35 @@ namespace Orion.Game.Simulation
             }
 
             #region Collection Modifications
+            /// <summary>
+            /// Adds an <see cref="Entity"/> to this <see cref="World"/>.
+            /// </summary>
+            /// <param name="entity">The <see cref="Entity"/> to be added.</param>
             public void Add(Entity entity)
             {
                 Argument.EnsureNotNull(entity, "entity");
 
+                Debug.Assert(!entity.IsActive, "An entity added to the world was already active.");
+
+                // Even if the entity is only going to be added to the entity
+                // collection on next frame, it needs to be activated right
+                // now so that its components are activated too and
+                // the spatial component can reserve its required grid space.
+                entity.Activate();
+                
                 if (isUpdating) deferredChanges.Add(entity, DeferredChangeType.Add);
                 else CommitAdd(entity);
             }
 
             /// <summary>
-            /// Removes an entity from this world.
+            /// Removes an <see cref="Entity"/> from this <see cref="World"/>.
             /// </summary>
-            /// <param name="entity">The entity to be removed.</param>
+            /// <param name="entity">The <see cref="Entity"/> to be removed.</param>
             public void Remove(Entity entity)
             {
                 Argument.EnsureNotNull(entity, "entity");
+
+                if (entity.IsActive) entity.Deactivate();
 
                 if (isUpdating) deferredChanges.Add(entity, DeferredChangeType.Remove);
                 else CommitRemove(entity);
@@ -156,8 +170,6 @@ namespace Orion.Game.Simulation
             {
                 entities.Add(entity.Handle, entity);
 
-                Debug.Assert(!entity.IsAwake, "An entity added to the world was already awake.");
-                entity.Wake();
                 world.OnEntityAdded(entity);
             }
 
@@ -166,7 +178,6 @@ namespace Orion.Game.Simulation
                 bool wasRemoved = entities.Remove(entity.Handle);
                 if (!wasRemoved) return;
 
-                entity.Sleep();
                 world.OnEntityRemoved(entity);
             }
             #endregion

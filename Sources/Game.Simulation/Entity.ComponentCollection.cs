@@ -73,7 +73,7 @@ namespace Orion.Game.Simulation
                 components.Add(componentType, component);
                 if (componentType == typeof(Spatial)) spatial = (Spatial)component;
 
-                if (entity.IsAwake) component.InvokeWake();
+                if (entity.IsActive) component.InvokeActivate();
             }
 
             /// <summary>
@@ -109,7 +109,7 @@ namespace Orion.Game.Simulation
                 components.Remove(componentType);
                 if (componentType == typeof(Spatial)) spatial = null;
 
-                if (entity.IsAwake) component.InvokeSleep();
+                if (entity.IsActive) component.InvokeDeactivate();
 
                 return true;
             }

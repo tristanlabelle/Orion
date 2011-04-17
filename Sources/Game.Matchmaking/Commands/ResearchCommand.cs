@@ -61,12 +61,9 @@ namespace Orion.Game.Matchmaking.Commands
             if (faction.AladdiumAmount >= aladiumCost && faction.AlageneAmount >= alageneCost)
             {
                 TaskQueue taskQueue = researcher.Components.Get<TaskQueue>();
-                if (taskQueue.IsEmpty)
-                {
-                    taskQueue.Enqueue(new ResearchTask(researcher, technology));
-                    faction.AladdiumAmount -= aladiumCost;
-                    faction.AlageneAmount -= alageneCost;
-                }
+                taskQueue.Enqueue(new ResearchTask(researcher, technology));
+                faction.AladdiumAmount -= aladiumCost;
+                faction.AlageneAmount -= alageneCost;
             }
             else
             {

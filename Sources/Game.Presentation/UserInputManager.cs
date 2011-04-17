@@ -386,12 +386,10 @@ namespace Orion.Game.Presentation
             return entityFaction != null && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl);
         }
 
-        private void ClearTasksIfNecessary()
+        private void ClearTasksIfNecessary(IEnumerable<Entity> entities)
         {
             if (shiftKeyPressed) return;
             
-            IEnumerable<Entity> entities = Selection
-                .Where(entity => IsControllable(entity) && !entity.Components.Has<Trainer>());
             commander.LaunchCancelAllTasks(entities);
         }
 
@@ -400,18 +398,17 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> builders = Selection
                 .Where(entity => IsControllable(entity) && Builder.Supports(entity, buildingPrototype));
 
-            ClearTasksIfNecessary();
+            ClearTasksIfNecessary(builders);
             commander.LaunchBuild(builders, buildingPrototype, location);
         }
 
         public void LaunchLoad(Entity target)
         {
             Entity transporter = Selection
-                .Where(e => IsControllable(e))
-                .Where(e => Identity.GetPrototype(e) == SelectionManager.FocusedPrototype)
-                .Where(e => e.Components.Has<Transporter>())
-                .Where(e => e.Components.Get<Transporter>().RemainingSpace >= target.Components.Get<Cost>().Food)
-                .FirstOrDefault();
+                .FirstOrDefault(e => IsControllable(e)
+                    && Identity.GetPrototype(e) == SelectionManager.FocusedPrototype
+                    && e.Components.Has<Transporter>()
+                    && e.Components.Get<Transporter>().RemainingSpace >= Cost.GetResourceAmount(target).Food);
 
             commander.LaunchLoad(transporter, target);
         }
@@ -419,45 +416,46 @@ namespace Orion.Game.Presentation
         public void LaunchUnload()
         {
             IEnumerable<Entity> transporters = Selection
-                .Where(e => IsControllable(e))
-                .Where(e => Identity.GetPrototype(e) == SelectionManager.FocusedPrototype)
-                .Where(e => e.Components.Has<Transporter>());
+                .Where(e => IsControllable(e)
+                    && Identity.GetPrototype(e) == SelectionManager.FocusedPrototype
+                    && e.Components.Has<Transporter>());
 
             commander.LaunchUnload(transporters);
         }
 
         public void LaunchAttack(Entity target)
         {
-            IEnumerable<Entity> selection = Selection.Where(entity => IsControllable(entity));
+            IEnumerable<Entity> entities = Selection.Where(entity => IsControllable(entity)
+                && entity.Components.Has<Attacker>() || entity.Components.Has<Mobile>());
 
-            ClearTasksIfNecessary();
+            ClearTasksIfNecessary(entities);
             // Those who can attack do so, the others simply move to the target's position
-            commander.LaunchAttack(selection.Where(entity => entity.Components.Has<Attacker>()), target);
-            commander.LaunchMove(selection.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Mobile>()), target.Spatial.Position);
+            commander.LaunchAttack(entities.Where(entity => entity.Components.Has<Attacker>()), target);
+            commander.LaunchMove(entities.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Mobile>()), target.Spatial.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
-            IEnumerable<Entity> movableEntities = Selection
+            IEnumerable<Entity> entities = Selection
                 .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
             // Those who can attack do so, the others simply move to the destination
-            ClearTasksIfNecessary();
-            commander.LaunchZoneAttack(movableEntities.Where(entity => entity.Components.Has<Attacker>()), destination);
-            commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Attacker>()), destination);
+            ClearTasksIfNecessary(entities);
+            commander.LaunchZoneAttack(entities.Where(entity => entity.Components.Has<Attacker>()), destination);
+            commander.LaunchMove(entities.Where(entity => !entity.Components.Has<Attacker>()), destination);
         }
 
         public void LaunchHarvest(Entity node)
         {
             Debug.Assert(node.Components.Has<Harvestable>(), "Node is not a resource node!");
 
-            IEnumerable<Entity> movableEntities = Selection
+            IEnumerable<Entity> entities = Selection
                 .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
             // Those who can harvest do so, the others simply move to the resource's position
-            ClearTasksIfNecessary();
-            commander.LaunchHarvest(movableEntities.Where(entity => entity.Components.Has<Harvester>()), node);
-            commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Harvester>()), node.Spatial.Position);
+            ClearTasksIfNecessary(entities);
+            commander.LaunchHarvest(entities.Where(entity => entity.Components.Has<Harvester>()), node);
+            commander.LaunchMove(entities.Where(entity => !entity.Components.Has<Harvester>()), node.Spatial.Position);
         }
 
         public void LaunchMove(Vector2 destination)
@@ -465,7 +463,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> entities = Selection
                 .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
 
-            ClearTasksIfNecessary();
+            ClearTasksIfNecessary(entities);
             commander.LaunchMove(entities, destination);
         }
 
@@ -475,7 +473,6 @@ namespace Orion.Game.Presentation
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
                     && entity.Components.Has<Trainer>());
 
-            ClearTasksIfNecessary();
             commander.LaunchChangeRallyPoint(entities, at);
         }
 
@@ -489,7 +486,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Builder>());
 
-            ClearTasksIfNecessary();
+            ClearTasksIfNecessary(entities);
             commander.LaunchRepair(entities, target);
         }
 
@@ -506,7 +503,7 @@ namespace Orion.Game.Presentation
             Faction targetFaction = FactionMembership.GetFaction(target);
             if (entities.Any(entity => FactionMembership.GetFaction(entity) != targetFaction)) return;
 
-            ClearTasksIfNecessary();
+            ClearTasksIfNecessary(entities);
             commander.LaunchHeal(entities, target);
         }
 
@@ -522,7 +519,6 @@ namespace Orion.Game.Presentation
                         && trainer.Supports(prototype);
                 });
 
-            ClearTasksIfNecessary();
             commander.LaunchTrain(entities, prototype);
         }
 
@@ -539,7 +535,6 @@ namespace Orion.Game.Presentation
                     return;
                 }
 
-                ClearTasksIfNecessary();
                 commander.LaunchResearch(entity, technology);
             }
         }
@@ -555,7 +550,6 @@ namespace Orion.Game.Presentation
                         && health.CanSuicide;
                 });
 
-            ClearTasksIfNecessary();
             commander.LaunchSuicide(entities);
         }
 
@@ -564,7 +558,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Entity> entities = Selection
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Mobile>());
 
-            ClearTasksIfNecessary();
+            ClearTasksIfNecessary(entities);
             commander.LaunchStandGuard(entities);
         }
 

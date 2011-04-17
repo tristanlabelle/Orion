@@ -57,6 +57,8 @@ namespace Orion.Game.Presentation.Renderers
         private readonly GameGraphics gameGraphics;
         private readonly SpriteAnimation fireAnimation;
         private readonly FogOfWarMemory fogOfWarMemory;
+        private readonly Action<GraphicsContext, Entity> drawEntityDelegate;
+        private readonly Action<GraphicsContext, Entity> drawEntityShadowDelegate;
         private readonly List<Laser> lasers = new List<Laser>();
         private bool drawHealthBars;
         #endregion
@@ -71,6 +73,8 @@ namespace Orion.Game.Presentation.Renderers
             this.gameGraphics = gameGraphics;
             this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
             this.fogOfWarMemory = new FogOfWarMemory(faction);
+            this.drawEntityDelegate = DrawEntity;
+            this.drawEntityShadowDelegate = DrawEntityShadow;
 
             World.HitOccured += OnUnitHitting;
         }
@@ -114,11 +118,11 @@ namespace Orion.Game.Presentation.Renderers
 
             DrawRememberedEntities(graphicsContext);
 
-            DrawEntities(graphicsContext, viewBounds, CollisionLayer.None, DrawEntity);
-            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Ground, DrawEntity);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.None, drawEntityDelegate);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Ground, drawEntityDelegate);
             DrawLasers(graphicsContext, viewBounds, CollisionLayer.Ground);
-            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Air, DrawEntityShadow);
-            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Air, DrawEntity);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Air, drawEntityShadowDelegate);
+            DrawEntities(graphicsContext, viewBounds, CollisionLayer.Air, drawEntityDelegate);
             DrawLasers(graphicsContext, viewBounds, CollisionLayer.Air);
         }
 
@@ -182,7 +186,7 @@ namespace Orion.Game.Presentation.Renderers
                 if (spatial.CollisionLayer != collisionLayer || !faction.CanSee(entity))
                     continue;
 
-                DrawEntity(graphicsContext, entity);
+                drawDelegate(graphicsContext, entity);
             }
         }
 

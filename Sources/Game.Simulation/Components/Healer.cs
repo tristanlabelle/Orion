@@ -91,13 +91,12 @@ namespace Orion.Game.Simulation.Components
                     || targetHealth.Constitution != Constitution.Biological
                     || targetHealth.Damage == 0
                     || !vision.IsInRange(target)
-                    || !IsInRange(target)
                     || !FactionMembership.IsAlliedTo(Entity, target))
                 {
                     continue;
                 }
 
-                float score = Region.Distance(spatial.GridRegion, targetSpatial.GridRegion);
+                float score = 50 - Region.Distance(spatial.GridRegion, targetSpatial.GridRegion);
                 if (score > bestScore) bestTarget = target;
             }
 

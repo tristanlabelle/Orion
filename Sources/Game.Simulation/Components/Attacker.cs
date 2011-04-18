@@ -180,14 +180,13 @@ namespace Orion.Game.Simulation.Components
                 Entity target = targetSpatial.Entity;
                 if (target == Entity
                     || !vision.IsInRange(target)
-                    || !IsInRange(target)
                     || !target.Components.Has<Health>()
                     || FactionMembership.IsAlliedTo(Entity, target))
                 {
                     continue;
                 }
 
-                float score = Region.Distance(spatial.GridRegion, targetSpatial.GridRegion);
+                float score = 50 - Region.Distance(spatial.GridRegion, targetSpatial.GridRegion);
 
                 // Favor attackers first.
                 if (target.Components.Has<Attacker>()) score += 100;

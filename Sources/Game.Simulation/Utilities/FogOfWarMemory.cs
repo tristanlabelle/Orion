@@ -82,7 +82,7 @@ namespace Orion.Game.Simulation.Utilities
                 if (!faction.CanSee(rememberedEntity.GridRegion)) return false;
 
                 CollisionLayer collisionLayer = rememberedEntity.Prototype.Spatial.CollisionLayer;
-                Spatial spatial = faction.World.SpatialManager.GetGridObstacleAt(rememberedEntity.Location, collisionLayer);
+                Spatial spatial = faction.World.SpatialManager.GetGridObstacleAt(rememberedEntity.Position, collisionLayer);
                 return spatial == null || !rememberedEntity.Matches(spatial.Entity);
             });
         }

@@ -50,7 +50,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             foreach (RememberedEntity building in memory.Entities)
             {
-                Rectangle rectangle = new Rectangle(building.Location, (Vector2)unitSize);
+                Rectangle rectangle = new Rectangle(building.Position, (Vector2)unitSize);
                 graphics.Fill(rectangle, building.Faction.Color);
             }
         }

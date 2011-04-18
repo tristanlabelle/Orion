@@ -42,7 +42,7 @@ namespace Orion.Game.Presentation.Renderers
         private const float maxRuinAlpha = 0.8f;
         private static readonly TimeSpan ruinFadeDuration = TimeSpan.FromSeconds(1);
 
-        private static readonly Size miniatureUnitSize = new Size(3, 3);
+        private static readonly Size miniatureEntitySize = new Size(3, 3);
 
         private static readonly float shadowAlpha = 0.3f;
         private static readonly float shadowDistance = 0.7f;
@@ -127,41 +127,40 @@ namespace Orion.Game.Presentation.Renderers
         }
 
         #region Miniature
-        public void DrawMiniature(GraphicsContext context)
+        /// <summary>
+        /// Draws a miniature version of <see cref="Entities"/>, as they appear on the minimap.
+        /// </summary>
+        /// <param name="graphics">The <see cref="GraphicsContext"/> used for drawing.</param>
+        public void DrawMiniature(GraphicsContext graphics)
         {
             foreach (RememberedEntity entity in fogOfWarMemory.Entities)
-            {
-                Rectangle rectangle = new Rectangle(entity.Location, (Vector2)miniatureUnitSize);
-
-                ColorRgb color = Colors.White;
-                if (entity.Faction == null)
-                {
-                    Harvestable harvestable = entity.Prototype.Components.TryGet<Harvestable>();
-                    if (harvestable != null)
-                    {
-                        color = harvestable.Type == ResourceType.Aladdium ? miniatureAladdiumColor : miniatureAlageneColor;
-                    }
-                }
-                else
-                {
-                    color = entity.Faction.Color;
-                }
-
-                context.Fill(rectangle, color);
-            }
+                DrawMiniature(graphics, entity.Prototype, entity.Position, entity.Faction);
 
             foreach (Entity entity in World.Entities)
             {
-                Faction entityFaction = FactionMembership.GetFaction(entity);
-                if (entityFaction == null || !faction.CanSee(entity)) continue;
-
                 Spatial spatial = entity.Spatial;
-                if (spatial != null)
-                {
-                    Rectangle rectangle = Rectangle.FromCenterSize(spatial.Center, (Vector2)miniatureUnitSize);
-                    context.Fill(rectangle, entityFaction.Color);
-                }
+                if (spatial == null || !faction.CanSee(entity)) continue;
+
+                Faction entityFaction = FactionMembership.GetFaction(entity);
+                DrawMiniature(graphics, entity, spatial.Position, entityFaction);
             }
+        }
+
+        private static void DrawMiniature(GraphicsContext graphics, Entity prototype, Vector2 position, Faction faction)
+        {
+            Rectangle rectangle = new Rectangle(position, (Vector2)miniatureEntitySize);
+            ColorRgb color = GetMiniatureColor(prototype, faction);
+            graphics.Fill(rectangle, color);
+        }
+
+        private static ColorRgb GetMiniatureColor(Entity prototype, Faction faction)
+        {
+            if (faction != null) return faction.Color;
+
+            Harvestable harvestable = prototype.Components.TryGet<Harvestable>();
+            if (harvestable != null) return harvestable.Type == ResourceType.Aladdium ? miniatureAladdiumColor : miniatureAlageneColor;
+
+            return Colors.White;
         }
         #endregion
 

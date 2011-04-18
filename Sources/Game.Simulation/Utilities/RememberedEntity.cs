@@ -18,17 +18,17 @@ namespace Orion.Game.Simulation.Utilities
     {
         #region Instance
         #region Fields
-        private readonly Point location;
+        private readonly Point position;
         private readonly Entity prototype;
         private readonly Faction faction;
         #endregion
 
         #region Constructors
-        public RememberedEntity(Point location, Entity prototype, Faction faction)
+        public RememberedEntity(Point position, Entity prototype, Faction faction)
         {
             Argument.EnsureNotNull(prototype, "prototype");
 
-            this.location = location;
+            this.position = position;
             this.prototype = prototype;
             this.faction = faction;
         }
@@ -36,11 +36,11 @@ namespace Orion.Game.Simulation.Utilities
 
         #region Properties
         /// <summary>
-        /// Gets the location of the remembered entity.
+        /// Gets the position of the origin of the remembered entity.
         /// </summary>
-        public Point Location
+        public Point Position
         {
-            get { return location; }
+            get { return position; }
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation.Utilities
         /// </summary>
         public Region GridRegion
         {
-            get { return Spatial.GetGridRegion(location, prototype.Spatial.Size); }
+            get { return Spatial.GetGridRegion(position, prototype.Spatial.Size); }
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Orion.Game.Simulation.Utilities
 
         public bool Equals(RememberedEntity other)
         {
-            return location == other.location
+            return position == other.position
                 && prototype == other.prototype
                 && faction == other.faction;
         }
@@ -98,12 +98,12 @@ namespace Orion.Game.Simulation.Utilities
 
         public override int GetHashCode()
         {
-            return location.GetHashCode();
+            return position.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "{0} {1} at {2}".FormatInvariant(faction, prototype, location);
+            return "{0} {1} at {2}".FormatInvariant(faction, prototype, position);
         }
         #endregion
         #endregion

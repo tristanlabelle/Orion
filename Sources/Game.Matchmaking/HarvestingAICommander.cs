@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
+using Orion.Engine.Geometry;
 using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Tasks;
-using Orion.Engine.Geometry;
 
 namespace Orion.Game.Matchmaking
 {
@@ -22,12 +21,12 @@ namespace Orion.Game.Matchmaking
         #region ResourceNodeData
         private sealed class ResourceNodeData
         {
-            public readonly ResourceNode Node;
+            public readonly Entity Node;
             public int HarvesterCount;
-            public Unit NearbyDepot;
-            public Unit Extractor;
+            public Entity NearbyDepot;
+            public Entity Extractor;
 
-            public ResourceNodeData(ResourceNode node)
+            public ResourceNodeData(Entity node)
             {
                 Argument.EnsureNotNull(node, "node");
                 this.Node = node;
@@ -57,24 +56,24 @@ namespace Orion.Game.Matchmaking
         private const float minimumTimeBetweenSuccessiveExplorations = 10;
         private const int maximumExplorationCount = 6;
 
-        private readonly UnitType workerUnitType;
-        private readonly UnitType foodSupplyUnitType;
-        private readonly UnitType resourceDepotUnitType;
-        private readonly UnitType alageneExtractorUnitType;
-        private readonly UnitType pyramidUnitType;
-        private readonly UnitType defenseTowerUnitType;
-        private readonly UnitType laboratoryUnitType;
+        private readonly Entity workerPrototype;
+        private readonly Entity foodSupplyPrototype;
+        private readonly Entity resourceDepotPrototype;
+        private readonly Entity alageneExtractorPrototype;
+        private readonly Entity pyramidPrototype;
+        private readonly Entity defenseTowerPrototype;
+        private readonly Entity laboratoryPrototype;
 
         private readonly List<PlaceToExplore> placesToExplore = new List<PlaceToExplore>();
-        private readonly HashSet<UnitType> createdUnitTypes = new HashSet<UnitType>();
-        private readonly HashSet<Unit> buildings = new HashSet<Unit>();
-        private readonly Dictionary<ResourceNode, ResourceNodeData> resourceNodesData
-            = new Dictionary<ResourceNode, ResourceNodeData>();
+        private readonly HashSet<Entity> createdPrototypes = new HashSet<Entity>();
+        private readonly HashSet<Entity> buildings = new HashSet<Entity>();
+        private readonly Dictionary<Entity, ResourceNodeData> resourceNodesData
+            = new Dictionary<Entity, ResourceNodeData>();
 
         /// <summary>
-        /// A set of units which have been assigned tasks within the update.
+        /// A set of <see cref="Entity">entities</see> which have been assigned tasks within the update.
         /// </summary>
-        private readonly HashSet<Unit> assignedUnits = new HashSet<Unit>();
+        private readonly HashSet<Entity> assignedEntities = new HashSet<Entity>();
 
         private float lastUpdateTime;
         #endregion
@@ -83,13 +82,13 @@ namespace Orion.Game.Matchmaking
         public HarvestingAICommander(Match match, Faction faction)
             : base(match, faction)
         {
-            workerUnitType = match.UnitTypes.FromName("Smurf");
-            foodSupplyUnitType = match.UnitTypes.FromName("Supply");
-            resourceDepotUnitType = match.UnitTypes.FromName("HellsCostco");
-            alageneExtractorUnitType = match.UnitTypes.FromName("AlageneExtractor");
-            pyramidUnitType = match.UnitTypes.FromName("Pyramid");
-            defenseTowerUnitType = match.UnitTypes.FromName("JeanMarc");
-            laboratoryUnitType = match.UnitTypes.FromName("TristansHouse");
+            workerPrototype = match.Prototypes.FromName("Smurf");
+            foodSupplyPrototype = match.Prototypes.FromName("Supply");
+            resourceDepotPrototype = match.Prototypes.FromName("HellsCostco");
+            alageneExtractorPrototype = match.Prototypes.FromName("AlageneExtractor");
+            pyramidPrototype = match.Prototypes.FromName("Pyramid");
+            defenseTowerPrototype = match.Prototypes.FromName("JeanMarc");
+            laboratoryPrototype = match.Prototypes.FromName("TristansHouse");
 
             for (int y = 0; y < World.Height / explorationZoneSize; ++y)
             {
@@ -115,28 +114,25 @@ namespace Orion.Game.Matchmaking
             get { return Match.Random; }
         }
 
-        private IEnumerable<ResourceNode> VisibleResourceNodes
+        private IEnumerable<Entity> VisibleResourceNodes
         {
             get
             {
                 foreach (Entity entity in World.Entities)
                 {
-                    ResourceNode node = entity as ResourceNode;
-                    if (node == null || !Faction.CanSee(node)) continue;
-                    yield return node;
+                    if (!entity.Components.Has<Harvestable>()) continue;
+                    if (!Faction.CanSee(entity)) continue;
+                    yield return entity;
                 }
             }
         }
 
-        private IEnumerable<Unit> IdleUnits
+        private IEnumerable<Entity> IdleEntities
         {
             get
             {
-                return World.Entities
-                    .OfType<Unit>()
-                    .Where(unit => unit.Faction == Faction
-                        && unit.IsIdle
-                        && !assignedUnits.Contains(unit));
+                return Faction.Entities
+                    .Where(entity => TaskQueue.HasEmpty(entity) && !assignedEntities.Contains(entity));
             }
         }
         #endregion
@@ -149,7 +145,7 @@ namespace Orion.Game.Matchmaking
 
             lastUpdateTime = step.TimeInSeconds;
 
-            assignedUnits.Clear();
+            assignedEntities.Clear();
             ResourceAmount budget = new ResourceAmount(
                 Faction.AladdiumAmount, Faction.AlageneAmount,
                 Faction.RemainingFoodAmount);
@@ -160,9 +156,9 @@ namespace Orion.Game.Matchmaking
             UpdateResourceNodes(ref budget);
             UpdateExploration();
 
-            foreach (Unit unit in IdleUnits)
+            foreach (Entity entity in IdleEntities)
             {
-                UpdateIdleUnit(step, unit, ref budget);
+                UpdateIdleUnit(step, entity, ref budget);
             }
         }
 
@@ -173,12 +169,12 @@ namespace Orion.Game.Matchmaking
                 && Faction.MaxFoodAmount != World.MaximumFoodAmount;
             if (isLowOnFood)
             {
-                var foodSupplyCost = GetCost(foodSupplyUnitType);
+                var foodSupplyCost = GetCost(foodSupplyPrototype);
                 if (budget >= foodSupplyCost)
                 {
-                    Unit unit = GetMostIdleUnit(u => u.Type.CanBuild(foodSupplyUnitType));
-                    if (unit != null && TryBuildNear(unit, foodSupplyUnitType, unit.Center))
-                        assignedUnits.Add(unit);
+                    Entity entity = GetMostIdleUnit(u => Builder.Supports(u, foodSupplyPrototype));
+                    if (entity != null && TryBuildNear(entity, foodSupplyPrototype, entity.Center))
+                        assignedEntities.Add(entity);
                 }
 
                 budget -= foodSupplyCost;
@@ -187,36 +183,36 @@ namespace Orion.Game.Matchmaking
         
         private void UpdateDefense(ref ResourceAmount budget)
         {
-        	var firstUnthreatenedVisibleEnemy = World.Entities.OfType<Unit>()
-        		.FirstOrDefault(u => Faction.CanSee(u)
-        		    && buildings.None(b => b.Type == defenseTowerUnitType && (b.Center - u.Center).LengthFast < 5));
-        	if (firstUnthreatenedVisibleEnemy == null) return;
-        	
-        	var defenseTowerCost = GetCost(defenseTowerUnitType);
-        	if (budget >= defenseTowerCost)
-        	{
-    		    Unit unit = GetNearbyUnit(u => u.Type.CanBuild(defenseTowerUnitType), firstUnthreatenedVisibleEnemy.Center);
-                if (unit != null && TryBuildNear(unit, defenseTowerUnitType, firstUnthreatenedVisibleEnemy.Center))
-                    assignedUnits.Add(unit);
-        	}
-        	
-        	budget -= defenseTowerCost;
+            var firstUnthreatenedVisibleEnemy = World.Entities
+                .FirstOrDefault(u => Faction.CanSee(u)
+                    && buildings.None(b => Identity.GetPrototype(b) == defenseTowerPrototype && (b.Center - u.Center).LengthFast < 5));
+            if (firstUnthreatenedVisibleEnemy == null) return;
+            
+            var defenseTowerCost = GetCost(defenseTowerPrototype);
+            if (budget >= defenseTowerCost)
+            {
+                Entity entity = GetNearbyUnit(u => Builder.Supports(u, defenseTowerPrototype), firstUnthreatenedVisibleEnemy.Center);
+                if (entity != null && TryBuildNear(entity, defenseTowerPrototype, firstUnthreatenedVisibleEnemy.Center))
+                    assignedEntities.Add(entity);
+            }
+            
+            budget -= defenseTowerCost;
         }
         
         private void UpdateTechnologies(ref ResourceAmount budget)
         {
-        	if (Faction.UsedFoodAmount < 50) return;
-        	if (buildings.Any(b => b.Type == laboratoryUnitType)) return;
-        	
-        	var laboratoryCost = GetCost(laboratoryUnitType);
-        	if (budget >= laboratoryCost)
-        	{
-    		    Unit unit = GetMostIdleUnit(u => u.Type.CanBuild(laboratoryUnitType));
-                if (unit != null && TryBuildNear(unit, laboratoryUnitType, unit.Center))
-                    assignedUnits.Add(unit);
-        	}
-        	
-        	budget -= laboratoryCost;
+            if (Faction.UsedFoodAmount < 50) return;
+            if (buildings.Any(b => Identity.GetPrototype(b) == laboratoryPrototype)) return;
+            
+            var laboratoryCost = GetCost(laboratoryPrototype);
+            if (budget >= laboratoryCost)
+            {
+                Entity entity = GetMostIdleUnit(u => Builder.Supports(u, laboratoryPrototype));
+                if (entity != null && TryBuildNear(entity, laboratoryPrototype, entity.Center))
+                    assignedEntities.Add(entity);
+            }
+            
+            budget -= laboratoryCost;
         }
 
         private void UpdateResourceNodes(ref ResourceAmount budget)
@@ -224,11 +220,14 @@ namespace Orion.Game.Matchmaking
             foreach (ResourceNodeData data in resourceNodesData.Values)
                 data.HarvesterCount = 0;
 
-            var harvestTasks = Faction.Units
-                .Select(u => u.TaskQueue.FirstOrDefault() as HarvestTask)
-                .Where(t => t != null);
-            foreach (HarvestTask harvestTask in harvestTasks)
+            foreach (Entity entity in Faction.Entities)
             {
+                TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+                if (taskQueue == null) continue;
+
+                HarvestTask harvestTask = taskQueue.FirstOrDefault() as HarvestTask;
+                if (harvestTask == null) continue;
+
                 ResourceNodeData nodeData;
                 if (!resourceNodesData.TryGetValue(harvestTask.ResourceNode, out nodeData))
                 {
@@ -239,8 +238,8 @@ namespace Orion.Game.Matchmaking
                 ++nodeData.HarvesterCount;
             }
 
-            var resourceNodes = World.Entities.OfType<ResourceNode>();
-            foreach (ResourceNode node in resourceNodes)
+            var resourceNodes = World.Entities.Where(e => e.Components.Has<Harvestable>());
+            foreach (Entity node in resourceNodes)
             {
                 ResourceNodeData nodeData;
                 if (!resourceNodesData.TryGetValue(node, out nodeData))
@@ -251,51 +250,52 @@ namespace Orion.Game.Matchmaking
                     resourceNodesData.Add(node, nodeData);
                 }
 
-                if (nodeData.Node.Type == ResourceType.Alagene
-                    && (nodeData.Extractor == null || !nodeData.Extractor.IsAliveInWorld)
-                    && World.IsFree(node.GridRegion, CollisionLayer.Ground))
+                Spatial nodeSpatial = node.Spatial;
+                if (nodeData.Node.Components.Get<Harvestable>().Type == ResourceType.Alagene
+                    && (nodeData.Extractor == null || !nodeData.Extractor.IsAlive)
+                    && World.IsFree(nodeSpatial.GridRegion, CollisionLayer.Ground))
                 {
-                    var alageneExtractorCost = GetCost(alageneExtractorUnitType);
+                    var alageneExtractorCost = GetCost(alageneExtractorPrototype);
                     if (budget >= alageneExtractorCost)
                     {
-                        Unit builder = GetNearbyUnit(u => u.Type.CanBuild(alageneExtractorUnitType), node.Center);
+                        Entity builder = GetNearbyUnit(u => Builder.Supports(u, alageneExtractorPrototype), nodeSpatial.Center);
                         if (builder != null)
                         {
-                            var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorUnitType.Handle, node.Position);
+                            var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorPrototype.Handle, Point.Truncate(nodeSpatial.Position));
                             IssueCommand(command);
-                            assignedUnits.Add(builder);
+                            assignedEntities.Add(builder);
                         }
                     }
 
                     budget -= alageneExtractorCost;
                 }
                 
-                if (nodeData.HarvesterCount == 0 || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAliveInWorld))
+                if (nodeData.HarvesterCount == 0 || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAlive))
                     continue;
 
                 // Find a nearby depot;
-                nodeData.NearbyDepot = World.Entities
+                nodeData.NearbyDepot = World.SpatialManager
                     .Intersecting(new Circle(node.Center, maximumResourceDepotDistance))
-                    .OfType<Unit>()
-                    .Where(u => u.Faction == Faction && u.HasSkill<StoreResourcesSkill>())
-                    .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
+                    .Select(s => s.Entity)
+                    .Where(e => FactionMembership.GetFaction(e) == Faction && e.Components.Has<ResourceDepot>())
+                    .WithMinOrDefault(e => (e.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;
                 
                 // Build a nearby depot or pyramid
-                UnitType buildingType = resourceDepotUnitType;
+                Entity buildingType = resourceDepotPrototype;
 
-                Unit nearestPyramid = buildings
-                    .Where(building => building.Type == pyramidUnitType)
+                Entity nearestPyramid = buildings
+                    .Where(building => Identity.GetPrototype(building) == pyramidPrototype)
                     .WithMinOrDefault(pyramid => (pyramid.Center - node.Center).LengthSquared);
                 if (nearestPyramid == null || (nearestPyramid.Center - node.Center).LengthFast > minimumPyramidDistance)
-                    buildingType = pyramidUnitType;
+                    buildingType = pyramidPrototype;
 
                 var buildingCost = GetCost(buildingType);
                 if (budget >= buildingCost)
                 {
-                    Unit builder = GetNearbyUnit(u => u.Type.CanBuild(buildingType), node.Center);
+                    Entity builder = GetNearbyUnit(u => Builder.Supports(u, buildingType), node.Center);
                     if (builder != null && TryBuildNear(builder, buildingType, node.Center))
-                        assignedUnits.Add(builder);
+                        assignedEntities.Add(builder);
                 }
 
                 budget -= buildingCost;
@@ -307,43 +307,44 @@ namespace Orion.Game.Matchmaking
             placesToExplore.RemoveAll(place => Faction.GetTileVisibility(place.Point) != TileVisibility.Undiscovered);
         }
 
-        private void UpdateIdleUnit(SimulationStep step, Unit unit, ref ResourceAmount budget)
+        private void UpdateIdleUnit(SimulationStep step, Entity entity, ref ResourceAmount budget)
         {
-            if (unit.IsUnderConstruction) return;
+            if (entity.Components.Has<BuildProgress>()) return;
 
-            if (unit.Type.CanTrain(workerUnitType))
+            Trainer trainer = entity.Components.TryGet<Trainer>();
+            if (trainer != null && trainer.Supports(workerPrototype))
             {
-                var workerCost = GetCost(workerUnitType);
+                var workerCost = GetCost(workerPrototype);
                 int workerToCreateCount = budget.GetQuotient(workerCost);
                 if (workerToCreateCount > 0)
                 {
-                    var command = new TrainCommand(Faction.Handle, unit.Handle, workerUnitType.Handle, workerToCreateCount);
+                    var command = new TrainCommand(Faction.Handle, entity.Handle, workerPrototype.Handle, workerToCreateCount);
                     IssueCommand(command);
                     budget -= workerCost * workerToCreateCount;
                     return;
                 }
             }
 
-            if (unit.HasSkill<HarvestSkill>())
+            if (entity.Components.Has<Harvester>())
             {
                 var nodeData = resourceNodesData.Values
                     .Where(d => Faction.CanHarvest(d.Node) && d.HarvesterCount < maximumHarvestersPerResourceNode)
-                    .WithMinOrDefault(d => Region.Distance(unit.GridRegion, d.Node.GridRegion) + d.HarvesterCount * 2);
+                    .WithMinOrDefault(d => Region.Distance(entity.Spatial.GridRegion, d.Node.Spatial.GridRegion) + d.HarvesterCount * 2);
                 if (nodeData != null)
                 {
                     ++nodeData.HarvesterCount;
                     var command = new HarvestCommand(Faction.Handle,
-                        unit.Handle, nodeData.Node.Handle);
+                        entity.Handle, nodeData.Node.Handle);
                     IssueCommand(command);
                     return;
                 }
             }
 
-            if (unit.HasSkill<MoveSkill>())
+            if (entity.Components.Has<Mobile>())
             {
                 var placeToExplore = placesToExplore
                     .Where(p => step.TimeInSeconds - p.TimeLastExplorerSent > minimumTimeBetweenSuccessiveExplorations)
-                    .WithMinOrDefault(p => (unit.Center - p.Point).LengthSquared);
+                    .WithMinOrDefault(p => (entity.Center - p.Point).LengthSquared);
                 if (placeToExplore != null)
                 {
                     placeToExplore.TimeLastExplorerSent = step.TimeInSeconds;
@@ -351,100 +352,103 @@ namespace Orion.Game.Matchmaking
                     if (placeToExplore.ExplorationCount >= maximumExplorationCount)
                         placesToExplore.Remove(placeToExplore);
 
-                    var command = new MoveCommand(Faction.Handle, unit.Handle, placeToExplore.Point);
+                    var command = new MoveCommand(Faction.Handle, entity.Handle, placeToExplore.Point);
                     IssueCommand(command);
 
                     return;
                 }
             }
-            
-            if (unit.HasSkill<ResearchSkill>())
+
+            Researcher researcher = entity.Components.TryGet<Researcher>();
+            if (researcher != null)
             {
-            	foreach (var technology in Match.TechnologyTree.Technologies)
-            	{
-            		if (!unit.Type.CanResearch(technology)) continue;
+                foreach (var technology in Match.TechnologyTree.Technologies)
+                {
+                    if (!researcher.Supports(technology)) continue;
                     if (Faction.HasResearched(technology)) continue;
-            		if (createdUnitTypes.None(type => technology.AppliesTo(type))) continue;
-            		
-            		var cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost);
-            		if (!(budget >= cost)) continue;
-            		
-	            	var command = new ResearchCommand(Faction.Handle, unit.Handle, technology.Handle);
-	            	IssueCommand(command);
-            		
-            		budget -= cost;
-            		
-            		break;
-            	}
+                    if (createdPrototypes.None(type => technology.AppliesTo(type))) continue;
+                    
+                    var cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost);
+                    if (!(budget >= cost)) continue;
+                    
+                    var command = new ResearchCommand(Faction.Handle, entity.Handle, technology.Handle);
+                    IssueCommand(command);
+                    
+                    budget -= cost;
+                    
+                    break;
+                }
             }
-            
-            foreach (UnitTypeUpgrade upgrade in unit.Type.Upgrades)
+
+            foreach (EntityUpgrade upgrade in entity.Identity.Upgrades)
             {
-            	if (upgrade.IsFree) continue;
-            	
-            	var upgradeCost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost);
-            	if (!(budget >= upgradeCost)) continue;
-            	
-            	var upgradedUnitType = Match.UnitTypes.FromName(upgrade.Target);
-            	if (upgradedUnitType == null) continue;
-            	
-            	var command = new UpgradeCommand(Faction.Handle, unit.Handle, upgradedUnitType.Handle);
-            	IssueCommand(command);
-            	
-            	budget -= upgradeCost;
-            	break;
+                if (upgrade.IsFree) continue;
+                
+                var upgradeCost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost);
+                if (!(budget >= upgradeCost)) continue;
+                
+                var upgradedPrototype = Match.Prototypes.FromName(upgrade.Target);
+                if (upgradedPrototype == null) continue;
+                
+                var command = new UpgradeCommand(Faction.Handle, entity.Handle, upgradedPrototype.Handle);
+                IssueCommand(command);
+                
+                budget -= upgradeCost;
+                break;
             }
         }
         #endregion
 
         #region Helpers
-        private ResourceAmount GetCost(UnitType unitType)
+        private ResourceAmount GetCost(Entity prototype)
         {
-            return ResourceAmount.FromUnitCost(unitType, Faction);
+            return ResourceAmount.FromEntityCost(prototype, Faction);
         }
 
-        private Unit GetNearbyUnit(Func<Unit, bool> predicate, Vector2 location)
+        private Entity GetNearbyUnit(Func<Entity, bool> predicate, Vector2 location)
         {
-            return Faction.Units
-                .Where(unit => !assignedUnits.Contains(unit) && predicate(unit))
-                .WithMinOrDefault(unit => (unit.Center - location).LengthFast + GetOccupationImportance(unit));
+            return Faction.Entities
+                .Where(entity => !assignedEntities.Contains(entity) && predicate(entity))
+                .WithMinOrDefault(entity => (entity.Center - location).LengthFast + GetOccupationImportance(entity));
         }
 
-        private Unit GetMostIdleUnit(Func<Unit, bool> predicate)
+        private Entity GetMostIdleUnit(Func<Entity, bool> predicate)
         {
-            return Faction.Units
-                .Where(unit => !assignedUnits.Contains(unit) && predicate(unit))
-                .WithMinOrDefault(unit => GetOccupationImportance(unit));
+            return Faction.Entities
+                .Where(entity => !assignedEntities.Contains(entity) && predicate(entity))
+                .WithMinOrDefault(entity => GetOccupationImportance(entity));
         }
 
-        private float GetOccupationImportance(Unit unit)
+        private float GetOccupationImportance(Entity entity)
         {
-            Task task = unit.TaskQueue.FirstOrDefault();
+            Task task = entity.Components.Get<TaskQueue>().FirstOrDefault();
             if (task == null || task is MoveTask) return 0;
             if (task is HarvestTask) return 4;
             if (task is BuildTask) return 30;
             return 2;
         }
 
-        private bool TryBuildNear(Unit builder, UnitType buildingType, Vector2 location)
+        private bool TryBuildNear(Entity builder, Entity buildingPrototype, Vector2 location)
         {
             Point buildingLocation = new Point(
                             (int)location.X + Random.Next(-8, 9),
                             (int)location.Y + Random.Next(-8, 9));
+
+            Size foodSupplySize = foodSupplyPrototype.Spatial.Size;
             buildingLocation = new Region(
-                World.Width - foodSupplyUnitType.Width,
-                World.Height - foodSupplyUnitType.Height)
+                World.Width - foodSupplySize.Width,
+                World.Height - foodSupplySize.Height)
                 .Clamp(buildingLocation);
 
-            Region buildingRegion = new Region(buildingLocation, buildingType.Size);
+            Region buildingRegion = new Region(buildingLocation, buildingPrototype.Spatial.Size);
             if (!Faction.CanSee(buildingRegion) || !World.IsFree(buildingRegion, CollisionLayer.Ground))
                 return false;
 
             bool isNearOtherBuilding = buildings
-                .Any(b => Region.Distance(b.GridRegion, buildingRegion) < minimumBuildingDistance);
+                .Any(b => Region.Distance(b.Spatial.GridRegion, buildingRegion) < minimumBuildingDistance);
             if (isNearOtherBuilding) return false;
             
-            var command = new BuildCommand(Faction.Handle, builder.Handle, buildingType.Handle, buildingLocation);
+            var command = new BuildCommand(Faction.Handle, builder.Handle, buildingPrototype.Handle, buildingLocation);
             IssueCommand(command);
             return true;
         }
@@ -453,39 +457,40 @@ namespace Orion.Game.Matchmaking
         #region Event Handlers
         private void OnEntityAdded(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != Faction) return;
+            if (FactionMembership.GetFaction(entity) != Faction) return;
 
-            createdUnitTypes.Add(unit.Type);
+            var prototype = Identity.GetPrototype(entity);
+            createdPrototypes.Add(prototype);
             
-            if (unit.IsBuilding)
+            if (entity.Identity.IsBuilding)
             {
-                buildings.Add(unit);
-                if (unit.Type == alageneExtractorUnitType)
+                buildings.Add(entity);
+                if (prototype == alageneExtractorPrototype)
                 {
-                    ResourceNode node = World.Entities.Intersecting(unit.Center)
-                        .OfType<ResourceNode>()
-                        .First();
+                    Entity node = World.SpatialManager
+                        .Intersecting(entity.Center)
+                        .Select(s => s.Entity)
+                        .First(e => e.Components.Has<Harvestable>());
 
                     var nodeData = resourceNodesData[node];
-                    nodeData.Extractor = unit;
+                    nodeData.Extractor = entity;
                 }
             }
         }
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            ResourceNode node = entity as ResourceNode;
-            if (node != null)
+            if (!entity.Components.Has<Harvestable>()) return;
+
+            if (entity != null)
             {
-                resourceNodesData.Remove(node);
+                resourceNodesData.Remove(entity);
                 return;
             }
 
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != Faction) return;
+            if (FactionMembership.GetFaction(entity) != Faction) return;
 
-            if (unit.IsBuilding) buildings.Remove(unit);
+            buildings.Remove((Entity)entity);
         }
         #endregion
         #endregion

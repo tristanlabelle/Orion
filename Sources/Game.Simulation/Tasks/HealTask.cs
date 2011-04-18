@@ -1,47 +1,43 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which causes a <see cref="Unit"/> to repair a target to its full health
+    /// A <see cref="Task"/> which causes a <see cref="Entity"/> to repair a target to its full health
     /// or to complete its construction.
     /// </summary>
     [Serializable]
     public sealed class HealTask : Task
     {
         #region Fields
-        private readonly Unit target;
+        private readonly Entity target;
         private readonly FollowTask follow;    
         #endregion
 
         #region Constructors
-        public HealTask(Unit healer, Unit target)
-            : base(healer)
+        public HealTask(Entity entity, Entity target)
+            : base(entity)
         {
-            Argument.EnsureNotNull(healer, "unit");
+            Argument.EnsureNotNull(entity, "entity");
             Argument.EnsureNotNull(target, "target");
-            if (!healer.HasSkill<HealSkill>())
-                throw new ArgumentException("Cannot heal without the heal skill.", "unit");
-            if (target == healer)
-                throw new ArgumentException("A unit cannot heal itself.");
-            if (target.Type.IsBuilding)
-                throw new ArgumentException("Cannot heal buildings.", "target");
+            if (!entity.Components.Has<Healer>())
+                throw new ArgumentException("Cannot heal without the healer component.", "entity");
+            if (target == entity)
+                throw new ArgumentException("An entity cannot heal itself.", "entity");
+
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth == null) throw new ArgumentException("Cannot heal an entity without a health component.", "target");
+            if (targetHealth.Constitution != Constitution.Biological)
+                throw new ArgumentException("Cannot heal a non-biological entity.", "target");
 
             this.target = target;
-            if (healer.HasSkill<MoveSkill>()) this.follow = new FollowTask(healer, target);
+            if (entity.Components.Has<Mobile>()) this.follow = new FollowTask(entity, target);
         }
         #endregion
 
         #region Properties
-        public Unit Target
-        {
-            get { return target; }
-        }
-
         public override string Description
         {
             get { return "healing {0}".FormatInvariant(target); }
@@ -51,28 +47,39 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!Unit.Faction.CanSee(target))
+            Spatial spatial = Entity.Spatial;
+            Healer healer = Entity.Components.TryGet<Healer>();
+            Faction faction = FactionMembership.GetFaction(Entity);
+            Spatial targetSpatial = target.Spatial;
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (spatial == null
+                || healer == null
+                || faction == null
+                || !faction.CanSee(target)
+                || targetSpatial == null
+                || targetHealth == null
+                || targetHealth.Constitution != Constitution.Biological)
             {
                 MarkAsEnded();
                 return;
             }
 
-            if (!target.IsAliveInWorld)
+            if (!target.IsAlive)
             {
                 // If the target has died while we weren't yet in attack range,
                 // but were coming, complete the motion with a move task.
-                if (follow != null && !Unit.IsWithinHealingRange(target) && Unit.TaskQueue.Count == 1)
-                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)target.Center));
+                if (follow != null && !healer.IsInRange(target) && TaskQueue.Count == 1)
+                    TaskQueue.OverrideWith(new MoveTask(Entity, (Point)targetSpatial.Center));
                 MarkAsEnded();
                 return;
             }
 
-            if (Unit.IsWithinHealingRange(target))
+            if (healer.IsInRange(target))
             {
-                Unit.LookAt(target.Center);
-                int speed = Unit.GetStat(HealSkill.SpeedStat);
-                target.Health += speed * step.TimeDeltaInSeconds;
-                if (target.Health == target.MaxHealth) MarkAsEnded();
+                spatial.LookAt(targetSpatial.Center);
+                float speed = (float)Entity.GetStatValue(Healer.SpeedStat);
+                targetHealth.Damage -= speed * step.TimeDeltaInSeconds;
+                if (targetHealth.Value == (int)target.GetStatValue(Health.MaxValueStat)) MarkAsEnded();
                 return;
             }
             else

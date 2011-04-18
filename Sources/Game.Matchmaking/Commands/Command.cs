@@ -49,7 +49,7 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         /// <summary>
-        /// Gets a sequence of handles to <see cref="Unit">units</see> executing in this command.
+        /// Gets a sequence of handles to <see cref="Entity">units</see> executing in this command.
         /// </summary>
         public abstract IEnumerable<Handle> ExecutingUnitHandles { get; }
         #endregion
@@ -90,7 +90,7 @@ namespace Orion.Game.Matchmaking.Commands
 
         protected bool IsValidUnitTypeHandle(Match match, Handle handle)
         {
-            return match.UnitTypes.FromHandle(handle) != null;
+            return match.Prototypes.FromHandle(handle) != null;
         }
         #endregion
 

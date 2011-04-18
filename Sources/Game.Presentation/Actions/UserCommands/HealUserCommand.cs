@@ -2,6 +2,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -15,15 +16,18 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             Point point = (Point)location;
             if (!World.IsWithinBounds(point)) return;
 
-            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+            Entity target = GetTopmostEntityWhere(location, entity =>
             {
-                Unit target = World.Entities.GetTopmostUnitAt(point);
-                if (target != null) InputManager.LaunchHeal(target);
-            }
+                Health health = entity.Components.TryGet<Health>();
+                return health != null
+                    && health.Constitution == Constitution.Biological
+                    && FactionMembership.GetFaction(entity) == LocalFaction;
+            });
+
+            if (target != null && LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+                InputManager.LaunchHeal(target);
             else
-            {
                 InputManager.LaunchMove(location);
-            }
         }
     }
 }

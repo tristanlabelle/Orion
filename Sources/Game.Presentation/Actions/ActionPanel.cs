@@ -36,8 +36,8 @@ namespace Orion.Game.Presentation.Actions
             	HotKey = Key.Escape,
             	Action = () =>
 	            {
-	                inputManager.SelectedCommand = null;
-	                this.Restore();
+                inputManager.SelectedCommand = null;
+                this.Restore();
 	            }
             };
         }
@@ -91,9 +91,9 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Point point = new Point(x, y);
                     ui.SetActionButton(3 - y, x, provider.GetActionAt(point));
+                    }
                 }
             }
-        }
         #endregion
     }
 }

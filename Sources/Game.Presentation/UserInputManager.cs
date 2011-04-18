@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK;
@@ -9,11 +8,11 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Input;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
+using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
-using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation
 {
@@ -23,13 +22,15 @@ namespace Orion.Game.Presentation
     public sealed class UserInputManager
     {
         #region Fields
-        private static readonly float SingleClickMaxRectangleArea = 0.1f;
+        private const int selectionGroupCount = 10;
+        private const float singleClickMaxRectangleArea = 0.1f;
 
         private readonly Match match;
         private readonly SlaveCommander commander;
         private readonly UnderAttackMonitor underAttackMonitor;
+        private readonly SelectionGroupManager selectionGroupManager;
         private readonly SelectionManager selectionManager;
-        private Unit hoveredUnit;
+        private Entity hoveredEntity;
         private UserInputCommand mouseCommand;
         private Vector2? selectionStart;
         private Vector2? selectionEnd;
@@ -46,6 +47,7 @@ namespace Orion.Game.Presentation
             this.match = match;
             this.commander = commander;
             this.underAttackMonitor = new UnderAttackMonitor(commander.Faction);
+            this.selectionGroupManager = new SelectionGroupManager(match.World, 10);
             this.selectionManager = new SelectionManager(commander.Faction);
             this.commander.Faction.World.EntityRemoved += OnEntityRemoved;
         }
@@ -87,10 +89,9 @@ namespace Orion.Game.Presentation
             get { return selectionManager.Selection; }
         }
 
-        public Unit HoveredUnit
+        public Entity HoveredEntity
         {
-            get { return hoveredUnit; }
-            set { hoveredUnit = value; }
+            get { return hoveredEntity; }
         }
 
         public Rectangle? SelectionRectangle
@@ -152,27 +153,30 @@ namespace Orion.Game.Presentation
             this.selectionStart = null;
             this.selectionEnd = null;
 
-            if (selectionRectangle.Area < SingleClickMaxRectangleArea)
+            if (selectionRectangle.Area < singleClickMaxRectangleArea)
             {
                 HandleMouseClick(selectionRectangleStart);
             }
             else
             {
                 if (shiftKeyPressed)
-                    Selection.AddUnitsInRectangle(selectionRectangleStart, selectionRectangleEnd);
+                    Selection.AddFromRectangle(selectionRectangleStart, selectionRectangleEnd);
                 else
-                    Selection.SetToRectangle(selectionRectangleStart, selectionRectangleEnd);
+                    Selection.SetFromRectangle(selectionRectangleStart, selectionRectangleEnd);
             }
         }
 
         private void HandleMouseClick(Vector2 position)
         {
             Point point = (Point)position;
-            Entity clickedEntity = World.IsWithinBounds(point)
-                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.CollisionLayer)
-                : null;
+            if (!World.IsWithinBounds(point)) return;
 
-            if (clickedEntity == null)
+            Spatial clickedEntitySpatial = World.SpatialManager
+                .Intersecting(position)
+                .WithMaxOrDefault(spatial => spatial.CollisionLayer);
+
+            Entity clickedEntity = clickedEntitySpatial == null ? null : clickedEntitySpatial.Entity;
+            if (clickedEntity == null || !clickedEntity.Identity.IsSelectable)
             {
                 if (!shiftKeyPressed) Selection.Clear();
                 return;
@@ -198,17 +202,18 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            Unit clickedUnit = World.Entities.GetTopmostUnitAt(point);
-            if (clickedUnit == null)
+            Spatial clickedEntitySpatial = World.SpatialManager.GetTopmostAt(point);
+            if (clickedEntitySpatial == null)
             {
                 Selection.Clear();
                 return;
             }
 
-            if (clickedUnit.Faction == LocalFaction)
-                Selection.SetToNearbySimilar(clickedUnit);
+            Entity clickedEntity = clickedEntitySpatial.Entity;
+            if (FactionMembership.GetFaction(clickedEntity) == LocalFaction)
+                Selection.SetToNearbySimilar(clickedEntity);
             else
-                Selection.Set(clickedUnit);
+                Selection.Set(clickedEntity);
         }
 
         public void HandleMouseMove(MouseEventArgs args)
@@ -223,7 +228,9 @@ namespace Orion.Game.Presentation
             else
             {
                 Point point = (Point)args.Position;
-                hoveredUnit = World.IsWithinBounds(point) ? World.Entities.GetTopmostUnitAt(point) : null;
+
+                Spatial hoveredSpatial = World.SpatialManager.GetTopmostAt(args.Position);
+                hoveredEntity = hoveredSpatial == null ? null : hoveredSpatial.Entity;
             }
         }
 
@@ -244,9 +251,9 @@ namespace Orion.Game.Presentation
             {
                 int groupNumber = args.Key - Keys.D0;
                 if (args.IsControlModifierDown)
-                    selectionManager.SaveSelectionGroup(groupNumber);
+                    selectionGroupManager.Set(groupNumber, Selection);
                 else
-                    selectionManager.TryLoadSelectionGroup(groupNumber);
+                    Selection.Set(selectionGroupManager[groupNumber]);
             }
         }
 
@@ -265,10 +272,7 @@ namespace Orion.Game.Presentation
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-
-            if (unit == hoveredUnit) hoveredUnit = null;
+            if (entity == hoveredEntity) hoveredEntity = null;
         }
         #endregion
 
@@ -284,8 +288,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchDefaultCommand(Vector2 target)
         {
-            if (Selection.Type != SelectionType.Units) return;
-            if (!Selection.Units.Any(unit => IsUnitControllable(unit))) return;
+            if (!Selection.Any(entity => IsControllable(entity))) return;
 
             Point point = (Point)target;
             if (!World.IsWithinBounds(point))
@@ -293,247 +296,292 @@ namespace Orion.Game.Presentation
                 LaunchMove(target);
                 return;
             }
-            
-            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
-            {
-                if (Selection.Units.All(unit => unit.Type.IsBuilding))
-                    LaunchChangeRallyPoint(target);
-                else
-                    LaunchMove(target);
-                return;
-            }
 
-            Entity targetEntity = World.Entities.GetTopmostEntityAt(point);
-            if (targetEntity is Unit)
+            bool anyCanMove = Selection.Any(entity => entity.Components.Has<Mobile>());
+            Spatial targetEntitySpatial = World.SpatialManager.GetTopmostAt(target);
+            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered
+                || targetEntitySpatial == null)
             {
-                LaunchDefaultCommand((Unit)targetEntity);
-            }
-            else if (targetEntity is ResourceNode)
-            {
-                ResourceNode targetResourceNode = (ResourceNode)targetEntity;
-                if (Selection.Units.All(unit => unit.Type.IsBuilding))
-                    LaunchChangeRallyPoint(targetResourceNode.Center);
+                if (anyCanMove)
+                    LaunchMove(target);
                 else
-                    LaunchDefaultCommand(targetResourceNode);
+                    LaunchChangeRallyPoint(target);
             }
             else
             {
-                Debug.Assert(targetEntity == null);
-                if (Selection.Units.All(unit => unit.Type.IsBuilding))
-                    LaunchChangeRallyPoint(target);
+                LaunchDefaultCommand(targetEntitySpatial.Entity);
+            }
+        }
+
+        private void LaunchDefaultCommand(Entity target)
+        {
+            Spatial targetSpatial = target.Spatial;
+            if (targetSpatial == null) return;
+
+            if (target.Components.Has<Harvestable>())
+            {
+                if (LocalFaction.CanHarvest(target) && Selection.Any(entity => entity.Components.Has<Harvester>()))
+                    LaunchHarvest(target);
+                else if (Selection.Any(entity => entity.Components.Has<Mobile>()))
+                    LaunchMove(targetSpatial.Position);
                 else
-                    LaunchMove(target);
-            }
-        }
+                    LaunchChangeRallyPoint(targetSpatial.Center);
 
-        private void LaunchDefaultCommand(Unit target)
-        {
-            if (Selection.Type != SelectionType.Units) return;
-
-            if (LocalFaction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Enemy)
-            {
-                LaunchAttack(target);
                 return;
             }
 
-            if (target.HasSkill<ExtractAlageneSkill>())
+            Faction targetFaction = FactionMembership.GetFaction(target);
+            if (targetFaction == null || LocalFaction.GetDiplomaticStance(targetFaction) == DiplomaticStance.Enemy)
             {
-                if (Selection.Units.All(unit => unit.Type.IsBuilding))
-                {
-                    LaunchChangeRallyPoint(target.Center);
-                    return;
-                }
+                if (target.Components.Has<Health>()) LaunchAttack(target);
+                else LaunchMove(targetSpatial.Center);
+                return;
+            }
 
-                ResourceNode alageneNode = World.Entities
-                    .Intersecting(Rectangle.FromCenterSize(target.Position, Vector2.One))
-                    .OfType<ResourceNode>()
-                    .FirstOrDefault(node => node.Position == target.Position);
-                if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
+            if (Selection.All(entity => entity.Components.Has<Trainer>()))
+            {
+                LaunchChangeRallyPoint(targetSpatial.Center);
+                return;
+            }
+
+            if (target.Components.Has<AlageneExtractor>())
+            {
+                foreach (Spatial spatial in World.SpatialManager.Intersecting(Rectangle.FromCenterSize(targetSpatial.Position, Vector2.One)))
                 {
-                    LaunchHarvest(alageneNode);
-                    return;
+                    if (spatial.Position == targetSpatial.Position && LocalFaction.CanHarvest(spatial.Entity))
+                    {
+                        LaunchHarvest(spatial.Entity);
+                        return;
+                    }
                 }
             }
-            else if (target.HasSkill<TransportSkill>())
-            {
-                LaunchEmbark(target);
-                return;
-            }
-            else if (target.Damage > 0)
-            {
-                if (target.IsBuilding) LaunchRepair(target);
-                else LaunchHeal(target);
-
-                return;
-            }
-            
-            LaunchMove(target.Position);
-        }
-
-        private void LaunchDefaultCommand(ResourceNode target)
-        {
-            if (LocalFaction.CanHarvest(target))
-                LaunchHarvest(target);
             else
-                LaunchMove(target.Position);
+            {
+                Health entityHealth = target.Components.TryGet<Health>();
+                if (entityHealth != null && entityHealth.Damage > 0)
+                {
+                    switch (entityHealth.Constitution)
+                    {
+                        case Constitution.Mechanical:
+                            LaunchRepair(target);
+                            break;
+
+                        case Constitution.Biological:
+                            LaunchHeal(target);
+                            break;
+                    }
+
+                    return;
+                }
+            }
+
+            LaunchMove(targetSpatial.Position);
         }
         #endregion
 
         #region Launching individual commands
-        private bool IsUnitControllable(Unit unit)
+        private bool IsControllable(Entity entity)
         {
-            return LocalFaction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.SharedControl);
+            Faction entityFaction = FactionMembership.GetFaction(entity);
+            return entityFaction != null && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl);
         }
 
-        private void OverrideIfNecessary()
+        private void ClearTasksIfNecessary(IEnumerable<Entity> entities)
         {
-            if (!shiftKeyPressed)
-            {
-                IEnumerable<Unit> units = Selection.Units
-                    .Where(unit => IsUnitControllable(unit) && !unit.Type.IsBuilding);
-                commander.LaunchCancelAllTasks(units);
-            }
+            if (shiftKeyPressed) return;
+            
+            commander.LaunchCancelAllTasks(entities);
         }
 
-        public void LaunchBuild(Point location, UnitType buildingType)
+        public void LaunchBuild(Point location, Entity buildingPrototype)
         {
-            IEnumerable<Unit> builders = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.Type.CanBuild(buildingType));
+            IEnumerable<Entity> builders = Selection
+                .Where(entity => IsControllable(entity) && Builder.Supports(entity, buildingPrototype));
 
-            OverrideIfNecessary();
-            commander.LaunchBuild(builders, buildingType, location);
+            ClearTasksIfNecessary(builders);
+            commander.LaunchBuild(builders, buildingPrototype, location);
         }
 
-        public void LaunchAttack(Unit target)
+        public void LaunchLoad(Entity target)
         {
-            IEnumerable<Unit> selection = Selection.Units.Where(unit => IsUnitControllable(unit));
-            OverrideIfNecessary();
+            Entity transporter = Selection
+                .FirstOrDefault(e => IsControllable(e)
+                    && Identity.GetPrototype(e) == SelectionManager.FocusedPrototype
+                    && e.Components.Has<Transporter>()
+                    && e.Components.Get<Transporter>().RemainingSpace >= Cost.GetResourceAmount(target).Food);
+
+            commander.LaunchLoad(transporter, target);
+        }
+
+        public void LaunchUnload()
+        {
+            IEnumerable<Entity> transporters = Selection
+                .Where(e => IsControllable(e)
+                    && Identity.GetPrototype(e) == SelectionManager.FocusedPrototype
+                    && e.Components.Has<Transporter>());
+
+            commander.LaunchUnload(transporters);
+        }
+
+        public void LaunchAttack(Entity target)
+        {
+            IEnumerable<Entity> entities = Selection.Where(entity => IsControllable(entity)
+                && entity.Components.Has<Attacker>() || entity.Components.Has<Mobile>());
+
+            ClearTasksIfNecessary(entities);
             // Those who can attack do so, the others simply move to the target's position
-            commander.LaunchAttack(selection.Where(unit => unit.HasSkill<AttackSkill>()), target);
-            commander.LaunchMove(selection.Where(unit => !unit.HasSkill<AttackSkill>() && unit.HasSkill<MoveSkill>()), target.Position);
+            commander.LaunchAttack(entities.Where(entity => entity.Components.Has<Attacker>()), target);
+            commander.LaunchMove(entities.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Mobile>()), target.Spatial.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
+
             // Those who can attack do so, the others simply move to the destination
-            OverrideIfNecessary();
-            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<AttackSkill>()), destination);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<AttackSkill>()), destination);
+            ClearTasksIfNecessary(entities);
+            commander.LaunchZoneAttack(entities.Where(entity => entity.Components.Has<Attacker>()), destination);
+            commander.LaunchMove(entities.Where(entity => !entity.Components.Has<Attacker>()), destination);
         }
 
-        public void LaunchHarvest(ResourceNode node)
+        public void LaunchHarvest(Entity node)
         {
-            IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
+            Debug.Assert(node.Components.Has<Harvestable>(), "Node is not a resource node!");
+
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
+
             // Those who can harvest do so, the others simply move to the resource's position
-            OverrideIfNecessary();
-            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<HarvestSkill>()), node);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<HarvestSkill>()), node.Position);
+            ClearTasksIfNecessary(entities);
+            commander.LaunchHarvest(entities.Where(entity => entity.Components.Has<Harvester>()), node);
+            commander.LaunchMove(entities.Where(entity => !entity.Components.Has<Harvester>()), node.Spatial.Position);
         }
 
         public void LaunchMove(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
-            OverrideIfNecessary();
-            commander.LaunchMove(movableUnits, destination);
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Mobile>());
+
+            ClearTasksIfNecessary(entities);
+            commander.LaunchMove(entities, destination);
         }
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
-            IEnumerable<Unit> targets = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction
-                    && unit.IsBuilding
-                    && unit.HasSkill<TrainSkill>());
-            OverrideIfNecessary();
-            commander.LaunchChangeRallyPoint(targets, at);
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
+                    && entity.Components.Has<Trainer>());
+
+            commander.LaunchChangeRallyPoint(entities, at);
         }
 
-        public void LaunchRepair(Unit building)
-        {
-            Argument.EnsureNotNull(building, "building");
-
-            if (!building.IsBuilding) return;
-           
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<BuildSkill>());
-            OverrideIfNecessary();
-            commander.LaunchRepair(targetUnits, building);
-        }
-
-        public void LaunchHeal(Unit target)
+        public void LaunchRepair(Entity target)
         {
             Argument.EnsureNotNull(target, "target");
-            if (target.Type.IsBuilding) return;
 
-            IEnumerable<Unit> healers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<HealSkill>());
-            if (healers.Any(unit => unit.Faction != target.Faction)) return;
-            OverrideIfNecessary();
-            commander.LaunchHeal(healers, target);
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth == null || targetHealth.Constitution != Constitution.Mechanical) return;
+
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Builder>());
+
+            ClearTasksIfNecessary(entities);
+            commander.LaunchRepair(entities, target);
         }
 
-        public void LaunchTrain(UnitType unitType)
+        public void LaunchHeal(Entity target)
         {
-            IEnumerable<Unit> trainers = Selection.Units
-                .Where(unit => IsUnitControllable(unit)
-                    && !unit.IsUnderConstruction
-                    && unit.Type.CanTrain(unitType));
+            Argument.EnsureNotNull(target, "target");
 
-            OverrideIfNecessary();
-            commander.LaunchTrain(trainers, unitType);
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth.Constitution != Constitution.Biological) return;
+
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Healer>());
+
+            Faction targetFaction = FactionMembership.GetFaction(target);
+            if (entities.Any(entity => FactionMembership.GetFaction(entity) != targetFaction)) return;
+
+            ClearTasksIfNecessary(entities);
+            commander.LaunchHeal(entities, target);
+        }
+
+        public void LaunchTrain(Entity prototype)
+        {
+            IEnumerable<Entity> entities = Selection
+                .Where(entity =>
+                {
+                    Trainer trainer = entity.Components.TryGet<Trainer>();
+                    return IsControllable(entity)
+                        && entity.Components.Has<TaskQueue>()
+                        && trainer != null
+                        && trainer.Supports(prototype);
+                });
+
+            commander.LaunchTrain(entities, prototype);
         }
 
         public void LaunchResearch(Technology technology)
         {
-            Unit researcher = Selection.Units
-                .FirstOrDefault(unit => unit.Faction == commander.Faction // I unilaterally decided you can't research from buildings that aren't yours
-                    && !unit.IsUnderConstruction
-                    && unit.IsIdle
-                    && unit.Type.CanResearch(technology));
+            foreach (Entity entity in Selection)
+            {
+                Researcher researcher = entity.Components.TryGet<Researcher>();
+                if (FactionMembership.GetFaction(entity) != LocalFaction
+                    || !entity.Components.Has<TaskQueue>()
+                    || researcher == null
+                    || !researcher.Supports(technology))
+                {
+                    return;
+                }
 
-            OverrideIfNecessary();
-            commander.LaunchResearch(researcher, technology);
+                commander.LaunchResearch(entity, technology);
+            }
         }
 
         public void LaunchSuicide()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.Type.IsSuicidable);
-            OverrideIfNecessary();
-            commander.LaunchSuicide(targetUnits);
+            IEnumerable<Entity> entities = Selection
+                .Where(entity =>
+                {
+                    Health health = entity.Components.TryGet<Health>();
+                    return FactionMembership.GetFaction(entity) == LocalFaction
+                        && health != null
+                        && health.CanSuicide;
+                });
+
+            commander.LaunchSuicide(entities);
         }
 
         public void LaunchStandGuard()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction)
-                .Where(unit => unit.HasSkill<MoveSkill>());
-            OverrideIfNecessary();
-            commander.LaunchStandGuard(targetUnits);
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Mobile>());
+
+            ClearTasksIfNecessary(entities);
+            commander.LaunchStandGuard(entities);
         }
 
         public void LaunchSell()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction)
-                .Where(unit => unit.HasSkill<SellableSkill>());
-            commander.LaunchSuicide(targetUnits);
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Sellable>());
+
+            commander.LaunchSuicide(entities);
         }
 
         public void LaunchCancelAllTasks()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction);
-            commander.LaunchCancelAllTasks(targetUnits);
+            IEnumerable<Entity> entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction);
+
+            commander.LaunchCancelAllTasks(entities);
         }
 
         public void LaunchCancelTask(Task task)
         {
             Argument.EnsureNotNull(task, "task");
-            Debug.Assert(Selection.Count == 1 && task.Unit == Selection.FirstOrDefault());
+            Debug.Assert(Selection.Count == 1 && task.Entity == Selection.FirstOrDefault());
 
             commander.LaunchCancelTask(task);
         }
@@ -560,31 +608,15 @@ namespace Orion.Game.Presentation
                 commander.SendMessage(text);
         }
 
-        public void LaunchUpgrade(UnitType targetType)
+        public void LaunchUpgrade(Entity targetPrototype)
         {
-            Argument.EnsureNotNull(targetType, "targetType");
+            Argument.EnsureNotNull(targetPrototype, "targetPrototype");
 
-            var targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.Type.Upgrades.Any(upgrade => upgrade.Target == targetType.Name));
-            commander.LaunchUpgrade(targetUnits, targetType);
-        }
+            var entities = Selection
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
+                    && entity.Identity.Upgrades.Any(upgrade => upgrade.Target == targetPrototype.Identity.Name));
 
-        public void LaunchDisembark()
-        {
-            var transporters = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<TransportSkill>());
-            OverrideIfNecessary();
-            commander.LaunchDisembark(transporters);
-        }
-
-        public void LaunchEmbark(Unit transporter)
-        {
-            Argument.EnsureNotNull(transporter, "transporter");
-
-            var embarkers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && transporter.Type.CanTransport(unit.Type));
-            OverrideIfNecessary();
-            commander.LaunchEmbark(embarkers, transporter);
+            commander.LaunchUpgrade(entities, targetPrototype);
         }
         #endregion
         #endregion

@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.Engine.Gui;
+using System.Diagnostics;
 using Orion.Engine;
-using Orion.Engine.Collections;
-using Orion.Engine.Graphics;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Tasks;
-using Orion.Game.Simulation.Skills;
+using Orion.Engine.Gui;
 using Orion.Engine.Localization;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -19,19 +16,18 @@ namespace Orion.Game.Presentation.Gui
     public sealed partial class SingleEntitySelectionPanel : ContentControl
     {
         #region Fields
-        private static readonly UnitStat[] statsToDisplay = new[]
+        private static readonly Stat[] statsToDisplay = new[]
         {
-            AttackSkill.PowerStat, AttackSkill.RangeStat,
-            BasicSkill.ArmorStat, BasicSkill.ArmorTypeStat,
-            MoveSkill.SpeedStat, BasicSkill.SightRangeStat
+            Attacker.PowerStat, Attacker.RangeStat,
+            Health.ArmorStat,
+            Mobile.SpeedStat, Vision.RangeStat
         };
 
         private readonly GameGraphics graphics;
         private readonly Localizer localizer;
         private readonly List<TodoButton> unusedTodoButtons = new List<TodoButton>();
-        private readonly Action<Unit> damageChangedEventHandler;
         private readonly Action<TaskQueue> taskQueueChangedEventHandler;
-        private readonly Action<ResourceNode> remainingAmountChangedEventHandler;
+        private readonly Action<UIManager, TimeSpan> updatedEventHandler;
 
         private Label nameLabel;
         private Label healthLabel;
@@ -40,6 +36,8 @@ namespace Orion.Game.Presentation.Gui
         private Label todoLabel;
         private StackLayout todoButtonStack;
         private Entity entity;
+        private int currentAmount;
+        private int currentMaxAmount;
         #endregion
 
         #region Constructors
@@ -50,9 +48,8 @@ namespace Orion.Game.Presentation.Gui
 
             this.graphics = graphics;
             this.localizer = localizer;
-            this.damageChangedEventHandler = UpdateHealth;
             this.taskQueueChangedEventHandler = UpdateTodoList;
-            this.remainingAmountChangedEventHandler = UpdateAmount;
+            this.updatedEventHandler = OnUpdated;
 
             DockLayout dock = new DockLayout();
             Content = dock;
@@ -65,7 +62,7 @@ namespace Orion.Game.Presentation.Gui
 
         #region Events
         /// <summary>
-        /// Raised when the user cancels a <see cref="Task"/> of the selected <see cref="Unit"/>.
+        /// Raised when the user cancels a <see cref="Task"/> of the selected <see cref="Entity"/>.
         /// </summary>
         public event Action<SingleEntitySelectionPanel, Task> TaskCancelled;
         #endregion
@@ -87,66 +84,58 @@ namespace Orion.Game.Presentation.Gui
 
         #region Methods
         /// <summary>
-        /// Show information on a given unit.
+        /// Show information on a given <see cref="Entity"/>.
         /// </summary>
-        /// <param name="unit">The <see cref="Unit"/> for which information is to be shown.</param>
+        /// <param name="entity">The <see cref="Entity"/> for which information is to be shown.</param>
         /// <param name="showTasks">
-        /// A value indicating if the <see cref="Task"/>s of the <see cref="Unit"/> are to be shown.
+        /// A value indicating if the <see cref="Task"/>s of the <see cref="Entity"/> are to be shown.
         /// </param>
-        public void ShowUnit(Unit unit, bool showTasks)
+        public void Show(Entity entity, bool showTasks)
         {
-            Argument.EnsureNotNull(unit, "unit");
-            if (unit == entity) return;
+            Argument.EnsureNotNull(entity, "entity");
+            if (entity == this.entity) return;
+
             Clear();
+            this.entity = entity;
 
-            nameLabel.Text = localizer.GetNoun(unit.Type.Name);
-            imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
+            Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+            if (harvestable == null)
+            {
+                nameLabel.Text = localizer.GetNoun(entity.Identity.Name);
+                imageBox.Texture = graphics.GetEntityTexture(entity);
+            }
+            else
+            {
+                nameLabel.Text = localizer.GetNoun(harvestable.Type.ToStringInvariant());
+                imageBox.Texture = graphics.GetResourceTexture(harvestable.Type);
+            }
 
-            UpdateHealth(unit);
-            unit.DamageChanged += damageChangedEventHandler;
+            TryUpdateAmount();
 
             if (showTasks)
             {
                 todoLabel.VisibilityFlag = Visibility.Visible;
-                UpdateTodoList(unit.TaskQueue);
-                unit.TaskQueue.Changed += taskQueueChangedEventHandler;
+
+                TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+                if (taskQueue != null)
+                {
+                    UpdateTodoList(taskQueue);
+                    taskQueue.Changed += taskQueueChangedEventHandler;
+                }
             }
 
             statsForm.VisibilityFlag = Visibility.Visible;
-            foreach (UnitStat stat in statsToDisplay)
+            foreach (Stat stat in statsToDisplay)
             {
-                if (!unit.Type.HasSkill(stat.SkillType)) continue;
-
-                int value = unit.GetStat(stat);
+                float value = (float)entity.GetStatValue(stat);
                 if (value == 0) continue;
 
-                string statName = localizer.GetNoun(stat.Name + "Stat");
+                string statName = localizer.GetNoun(stat.FullName + "Stat");
                 Label headerLabel = Style.CreateLabel(statName + ":");
                 Label valueLabel = Style.CreateLabel(value.ToStringInvariant());
 
                 statsForm.Entries.Add(headerLabel, valueLabel);
             }
-
-            entity = unit;
-        }
-
-        /// <summary>
-        /// Shows information on a given <see cref="ResourceNode"/>.
-        /// </summary>
-        /// <param name="resourceNode">The <see cref="ResourceNode"/> for which information is to be shown.</param>
-        public void ShowResourceNode(ResourceNode resourceNode)
-        {
-            Argument.EnsureNotNull(resourceNode, "node");
-            if (resourceNode == entity) return;
-            Clear();
-
-            nameLabel.Text = localizer.GetNoun(resourceNode.Type.ToStringInvariant());
-            imageBox.Texture = graphics.GetResourceTexture(resourceNode);
-            UpdateAmount(resourceNode);
-
-            resourceNode.RemainingAmountChanged += remainingAmountChangedEventHandler;
-
-            entity = resourceNode;
         }
 
         /// <summary>
@@ -154,9 +143,14 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public void Clear()
         {
+            if (entity == null) return;
+
             nameLabel.Text = string.Empty;
             imageBox.Texture = null;
             healthLabel.Text = string.Empty;
+
+            currentAmount = 0;
+            currentMaxAmount = 0;
 
             ClearTodoList();
             todoLabel.VisibilityFlag = Visibility.Hidden;
@@ -164,21 +158,10 @@ namespace Orion.Game.Presentation.Gui
             statsForm.Entries.Clear();
             statsForm.VisibilityFlag = Visibility.Hidden;
 
-            if (entity is Unit)
-            {
-                Unit unit = (Unit)entity;
+            TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+            if (taskQueue != null) taskQueue.Changed -= taskQueueChangedEventHandler;
 
-                unit.DamageChanged -= damageChangedEventHandler;
-                unit.TaskQueue.Changed -= taskQueueChangedEventHandler;
-            }
-            else if (entity is ResourceNode)
-            {
-                ResourceNode resourceNode = (ResourceNode)entity;
-
-                resourceNode.RemainingAmountChanged -= remainingAmountChangedEventHandler;
-            }
-
-            entity = null;
+            this.entity = null;
         }
 
         private void ClearTodoList()
@@ -193,9 +176,34 @@ namespace Orion.Game.Presentation.Gui
             todoButtonStack.Children.Clear();
         }
 
-        private void UpdateHealth(Unit unit)
+        private void TryUpdateAmount()
         {
-            healthLabel.Text = (int)Math.Ceiling(unit.Health) + "/" + unit.MaxHealth;
+            int newAmount = currentAmount;
+            int newMaxAmount = currentMaxAmount;
+
+            Health health = entity.Components.TryGet<Health>();
+            Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+            if (health != null)
+            {
+                newMaxAmount = (int)entity.GetStatValue(Health.MaxValueStat);
+                newAmount = (int)Math.Ceiling(newMaxAmount - health.Damage);
+            }
+            else if (harvestable != null)
+            {
+                newMaxAmount = 0;
+                newAmount = harvestable.Amount;
+            }
+
+            if (newAmount != currentAmount || newMaxAmount != currentMaxAmount)
+            {
+                healthLabel.VisibilityFlag = newAmount == 0 ? Visibility.Hidden : Visibility.Visible;
+
+                healthLabel.Text = newAmount.ToStringInvariant();
+                if (newMaxAmount != 0) healthLabel.Text += "/" + newMaxAmount;
+
+                currentMaxAmount = newMaxAmount;
+                currentAmount = newAmount;
+            }
         }
 
         private void UpdateTodoList(TaskQueue taskQueue)
@@ -218,9 +226,15 @@ namespace Orion.Game.Presentation.Gui
             }
         }
 
-        private void UpdateAmount(ResourceNode resourceNode)
+        protected override void OnManagerChanged(UIManager previousManager)
         {
-            healthLabel.Text = resourceNode.RemainingAmount + "/" + resourceNode.TotalAmount;
+            if (previousManager != null) previousManager.Updated -= updatedEventHandler;
+            if (Manager != null) Manager.Updated += updatedEventHandler;
+        }
+
+        private void OnUpdated(UIManager sender, TimeSpan elapsedTime)
+        {
+            if (entity != null) TryUpdateAmount();
         }
 
         private TodoButton GetTodoButton()

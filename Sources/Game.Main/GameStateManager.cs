@@ -2,11 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Engine.Collections;
-using Orion.Engine.Graphics;
 using Orion.Engine.Localization;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Audio;
@@ -180,7 +176,7 @@ namespace Orion.Game.Main
         }
         #endregion
 
-        public void Update(float timeDeltaInSeconds)
+        public void Update(TimeSpan timeDelta)
         {
             if (IsEmpty) return;
 
@@ -189,7 +185,7 @@ namespace Orion.Game.Main
             try
             {
                 deferActions = true;
-                activeState.Update(timeDeltaInSeconds);
+                activeState.Update(timeDelta);
             }
             finally
             {

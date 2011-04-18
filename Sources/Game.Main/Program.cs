@@ -1,22 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using Orion.Engine;
 using Orion.Engine.Graphics;
-using Orion.Engine.Networking;
-using Orion.Game.Matchmaking;
-using Orion.Game.Matchmaking.Networking;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Audio;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Main
 {
@@ -96,7 +84,7 @@ namespace Orion.Game.Main
 
                     while (timeAccumulator >= TargetSecondsPerFrame)
                     {
-                        gameStateManager.Update(TargetSecondsPerFrame);
+                        gameStateManager.Update(TimeSpan.FromSeconds(TargetSecondsPerFrame));
                         updateRateCounter.Update();
 
                         gameTime += TargetSecondsPerFrame;

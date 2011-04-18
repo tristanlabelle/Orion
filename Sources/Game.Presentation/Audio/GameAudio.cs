@@ -10,6 +10,7 @@ using Orion.Game.Simulation;
 using OpenALSoundContext = Orion.Engine.Audio.OpenAL.SoundContext;
 using NullSoundContext = Orion.Engine.Audio.Null.SoundContext;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Audio
 {
@@ -81,13 +82,15 @@ namespace Orion.Game.Presentation.Audio
         #endregion
 
         #region Methods
-        public string GetUnitSoundName(UnitType unitType, string eventName)
+        public string GetUnitSoundName(Entity entity, string eventName)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(entity, "entity");
             Argument.EnsureNotNull(eventName, "eventName");
 
+            Identity identity = entity.Identity;
+
             stringBuilder.Clear();
-            stringBuilder.Append(unitType.VoicesTemplate);
+            stringBuilder.Append(identity.SoundIdentity);
             stringBuilder.Append('.');
             stringBuilder.Append(eventName);
 

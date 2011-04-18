@@ -7,12 +7,13 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using HarvestTask = Orion.Game.Simulation.Tasks.HarvestTask;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes the <see cref="HarvestTask"/>
-    /// to be assigned to some <see cref="Unit"/>s.
+    /// to be assigned to some <see cref="Entity"/>s.
     /// </summary>
     public sealed class HarvestCommand : Command
     {
@@ -65,11 +66,11 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            ResourceNode resourceNode = (ResourceNode)match.World.Entities.FromHandle(resourceNodeHandle);
+            Entity resourceNode = match.World.Entities.FromHandle(resourceNodeHandle);
             foreach (Handle harvesterHandle in harvesterHandles)
             {
-                Unit harvester = (Unit)match.World.Entities.FromHandle(harvesterHandle);
-                harvester.TaskQueue.Enqueue(new HarvestTask(harvester, resourceNode));
+                Entity harvester = match.World.Entities.FromHandle(harvesterHandle);
+                harvester.Components.Get<TaskQueue>().Enqueue(new HarvestTask(harvester, resourceNode));
             }
         }
 

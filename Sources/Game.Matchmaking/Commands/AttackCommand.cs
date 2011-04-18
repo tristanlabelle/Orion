@@ -7,12 +7,13 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using AttackTask = Orion.Game.Simulation.Tasks.AttackTask;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
-    /// to attack another <see cref="Unit"/>.
+    /// A <see cref="Command"/> which causes one or many <see cref="Entity"/>s
+    /// to attack another <see cref="Entity"/>.
     /// </summary>
     public sealed class AttackCommand : Command
     {
@@ -65,12 +66,12 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            Unit target = (Unit)match.World.Entities.FromHandle(targetHandle);
+            Entity target = match.World.Entities.FromHandle(targetHandle);
 
             foreach (Handle attackerHandle in attackerHandles)
             {
-                Unit attacker = (Unit)match.World.Entities.FromHandle(attackerHandle);
-                attacker.TaskQueue.Enqueue(new AttackTask(attacker, target));
+                Entity attackerEntity = match.World.Entities.FromHandle(attackerHandle);
+                attackerEntity.Components.Get<TaskQueue>().Enqueue(new AttackTask(attackerEntity, target));
             }
         }
 

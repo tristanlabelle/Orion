@@ -39,16 +39,16 @@ namespace Orion.Game.Presentation.Renderers
         #region Methods
         public void Draw(GraphicsContext graphics)
         {
-            foreach (RememberedBuilding building in memory.Buildings)
+            foreach (RememberedEntity building in memory.Entities)
             {
-                Texture texture = gameGraphics.GetUnitTexture(building.Type);
+                Texture texture = gameGraphics.GetEntityTexture(building.Prototype);
                 graphics.Fill(building.GridRegion.ToRectangle(), texture, building.Faction.Color);
             }
         }
 
         public void DrawMiniature(GraphicsContext graphics, Size unitSize)
         {
-            foreach (RememberedBuilding building in memory.Buildings)
+            foreach (RememberedEntity building in memory.Entities)
             {
                 Rectangle rectangle = new Rectangle(building.Location, (Vector2)unitSize);
                 graphics.Fill(rectangle, building.Faction.Color);

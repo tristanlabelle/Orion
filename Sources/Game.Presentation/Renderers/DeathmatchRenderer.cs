@@ -14,7 +14,7 @@ namespace Orion.Game.Presentation.Renderers
     public sealed class DeathmatchRenderer : IMatchRenderer
     {
         #region Fields
-        private const float shakingDuration = 4;
+        private static readonly TimeSpan shakingDuration = TimeSpan.FromSeconds(4);
         private const float shakingMagnitude = 5;
         private const float shakingOscillationsPerSecond = 40;
 
@@ -22,7 +22,7 @@ namespace Orion.Game.Presentation.Renderers
         private readonly GameGraphics graphics;
         private readonly SelectionRenderer selectionRenderer;
         private readonly WorldRenderer worldRenderer;
-        private float shakingSecondsLeft = 0;
+        private TimeSpan shakingTimeLeft;
         #endregion
 
         #region Constructors
@@ -65,11 +65,14 @@ namespace Orion.Game.Presentation.Renderers
         {
             get
             {
-                if (shakingSecondsLeft == 0) return Vector2.Zero;
-                return new Vector2(
-                    (float)Math.Cos(shakingSecondsLeft * (shakingOscillationsPerSecond * 0.8f)),
-                    (float)Math.Sin(shakingSecondsLeft * (shakingOscillationsPerSecond + 1.2f)))
-                     * shakingMagnitude * (shakingSecondsLeft / shakingDuration);
+                if (shakingTimeLeft == TimeSpan.Zero) return Vector2.Zero;
+
+                float seconds = (float)shakingTimeLeft.TotalSeconds;
+
+                Vector2 shakingAxis = new Vector2(
+                    (float)Math.Cos(seconds * (shakingOscillationsPerSecond * 0.8f)),
+                    (float)Math.Sin(seconds * (shakingOscillationsPerSecond + 1.2f)));
+                return shakingAxis * shakingMagnitude * (seconds / (float)shakingDuration.TotalSeconds);
             }
         }
 
@@ -87,13 +90,12 @@ namespace Orion.Game.Presentation.Renderers
             using (context.PushTranslate(ShakeOffset))
             {
                 worldRenderer.DrawTerrain(context, visibleBounds);
-                worldRenderer.DrawResources(context, visibleBounds);
                 worldRenderer.DrawBlueprints(context, visibleBounds);
-                worldRenderer.DrawUnits(context, visibleBounds);
+                worldRenderer.DrawEntities(context, visibleBounds);
                 selectionRenderer.DrawSelectionMarkers(context);
 
-                if (inputManager.HoveredUnit != null && Faction.CanSee(inputManager.HoveredUnit))
-                    HealthBarRenderer.Draw(context, inputManager.HoveredUnit);
+                if (inputManager.HoveredEntity != null && Faction.CanSee(inputManager.HoveredEntity))
+                    HealthBarRenderer.Draw(context, inputManager.HoveredEntity);
 
                 worldRenderer.DrawExplosions(context, visibleBounds);
                 worldRenderer.DrawFogOfWar(context, visibleBounds);
@@ -110,8 +112,7 @@ namespace Orion.Game.Presentation.Renderers
         public void DrawMinimap()
         {
             worldRenderer.DrawMiniatureTerrain(graphics.Context);
-            worldRenderer.DrawMiniatureResources(graphics.Context);
-            worldRenderer.DrawMiniatureUnits(graphics.Context);
+            worldRenderer.DrawMiniatureEntities(graphics.Context);
             worldRenderer.DrawFogOfWar(graphics.Context, World.Bounds);
         }
 
@@ -123,17 +124,14 @@ namespace Orion.Game.Presentation.Renderers
         #region Chuck Norris
         private void OnEntityAdded(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-
-            if (unit.Type.Name == "Chuck Norris")
-                shakingSecondsLeft = shakingDuration;
+            if (entity.Identity.Name == "ChuckNorris")
+                shakingTimeLeft = shakingDuration;
         }
 
         private void OnWorldUpdated(World world, SimulationStep step)
         {
-            shakingSecondsLeft -= step.TimeDeltaInSeconds;
-            if (shakingSecondsLeft < 0) shakingSecondsLeft = 0;
+            shakingTimeLeft -= step.TimeDelta;
+            if (shakingTimeLeft < TimeSpan.Zero) shakingTimeLeft = TimeSpan.Zero;
         }
         #endregion
         #endregion

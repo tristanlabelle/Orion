@@ -22,29 +22,24 @@ namespace Orion.Game.Matchmaking
 
         private readonly World world;
         private readonly Random random;
-        private readonly Func<Point, bool> canBuildPredicate;
-        private readonly UnitTypeRegistry unitTypes;
+        private readonly PrototypeRegistry prototypes;
         private readonly TechnologyTree technologyTree;
         private bool isRunning = true;
         private bool areRandomHeroesEnabled = true;
         #endregion
 
         #region Constructors
-        public Match(AssetsDirectory assets, World world, Random random, Func<Point, bool> canBuildPredicate)
+        public Match(AssetsDirectory assets, World world, Random random)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(assets, "assets");
             Argument.EnsureNotNull(random, "random");
 
-            this.unitTypes = new UnitTypeRegistry(assets);
+            this.prototypes = new PrototypeRegistry(assets);
             this.technologyTree = new TechnologyTree(assets);
             this.world = world;
             this.random = random;
-            this.canBuildPredicate = canBuildPredicate;
         }
-
-        public Match(AssetsDirectory assets, World world, Random random)
-            : this(assets, world, random, null) { }
         #endregion
 
         #region Events
@@ -71,11 +66,11 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
-        /// Gets the collection of unit types available in this match.
+        /// Gets the collection of <see cref="Entity"/> prototypes available in this match.
         /// </summary>
-        public UnitTypeRegistry UnitTypes
+        public PrototypeRegistry Prototypes
         {
-            get { return unitTypes; }
+            get { return prototypes; }
         }
 
         /// <summary>
@@ -133,12 +128,6 @@ namespace Orion.Game.Matchmaking
         {
             isRunning = true;
         }
-
-        public bool CanBuild(Region region)
-        {
-            return world.IsFree(region, CollisionLayer.Ground)
-                && (canBuildPredicate == null || region.Points.All(p => canBuildPredicate(p)));
-        }
         
         /// <summary>
         /// Raises the <see cref="E:CheatUsed"/> event.
@@ -151,18 +140,18 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
-        /// Gets a random hero unit type from a given unit type.
+        /// Gets a random hero unit type from a given prototype.
         /// </summary>
-        /// <param name="unitType">The original unit type.</param>
-        /// <returns>One of the heroes of the original unit type, or that unit type itself.</returns>
-        public UnitType RandomizeHero(UnitType unitType)
+        /// <param name="prototype">The original protottype.</param>
+        /// <returns>One of the heroes of the original unit type, or that prototype itself.</returns>
+        public Entity RandomizeHero(Entity prototype)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
-            if (!areRandomHeroesEnabled) return unitType;
+            Argument.EnsureNotNull(prototype, "unitType");
+            if (!areRandomHeroesEnabled) return prototype;
 
             while (true)
             {
-                var heroUpgrades = unitType.Upgrades
+                var heroUpgrades = prototype.Identity.Upgrades
                     .Where(u => u.AladdiumCost == 0 && u.AlageneCost == 0);
 
                 int upgradeCount = heroUpgrades.Count();
@@ -170,22 +159,20 @@ namespace Orion.Game.Matchmaking
                     break;
 
                 int upgradeIndex = random.Next(upgradeCount);
-                UnitTypeUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
+                EntityUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
 
-                UnitType heroUnitType = UnitTypes.FromName(upgrade.Target);
-                if (heroUnitType == null)
+                Entity heroPrototype = Prototypes.FromName(upgrade.Target);
+                if (heroPrototype == null)
                 {
-#if DEBUG
                     Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
-                        .FormatInvariant(upgrade.Target, unitType.Name));
-#endif
+                        .FormatInvariant(upgrade.Target, prototype.Identity.Name));
                     break;
                 }
 
-                unitType = heroUnitType;
+                prototype = heroPrototype;
             }
 
-            return unitType;
+            return prototype;
         }
 
         /// <summary>

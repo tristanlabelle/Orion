@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -21,45 +20,86 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Instance
         #region Fields
-        private const float harvestDuration = 5;
-        private const float depositingDuration = 0;
+        private const float extractingDuration = 5;
 
-        private readonly ResourceNode node;
+        private readonly Entity resourceNode;
+        private readonly ResourceType resourceType;
         private int amountCarrying;
         private float amountAccumulator;
-        private float secondsGivingResource;
         private MoveTask move;
-        private Unit depot;
+        private Entity depot;
         private Mode mode = Mode.Extracting;
         #endregion
 
         #region Constructors
-        public HarvestTask(Unit harvester, ResourceNode node)
-            : base(harvester)
+        public HarvestTask(Entity entity, Entity resourceNode)
+            : base(entity)
         {
-            if (!harvester.HasSkill<HarvestSkill>())
-                throw new ArgumentException("Cannot harvest without the harvest skill.", "harvester");
-            Argument.EnsureNotNull(node, "node");
+            if (!entity.Components.Has<Harvester>())
+                throw new ArgumentException("Cannot harvest without the harvester component.", "entity");
+            Argument.EnsureNotNull(resourceNode, "node");
 
-            this.node = node;
-            this.move = MoveTask.ToNearRegion(harvester, node.GridRegion);
+            this.resourceNode = resourceNode;
+            this.resourceType = resourceNode.Components.Get<Harvestable>().Type;
+            this.move = MoveTask.ToNearRegion(entity, resourceNode.Spatial.GridRegion);
         }
         #endregion
 
         #region Properties
-        public ResourceNode ResourceNode
+        public Entity ResourceNode
         {
-            get { return node; }
+            get { return resourceNode; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if the <see cref="Entity"/> is currently extracting
+        /// resources from the resource node.
+        /// </summary>
+        public bool IsExtracting
+        {
+            get { return move == null && mode == Mode.Extracting; }
         }
 
         public override string Description
         {
-            get { return "harvesting " + node.Type; }
+            get { return "harvesting " + resourceType; }
+        }
+
+        private bool IsResourceNodeValid
+        {
+            get
+            {
+                Faction faction = FactionMembership.GetFaction(Entity);
+                return resourceNode.IsAlive
+                    && resourceNode.Spatial != null
+                    && faction != null
+                    && faction.CanHarvest(resourceNode);
+            }
         }
         #endregion
 
         #region Methods
         protected override void DoUpdate(SimulationStep step)
+        {
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (Entity.Spatial == null
+                || !Entity.Components.Has<Harvester>()
+                || faction == null)
+            {
+                Debug.Assert(faction != null, "Harvesting without a faction is unimplemented.");
+                MarkAsEnded();
+                return;
+            }
+
+            if (move != null)
+                UpdateMove(step);
+            else if (mode == Mode.Extracting)
+                UpdateExtracting(step);
+            else
+                UpdateDelivering(step);
+        }
+
+        private void UpdateMove(SimulationStep step)
         {
             if (!move.HasEnded)
             {
@@ -69,19 +109,19 @@ namespace Orion.Game.Simulation.Tasks
 
             if (!move.HasReachedDestination)
             {
+                // TODO: Resources are lost here
                 MarkAsEnded();
                 return;
             }
 
-            if (mode == Mode.Extracting)
-                UpdateExtracting(step);
-            else
-                UpdateDelivering(step);
+            // Setup so next update will extract or deposit
+            move = null;
         }
 
         private void UpdateExtracting(SimulationStep step)
         {
-            if (!node.IsAliveInWorld || !Unit.Faction.CanHarvest(node))
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (!IsResourceNodeValid)
             {
                 if (amountCarrying == 0)
                 {
@@ -89,99 +129,111 @@ namespace Orion.Game.Simulation.Tasks
                     return;
                 }
 
-                mode = Mode.Delivering;
+                TransitionToDelivering();
                 return;
             }
 
-            Unit.LookAt(node.Center);
+            Entity.Spatial.LookAt(resourceNode.Spatial.Center);
 
-            float extractingSpeed = Unit.GetStat(HarvestSkill.SpeedStat);
+            float extractingSpeed = (float)Entity.GetStatValue(Harvester.SpeedStat);
             amountAccumulator += extractingSpeed * step.TimeDeltaInSeconds;
 
-            int maxCarryingAmount = Unit.GetStat(HarvestSkill.MaxCarryingAmountStat);
+            int maxCarryingAmount = (int)Entity.GetStatValue(Harvester.MaxCarryingAmountStat);
             while (amountAccumulator >= 1)
             {
-                if (!node.IsAliveInWorld)
+                Harvestable harvestable = resourceNode.Components.Get<Harvestable>();
+                if (!resourceNode.IsAlive)
                 {
-                    Faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(node.Type));
-                    move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
-                    mode = Mode.Delivering;
+                    faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvestable.Type));
+                    TransitionToDelivering();
                     return;
                 }
 
-                if (node.RemainingAmount > 0)
+                if (!harvestable.IsEmpty)
                 {
-                    node.Harvest(1);
+                    harvestable.Harvest(1);
                     --amountAccumulator;
                     ++amountCarrying;
                 }
 
                 if (amountCarrying >= maxCarryingAmount)
                 {
-                    depot = FindClosestDepot();
-                    if (depot == null)
-                    {
-                        MarkAsEnded();
-                    }
-                    else
-                    {
-                        move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
-                        mode = Mode.Delivering;
-                    }
-
+                    TransitionToDelivering();
                     return;
                 }
+            }
+        }
+
+        private void TransitionToDelivering()
+        {
+            depot = FindNearestDepot();
+            if (depot == null)
+            {
+                MarkAsEnded();
+            }
+            else
+            {
+                mode = Mode.Delivering;
+                move = MoveTask.ToNearRegion(Entity, depot.Spatial.GridRegion);
             }
         }
 
         private void UpdateDelivering(SimulationStep step)
         {
-            if (depot == null || !depot.IsAliveInWorld)
+            if (!IsValidResourceDepot(depot))
             {
-                depot = FindClosestDepot();
-                if (depot == null)
-                {
-                    MarkAsEnded();
-                    return;
-                }
-
-                move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
+                TransitionToDelivering();
                 return;
             }
 
-            Unit.LookAt(depot.Center);
+            Entity.Spatial.LookAt(depot.Spatial.Center);
 
-            secondsGivingResource += step.TimeDeltaInSeconds;
-            if (secondsGivingResource < depositingDuration)
-                return;
-            
-            //adds the resources to the unit's faction
-            if (node.Type == ResourceType.Aladdium)
-                Unit.Faction.AladdiumAmount += amountCarrying;
-            else if (node.Type == ResourceType.Alagene)
-                Unit.Faction.AlageneAmount += amountCarrying;
+            // Add resources to the entity's faction
+            Faction faction = FactionMembership.GetFaction(Entity);
+            faction.AddResources(resourceType, amountCarrying);
             amountCarrying = 0;
 
-            if (!node.IsAliveInWorld || !Unit.Faction.CanHarvest(node))
+            if (!IsResourceNodeValid)
             {
-                if (Unit.TaskQueue.Count == 1)
-                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)node.Center));
+                if (TaskQueue.Count == 1) TaskQueue.OverrideWith(new MoveTask(Entity, (Point)resourceNode.Center));
                 MarkAsEnded();
                 return;
             }
 
-            // if the unit was enqueued other tasks, stop harvesting
-            if (Unit.TaskQueue.Count > 1) MarkAsEnded();
+            // If the entity was enqueued other tasks, stop harvesting
+            if (TaskQueue.Count > 1) MarkAsEnded();
 
-            move = MoveTask.ToNearRegion(Unit, node.GridRegion);
             mode = Mode.Extracting;
+            move = MoveTask.ToNearRegion(Entity, resourceNode.Spatial.GridRegion);
         }
 
-        private Unit FindClosestDepot()
+        private static bool IsValidResourceDepot(Entity entity)
         {
-            return Faction.Units
-                .Where(other => !other.IsUnderConstruction && other.HasSkill<StoreResourcesSkill>())
-                .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Unit.GridRegion));
+#warning The resource depot component should not be present while the build is in progress
+            return entity.Components.Has<ResourceDepot>()
+                && entity.IsAlive
+                && entity.Spatial != null
+                && !entity.Components.Has<BuildProgress>();
+        }
+
+        private Entity FindNearestDepot()
+        {
+            float nearestDepotSquaredDistance = float.PositiveInfinity;
+            Entity nearestDepot = null;
+
+            foreach (Entity entity in FactionMembership.GetFaction(Entity).Entities)
+            {
+                if (!IsValidResourceDepot(entity)) continue;
+
+                float squaredDistance = Region.SquaredDistance(entity.Spatial.GridRegion, Entity.Spatial.GridRegion);
+                if (squaredDistance < nearestDepotSquaredDistance)
+                {
+                    nearestDepot = entity;
+                    nearestDepotSquaredDistance = squaredDistance;
+                }
+            }
+
+            return nearestDepot;
         }
         #endregion
         #endregion

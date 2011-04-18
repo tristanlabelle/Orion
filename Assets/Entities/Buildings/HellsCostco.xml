@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>HellsCostco</Name>
+		<HotKey>H</HotKey>
+		<IsBuilding>True</IsBuilding>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>80</Aladdium>
+		<SpawnTime>100</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<ResourceDepot/>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>100</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
+</Entity>

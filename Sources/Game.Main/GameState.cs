@@ -73,7 +73,7 @@ namespace Orion.Game.Main
         /// Invoked each logic frame to update the game state's logic.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame.</param>
-        protected internal virtual void Update(float timeDeltaInSeconds) { }
+        protected internal virtual void Update(TimeSpan timeDelta) { }
 
         /// <summary>
         /// Invoked each rendering frame to refresh the screen.

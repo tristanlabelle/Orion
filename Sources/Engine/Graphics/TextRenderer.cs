@@ -117,14 +117,14 @@ namespace Orion.Engine.Graphics
 
                             // Prevent other characters from being drawn
                             i = tempStringBuilder.Length;
-                        }
+                }
                         else if (options.HorizontalOverflowPolicy == TextOverflowPolicy.Wrap)
                         {
                             position.X = options.Origin.X;
                             position.Y -= renderedFont.Height;
                             box = new Box(position.X, position.Y, box.Width, box.Height);
-                        }
-                    }
+            }
+        }
 
                     if (box.MaxX - origin.X > totalWidth) totalWidth = (int)Math.Ceiling(box.MaxX - origin.X);
                     if (box.MaxY - origin.Y > totalHeight) totalHeight = (int)Math.Ceiling(box.MaxY - origin.Y);
@@ -145,9 +145,9 @@ namespace Orion.Engine.Graphics
 
             if (fontRenderer != null)
             {
-                fontRenderer.Dispose();
-                fontRenderTarget.Dispose();
-            }
+            fontRenderer.Dispose();
+            fontRenderTarget.Dispose();
+        }
         }
 
         private RenderedFont FindOrCreateRenderedFont(Font font)

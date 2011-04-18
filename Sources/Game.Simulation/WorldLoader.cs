@@ -8,6 +8,7 @@ using OpenTK;
 using System.IO;
 using System.Diagnostics;
 using Orion.Game.Simulation.IO;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -32,17 +33,25 @@ namespace Orion.Game.Simulation
             return worldData.Terrain;
         }
 
-        public override void PrepareWorld(World world, UnitTypeRegistry unitTypes)
+        public override void PrepareWorld(World world, PrototypeRegistry prototypes)
         {
-            // create resource nodes
+            CreateResourceNodes(world, prototypes);
+            CreateUnits(world, prototypes);
+        }
+
+        private void CreateResourceNodes(World world, PrototypeRegistry prototypes)
+        {
             foreach (ResourceNodeTemplate node in worldData.AladdiumNodes)
             {
                 Point nodeLocation = node.Location;
-                ResourceNode concreteNode = world.Entities.CreateResourceNode(node.ResourceType, nodeLocation);
-                concreteNode.RemainingAmount = node.RemainingAmount;
-            }
 
-            // place units
+                Entity concreteNode = CreateResourceNode(world, prototypes, node.ResourceType, node.Location);
+                concreteNode.Components.Get<Harvestable>().Amount = node.RemainingAmount;
+            }
+        }
+
+        private void CreateUnits(World world, PrototypeRegistry prototypes)
+        {
             Debug.Assert(world.Factions.Count() <= worldData.NumberOfFactions,
                 "There are more factions than this map supports.");
 
@@ -53,8 +62,8 @@ namespace Orion.Game.Simulation
                 Faction currentFaction = factionEnumerator.Current;
                 foreach (UnitTemplate unit in worldData.GetUnitsForFaction(i))
                 {
-                    UnitType type = unitTypes.FromName(unit.UnitTypeName);
-                    currentFaction.CreateUnit(type, unit.Location);
+                    Entity prototype = prototypes.FromName(unit.UnitTypeName);
+                    currentFaction.CreateUnit(prototype, unit.Location);
                 }
             }
         }

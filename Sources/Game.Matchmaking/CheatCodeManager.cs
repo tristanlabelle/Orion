@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking
 {
@@ -109,23 +111,23 @@ namespace Orion.Game.Matchmaking
 
         private static void SpawnChuckNorris(Match match, Faction faction)
         {
-            UnitType unitType = match.UnitTypes.FromName("ChuckNorris");
-            if (unitType == null)
+            Entity prototype = match.Prototypes.FromName("ChuckNorris");
+            if (prototype == null)
             {
                 Debug.Fail("Failed to find hero unit type.");
                 return;
             }
 
-            faction.CreateUnit(unitType, (Point)match.World.Bounds.Center);
+            faction.CreateUnit(prototype, (Point)match.World.Bounds.Center);
         }
 
         private static void InstantVictory(Match match, Faction faction)
         {
-            List<Unit> enemyUnits = match.World.Entities
-                .OfType<Unit>()
-                .Where(u => u.Faction != faction)
-                .ToList();
-            foreach (Unit enemy in enemyUnits) enemy.Suicide();
+            match.World.Entities
+                .Select(entity => entity.Components.TryGet<Health>())
+                .Where(health => health != null && FactionMembership.GetFaction(health.Entity) != faction)
+                .NonDeferred()
+                .ForEach(health => health.Suicide());
         }
 
         private static void IncreaseBuildAndTrainSpeed(Match match, Faction faction)
@@ -143,15 +145,17 @@ namespace Orion.Game.Matchmaking
 
         private static void InstantDefeat(Match match, Faction faction)
         {
-            List<Unit> userBuildings = match.World.Entities
-                .OfType<Unit>().Where(u => u.Faction == faction).ToList();
-            foreach (Unit building in userBuildings) building.Suicide();
+            match.World.Entities
+                .Select(entity => entity.Components.TryGet<Health>())
+                .Where(health => health != null && FactionMembership.GetFaction(health.Entity) == faction)
+                .NonDeferred()
+                .ForEach(health => health.Suicide());
         }
 
         private static void SpawnMisterT(Match match, Faction faction)
         {
-            UnitType heroUnitType = match.UnitTypes.FromName("MrT");
-            faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
+            Entity heroPrototype = match.Prototypes.FromName("MrT");
+            faction.CreateUnit(heroPrototype, (Point)match.World.Bounds.Center);
         }
 
         private static void MasterCheat(Match match, Faction faction)

@@ -6,11 +6,8 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.Game.Simulation.Pathfinding;
-using Orion.Game.Simulation.Skills;
-using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Technologies;
-using ColorPalette = Orion.Engine.Colors;
 
 namespace Orion.Game.Simulation
 {
@@ -18,17 +15,8 @@ namespace Orion.Game.Simulation
     /// Represents a faction, a group of allied units sharing resources and sharing a goal.
     /// </summary>
     [Serializable]
-    public sealed class Faction
+    public sealed partial class Faction
     {
-    	#region Static
-    	public static bool HaveAlliedVictory(Faction a, Faction b)
-    	{
-    		return a.GetDiplomaticStance(b).HasFlag(DiplomaticStance.AlliedVictory)
-    			&& b.GetDiplomaticStance(a).HasFlag(DiplomaticStance.AlliedVictory);
-    	}
-    	#endregion
-    	
-    	#region Instance
         #region Fields
         private const int minimumFoodAmount = 10;
 
@@ -80,8 +68,6 @@ namespace Orion.Game.Simulation
 
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
-            this.world.EntityAdded += OnWorldEntityAdded;
-            this.world.EntityRemoved += OnWorldEntityRemoved;
         }
         #endregion
 
@@ -163,15 +149,14 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets the collection of <see cref="Unit"/>s in this <see cref="Faction"/>.
+        /// Gets the collection of <see cref="Entity"/>s in this <see cref="Faction"/>.
         /// </summary>
-        public IEnumerable<Unit> Units
+        public IEnumerable<Entity> Entities
         {
             get
             {
                 return world.Entities
-                    .OfType<Unit>()
-                    .Where(unit => unit.Faction == this);
+                    .Where(unit => FactionMembership.GetFaction(unit) == this);
             }
         }
 
@@ -261,18 +246,42 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Adds resources to this <see cref="Faction"/>'s stored amount.
+        /// </summary>
+        /// <param name="type">The type of the resources to be added.</param>
+        /// <param name="amount">The amount of resources to add.</param>
+        public void AddResources(ResourceType type, int amount)
+        {
+            if (type == ResourceType.Aladdium)
+                AladdiumAmount += amount;
+            else
+                AlageneAmount += amount;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="FoodToken"/> which uses or provides food to this <see cref="Faction"/>.
+        /// </summary>
+        /// <param name="type">The type of the food token.</param>
+        /// <param name="amount">The amount of food involved.</param>
+        /// <returns>A new <see cref="FoodToken"/>.</returns>
+        public FoodToken CreateFoodToken(FoodTokenType type, int amount)
+        {
+            return new FoodToken(this, type, amount);
+        }
+
         #region Stats & Technologies
         /// <summary>
-        /// Gets the value of a <see cref="UnitStat"/> which take researched technologies into account
-        /// for a unit of this <see cref="Faction"/> by its <see cref="UnitType"/>.
+        /// Gets the value of a <see cref="Stat"/> which take researched technologies into account
+        /// for a unit of this <see cref="Faction"/> by its <see cref="Entity"/>.
         /// </summary>
-        /// <param name="type">The <see cref="UnitType"/> of the unit for which the stat is to be retrieved.</param>
-        /// <param name="stat">The <see cref="UnitStat"/> to be retrieved.</param>
-        /// <returns>The value of that stat for the specified <see cref="UnitType"/>.</returns>
-        public int GetStat(UnitType type, UnitStat stat)
+        /// <param name="prototype">The <see cref="Entity"/> for which the stat is to be retrieved.</param>
+        /// <param name="stat">The <see cref="Stat"/> to be retrieved.</param>
+        /// <returns>The value of that stat for the specified <see cref="Entity"/>.</returns>
+        public StatValue GetStat(Entity prototype, Stat stat)
         {
-            Argument.EnsureNotNull(type, "type");
-            return type.GetBaseStat(stat) + GetTechnologyBonuses(type, stat);
+            Argument.EnsureNotNull(prototype, "type");
+            return prototype.GetStatValue(stat) + GetTechnologyBonuses(prototype, stat);
         }
 
         /// <summary>
@@ -280,12 +289,12 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="stat">The stat type.</param>
         /// <returns>The sum of the bonuses offered by technologies</returns>
-        public int GetTechnologyBonuses(UnitType type, UnitStat stat)
+        public StatValue GetTechnologyBonuses(Entity prototype, Stat stat)
         {
-            int total = 0;
+            StatValue sum = StatValue.CreateZero(stat.Type);
             foreach (Technology technology in technologies)
-                total += technology.GetEffect(type, stat);
-            return total;
+                sum += technology.GetEffect(prototype, stat);
+            return sum;
         }
 
         public bool IsResearchable(Technology technology)
@@ -346,122 +355,20 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Units
+        #region Entities
         /// <summary>
-        /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
+        /// Creates new <see cref="Entity"/> part of this <see cref="Faction"/>.
         /// </summary>
-        /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
-        /// <param name="point">The initial position of the <see cref="Unit"/>.</param>
-        /// <returns>The newly created <see cref="Unit"/>.</returns>
-        public Unit CreateUnit(UnitType type, Point point)
+        /// <param name="prototype">The prototype of the <see cref="Entity"/> to be created.</param>
+        /// <param name="point">The initial position of the <see cref="Entity"/>.</param>
+        /// <returns>The newly created <see cref="Entity"/>.</returns>
+        public Entity CreateUnit(Entity prototype, Point point)
         {
-            Argument.EnsureNotNull(type, "type");
+            Argument.EnsureNotNull(prototype, "prototype");
 
-            Unit unit = world.Entities.CreateUnit(type, this, point);
+            Entity entity = world.Entities.CreateUnit(prototype, this, point);
 
-            UsedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
-
-            return unit;
-        }
-
-        #region Notifications invoked by Unit
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitMoved(Unit unit, Vector2 oldPosition, Vector2 newPosition)
-        {
-            Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
-            Debug.Assert(!unit.IsBuilding);
-
-            int sightRange = unit.GetStat(BasicSkill.SightRangeStat);
-            Vector2 extent = unit.BoundingRectangle.Extent;
-            Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
-            Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
-            localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
-        }
-
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitDied(Unit unit)
-        {
-            Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
-
-            UsedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
-        }
-
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitTypeChanged(Unit unit, UnitType oldType, UnitType newType)
-        {
-            Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
-            Debug.Assert(oldType != null);
-            Debug.Assert(newType != null);
-            Debug.Assert(oldType != newType);
-
-            UsedFoodAmount -= GetStat(oldType, BasicSkill.FoodCostStat);
-            UsedFoodAmount += GetStat(newType, BasicSkill.FoodCostStat);
-
-            if (unit.IsUnderConstruction)
-            {
-                Region oldRegion = Entity.GetGridRegion(unit.Position, oldType.Size);
-                Region newRegion = Entity.GetGridRegion(unit.Position, newType.Size);
-                localFogOfWar.RemoveRegion(oldRegion);
-                localFogOfWar.AddRegion(newRegion);
-            }
-            else
-            {
-                Vector2 oldCenter = unit.Position + (Vector2)oldType.Size * 0.5f;
-                int oldSightRange = GetStat(oldType, BasicSkill.SightRangeStat);
-                
-                Vector2 newCenter = unit.Position + (Vector2)newType.Size * 0.5f;
-                int newSightRange = GetStat(newType, BasicSkill.SightRangeStat);
-
-                localFogOfWar.RemoveLineOfSight(new Circle(oldCenter, oldSightRange));
-                localFogOfWar.AddLineOfSight(new Circle(newCenter, newSightRange));
-            }
-        }
-
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnBuildingConstructionCompleted(Unit unit)
-        {
-            Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
-            Debug.Assert(unit.IsBuilding);
-
-            localFogOfWar.RemoveRegion(unit.GridRegion);
-            localFogOfWar.AddLineOfSight(unit.LineOfSight);
-
-            if (unit.HasSkill<ProvideFoodSkill>())
-                TotalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
-        }
-        #endregion
-
-        private void OnWorldEntityRemoved(World world, Entity entity)
-        {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != this) return;
-
-            if (unit.IsUnderConstruction)
-            {
-                localFogOfWar.RemoveRegion(unit.GridRegion);
-            }
-            else
-            {
-                if (unit.Type.HasSkill<ProvideFoodSkill>())
-                    TotalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
-
-                localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
-            }
-        }
-
-        private void OnWorldEntityAdded(World world, Entity entity)
-        {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != this) return;
-
-            if (unit.IsBuilding && unit.IsUnderConstruction)
-                localFogOfWar.AddRegion(unit.GridRegion);
-            else
-                localFogOfWar.AddLineOfSight(unit.LineOfSight);
+            return entity;
         }
 
         /// <summary>
@@ -469,9 +376,10 @@ namespace Orion.Game.Simulation
         /// </summary>
         public void MassSuicide()
         {
-            Unit[] units = Units.OfType<Unit>().ToArray();
-            foreach (Unit unit in units)
-                unit.Suicide();
+            Entities.Select(entity => entity.Components.TryGet<Health>())
+                .Where(health => health != null)
+                .NonDeferred()
+                .ForEach(entity => entity.Suicide());
         }
 
         /// <summary>
@@ -479,17 +387,27 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="node">The resource node to be tested.</param>
         /// <returns><c>True</c> if the resource node can be harvested, <c>false</c> otherwise.</returns>
-        public bool CanHarvest(ResourceNode node)
+        public bool CanHarvest(Entity node)
         {
             Argument.EnsureNotNull(node, "node");
 
-            if (node.Type == ResourceType.Aladdium) return true;
+            Spatial nodeSpatial = node.Spatial;
+            Harvestable harvestable = node.Components.TryGet<Harvestable>();
+            if (!node.IsAlive || nodeSpatial == null || harvestable == null) return false;
+            if (harvestable.Type == ResourceType.Aladdium) return true;
 
-            Unit extractor = world.Entities.GetGroundEntityAt(node.Position) as Unit;
-            return extractor != null
-                && extractor.HasSkill<ExtractAlageneSkill>()
-                && !extractor.IsUnderConstruction
-                && GetDiplomaticStance(extractor.Faction).HasFlag(DiplomaticStance.AlliedVictory);
+            Vector2 location = nodeSpatial.Position;
+            Spatial extractorSpatial = world.SpatialManager.GetGroundGridObstacleAt(Point.Truncate(location));
+            if (extractorSpatial == null) return false;
+
+            Entity extractor = extractorSpatial.Entity;
+            Faction extractorFaction = FactionMembership.GetFaction(extractor);
+
+#warning The AlageneExtractor component should not be present while the BuildProgress component is
+            return extractor.Components.Has<AlageneExtractor>()
+                && !extractor.Components.Has<BuildProgress>()
+                && extractorFaction != null
+                && GetDiplomaticStance(extractorFaction).HasFlag(DiplomaticStance.AlliedVictory);
         }
         #endregion
 
@@ -549,6 +467,12 @@ namespace Orion.Game.Simulation
             DiplomaticStance diplomaticStance;
             return diplomaticStances.TryGetValue(faction, out diplomaticStance)
                 ? diplomaticStance : DiplomaticStance.Enemy;
+        }
+
+        public static bool HaveAlliedVictory(Faction a, Faction b)
+        {
+            return a.GetDiplomaticStance(b).HasFlag(DiplomaticStance.AlliedVictory)
+                && b.GetDiplomaticStance(a).HasFlag(DiplomaticStance.AlliedVictory);
         }
 
         private void OnOtherFactionDiplomaticStanceChanged(Faction source, DiplomaticStance stance)
@@ -624,6 +548,7 @@ namespace Orion.Game.Simulation
                         return true;
                 }
             }
+
             return false;
         }
 
@@ -637,10 +562,10 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(entity, "entity");
 
             // Early out for units of our faction, which we can always see.
-            Unit unit = entity as Unit;
-            if (unit != null && unit.Faction == this) return true;
+            if (FactionMembership.GetFaction(entity) == this) return true;
 
-            return CanSee(entity.GridRegion);
+            Spatial spatial = entity.Spatial;
+            return spatial != null && CanSee(spatial.GridRegion);
         }
 
         /// <summary>
@@ -713,9 +638,15 @@ namespace Orion.Game.Simulation
 
         private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)
         {
-            foreach (Point point in region.Points)
-                if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
-                    localFogOfWar.RevealWithoutRaisingEvent(point);
+            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+            {
+                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                {
+                    Point point = new Point(x, y);
+                    if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
+                        localFogOfWar.RevealWithoutRaisingEvent(point);
+                }
+            }
         }
         #endregion
 
@@ -723,7 +654,6 @@ namespace Orion.Game.Simulation
         {
             return name;
         }
-        #endregion
         #endregion
     }
 }

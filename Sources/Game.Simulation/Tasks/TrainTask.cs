@@ -1,45 +1,33 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A task which causes a unit (typically a building) to create a unit.
+    /// A task which causes an <see cref="Entity"/> (typically a building) to create another <see cref="Entity"/>.
     /// </summary>
     [Serializable]
     public sealed class TrainTask : Task
     {
         #region Fields
-        private readonly UnitType traineeType;
-        private float healthPointsTrained;
-        private bool attemptingToPlaceUnit;
+        private readonly Entity prototype;
+        private float elapsedTime;
+        private bool attemptingToPlaceEntity;
         private bool waitingForEnoughFood;
         #endregion
 
         #region Constructors
-        public TrainTask(Unit trainer, UnitType traineeType)
+        public TrainTask(Entity trainer, Entity prototype)
             : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
-            Argument.EnsureNotNull(traineeType, "traineeType");
-            Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
-            if (trainer.IsUnderConstruction)
-                throw new ArgumentException("Cannot train with an building under construction");
+            Argument.EnsureNotNull(prototype, "prototype");
 
-            if (!trainer.Type.HasSkill<TrainSkill>())
-                throw new ArgumentException("Cannot train without the train skill.", "trainer");
-
-            // Normally we'd check if the train skill supports the trainee type, but as the trainee type
-            // can be a hero, which is not explicitely specified in the skill targets, that check has
-            // been delegated to the TrainCommand level. Please update your bookmarks.
-
-            this.traineeType = traineeType;
+            this.prototype = prototype;
         }
         #endregion
 
@@ -49,17 +37,18 @@ namespace Orion.Game.Simulation.Tasks
             get { return "Training"; }
         }
 
-        public UnitType TraineeType
+        public Entity Prototype
         {
-            get { return traineeType; }
+            get { return prototype; }
         }
         
         public override float Progress
         {
             get
             {
-                int maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
-                return Math.Min(healthPointsTrained / maxHealth, 1);
+                float requiredTime = (float)FactionMembership.GetFaction(Entity)
+                    .GetStat(prototype, Cost.SpawnTimeStat);
+                return Math.Min(elapsedTime / requiredTime, 1);
             }
         }
         #endregion
@@ -67,35 +56,45 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (Unit.Faction.RemainingFoodAmount < Unit.Faction.GetStat(traineeType, BasicSkill.FoodCostStat))
+            if (Entity.Spatial == null
+                || !Entity.Components.Has<Trainer>()
+                || FactionMembership.GetFaction(Entity) == null)
+            {
+                MarkAsEnded();
+                return;
+            }
+
+            Faction faction = FactionMembership.GetFaction(Entity);
+            int foodCost = (int)faction.GetStat(prototype, Cost.FoodStat);
+            if (faction != null && faction.RemainingFoodAmount < foodCost)
             {
                 if (!waitingForEnoughFood)
                 {
                     waitingForEnoughFood = true;
-                    string warning = "Pas assez de nourriture pour entraîner un {0}".FormatInvariant(traineeType.Name);
-                    Faction.RaiseWarning(warning);
+                    string warning = "Pas assez de nourriture pour entraîner un {0}"
+                        .FormatInvariant(prototype.Identity.Name);
+                    faction.RaiseWarning(warning);
                 }
 
                 return;
             }
             waitingForEnoughFood = false;
 
-            int maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
-            if (healthPointsTrained < maxHealth)
-            {
-                float trainingSpeed = Unit.GetStat(TrainSkill.SpeedStat);
-                healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
-                return;
-            }
+            float trainingSpeed = (float)Entity.GetStatValue(Trainer.SpeedStat);
+            elapsedTime += step.TimeDeltaInSeconds * trainingSpeed;
 
-            Unit trainee = TrySpawn(traineeType);
+            float requiredTime = (float)faction.GetStat(prototype, Cost.SpawnTimeStat);
+            if (elapsedTime < requiredTime) return;
+
+            Entity trainee = TrySpawn();
             if (trainee == null)
             {
-                if (!attemptingToPlaceUnit)
+                if (faction != null && !attemptingToPlaceEntity)
                 {
-                    attemptingToPlaceUnit = true;
-                    string warning = "Pas de place pour faire apparaître un {0}".FormatInvariant(traineeType.Name);
-                    Faction.RaiseWarning(warning);
+                    attemptingToPlaceEntity = true;
+                    string warning = "Pas de place pour faire apparaître un {0}"
+                        .FormatInvariant(prototype.Identity.Name);
+                    faction.RaiseWarning(warning);
                 }
                 return;
             }
@@ -105,30 +104,34 @@ namespace Orion.Game.Simulation.Tasks
             MarkAsEnded();
         }
 
-        private Point? TryGetFreeSurroundingSpawnPoint(UnitType spawneeType)
+        private Point? TryGetFreeSurroundingSpawnPoint(Entity spawneePrototype)
         {
-            Argument.EnsureNotNull(spawneeType, "spawneeType");
+            Argument.EnsureNotNull(spawneePrototype, "spawneePrototype");
 
-            Region trainerRegion = Unit.GridRegion;
+            Region trainerRegion = Entity.Spatial.GridRegion;
+
+            Size spawneePrototypeSize = spawneePrototype.Spatial.Size;
 
             Region spawnRegion = new Region(
-                trainerRegion.MinX - spawneeType.Size.Width,
-                trainerRegion.MinY - spawneeType.Size.Height,
-                trainerRegion.Size.Width + spawneeType.Size.Width,
-                trainerRegion.Size.Height + spawneeType.Size.Height);
+                trainerRegion.MinX - spawneePrototypeSize.Width,
+                trainerRegion.MinY - spawneePrototypeSize.Height,
+                trainerRegion.Size.Width + spawneePrototypeSize.Width,
+                trainerRegion.Size.Height + spawneePrototypeSize.Height);
             var potentialSpawnPoints = spawnRegion.InternalBorderPoints
                 .Where(point =>
                 {
-                    Region region = new Region(point, spawneeType.Size);
+                    Region region = new Region(point, spawneePrototypeSize);
+                    CollisionLayer layer = spawneePrototype.Spatial.CollisionLayer;
                     return new Region(World.Size).Contains(region)
-                        && World.IsFree(new Region(point, spawneeType.Size), spawneeType.CollisionLayer);
+                        && World.IsFree(new Region(point, spawneePrototypeSize), layer);
                 });
 
-            if (Unit.HasRallyPoint)
+            Trainer trainer = Entity.Components.Get<Trainer>();
+            if (trainer.HasRallyPoint)
             {
                 return potentialSpawnPoints
                     .Select(point => (Point?)point)
-                    .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint).LengthSquared);
+                    .WithMinOrDefault(point => ((Vector2)point - trainer.RallyPoint.Value).LengthSquared);
             }
             else
             {
@@ -136,44 +139,50 @@ namespace Orion.Game.Simulation.Tasks
             }
         }
 
-        private Unit TrySpawn(UnitType spawneeType)
+        private Entity TrySpawn()
         {
-            Argument.EnsureNotNull(spawneeType, "spawneeType");
-
-            Point? point = TryGetFreeSurroundingSpawnPoint(spawneeType);
+            Point? point = TryGetFreeSurroundingSpawnPoint(prototype);
             if (!point.HasValue) return null;
 
-            Unit spawnee = Unit.Faction.CreateUnit(spawneeType, point.Value);
-            Vector2 traineeDelta = spawnee.Center - Unit.Center;
-            spawnee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
+            Entity spawnee = FactionMembership.GetFaction(Entity).CreateUnit(prototype, point.Value);
+            Vector2 traineeDelta = spawnee.Spatial.Center - Entity.Spatial.Center;
+            spawnee.Spatial.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
 
             return spawnee;
         }
 
-        private void TryApplyRallyPoint(Unit unit)
+        private void TryApplyRallyPoint(Entity entity)
         {
-            if (!Unit.HasRallyPoint) return;
+            Trainer trainer = Entity.Components.Get<Trainer>();
+            if (!trainer.HasRallyPoint) return;
+
+            Vector2 rallyPoint = trainer.RallyPoint.Value;
 
             Task rallyPointTask = null;
             // Check to see if we can harvest automatically
-            if (unit.HasSkill<HarvestSkill>())
+            Harvester harvester = entity.Components.TryGet<Harvester>();
+            if (harvester != null)
             {
-                ResourceNode resourceNode = World.Entities
-                    .Intersecting(Unit.RallyPoint)
-                    .OfType<ResourceNode>()
-                    .FirstOrDefault();
+                Entity resourceNode = World.SpatialManager
+                    .Intersecting(rallyPoint)
+                    .Select(s => s.Entity)
+                    .FirstOrDefault(e => 
+                    {
+                        Harvestable harvestable = e.Components.TryGet<Harvestable>();
+                        return harvestable != null && !harvestable.IsEmpty;
+                    });
 
-                if (resourceNode != null && unit.Faction.CanHarvest(resourceNode))
-                    rallyPointTask = new HarvestTask(unit, resourceNode);
+                if (resourceNode != null && harvester.CanHarvest(resourceNode))
+                    rallyPointTask = new HarvestTask(entity, resourceNode);
             }
             
             if (rallyPointTask == null)
             {
-                Point targetPoint = (Point)Unit.RallyPoint;
-                rallyPointTask = new MoveTask(unit, targetPoint);
+                Point targetPoint = (Point)rallyPoint;
+                rallyPointTask = new MoveTask(entity, targetPoint);
             }
 
-            unit.TaskQueue.OverrideWith(rallyPointTask);
+            entity.Components.Get<TaskQueue>().OverrideWith(rallyPointTask);
         }
         #endregion
     }

@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation.Technologies;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which causes a <see cref="Unit"/>
+    /// A <see cref="Task"/> which causes a <see cref="Entity"/>
     /// </summary>
     public sealed class ResearchTask : Task
     {
@@ -17,19 +18,32 @@ namespace Orion.Game.Simulation.Tasks
         private const float researchTimeInSeconds = 5;
 
         private readonly Technology technology;
+        private readonly Faction faction;
         private float timeElapsed;
         #endregion
 
         #region Constructors
-        public ResearchTask(Unit researcher, Technology technology)
+        public ResearchTask(Entity researcher, Technology technology)
             : base(researcher)
         {
+            Argument.EnsureNotNull(technology, "technology");
+
+            if (!researcher.Components.Has<Researcher>())
+                throw new ArgumentException("Cannot research without the researcher component.", "researcher");
+
+            this.faction = FactionMembership.GetFaction(researcher);
+            if (faction == null)
+                throw new ArgumentException("Cannot research without a faction.", "researcher");
+
             this.technology = technology;
-            researcher.Faction.BeginResearch(technology);
+            faction.BeginResearch(technology);
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="Technology"/> being researched.
+        /// </summary>
         public Technology Technology
         {
             get { return technology; }
@@ -49,17 +63,24 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            if (FactionMembership.GetFaction(Entity) != faction || !Entity.Components.Has<Researcher>())
+            {
+                faction.CancelResearch(technology);
+                MarkAsEnded();
+                return;
+            }
+
             timeElapsed += step.TimeDeltaInSeconds;
             if (timeElapsed >= researchTimeInSeconds)
             {
-                Unit.Faction.CompleteResearch(technology);
+                faction.CompleteResearch(technology);
                 MarkAsEnded();
             }
         }
 
         public override void Dispose()
         {
-            if (!HasEnded) Unit.Faction.CancelResearch(technology);
+            if (!HasEnded) faction.CancelResearch(technology);
         }
         #endregion
     }

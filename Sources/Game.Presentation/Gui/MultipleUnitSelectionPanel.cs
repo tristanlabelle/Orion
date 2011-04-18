@@ -16,7 +16,7 @@ namespace Orion.Game.Presentation.Gui
         #region Fields
         private readonly GameGraphics graphics;
         private readonly WrapLayout wrap;
-        private readonly Stack<UnitButton> unusedButtons = new Stack<UnitButton>();
+        private readonly Stack<EntityButton> unusedButtons = new Stack<EntityButton>();
         #endregion
 
         #region Constructors
@@ -37,52 +37,52 @@ namespace Orion.Game.Presentation.Gui
 
         #region Events
         /// <summary>
-        /// Raised when the selection should change to a specific unit.
+        /// Raised when the selection should change to a specific <see cref="Entity"/>.
         /// </summary>
-        public event Action<MultipleUnitSelectionPanel, Unit> UnitSelected;
+        public event Action<MultipleUnitSelectionPanel, Entity> EntityFocused;
 
         /// <summary>
-        /// Raised when a unit should be removed from the selection.
+        /// Raised when a <see cref="Entity"/> should be removed from the selection.
         /// </summary>
-        public event Action<MultipleUnitSelectionPanel, Unit> UnitDeselected;
+        public event Action<MultipleUnitSelectionPanel, Entity> EntityDeselected;
         #endregion
 
         #region Methods
         /// <summary>
-        /// Clears all units from this panel.
+        /// Clears all <see cref="Entity">entities</see> from this panel.
         /// </summary>
-        public void ClearUnits()
+        public void ClearEntities()
         {
             while (wrap.Children.Count > 0)
             {
-                UnitButton button = (UnitButton)wrap.Children[wrap.Children.Count - 1];
-                button.Unit = null;
+                EntityButton button = (EntityButton)wrap.Children[wrap.Children.Count - 1];
+                button.Entity = null;
                 wrap.Children.RemoveAt(wrap.Children.Count - 1);
                 unusedButtons.Push(button);
             }
         }
 
         /// <summary>
-        /// Sets the units to be displayed by this panel.
+        /// Sets the <see cref="Entity">entities</see> to be displayed by this panel.
         /// </summary>
-        /// <param name="units">The units to be displayed.</param>
-        public void SetUnits(IEnumerable<Unit> units)
+        /// <param name="entities">The <see cref="Entity">entities</see> to be displayed.</param>
+        public void SetEntities(IEnumerable<Entity> entities)
         {
-            Argument.EnsureNotNull(units, "units");
+            Argument.EnsureNotNull(entities, "units");
 
-            foreach (Unit unit in units)
+            foreach (Entity entity in entities)
             {
-                if (unit == null) throw new ArgumentException("units");
+                if (entity == null) throw new ArgumentException("entities");
 
-                UnitButton button = GetButton();
-                button.Unit = unit;
+                EntityButton button = GetButton();
+                button.Entity = entity;
                 wrap.Children.Add(button);
             }
         }
 
-        private UnitButton GetButton()
+        private EntityButton GetButton()
         {
-            return unusedButtons.Count > 0 ? unusedButtons.Pop() : new UnitButton(this);
+            return unusedButtons.Count > 0 ? unusedButtons.Pop() : new EntityButton(this);
         }
         #endregion
     }

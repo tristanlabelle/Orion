@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>TristansHouse</Name>
+		<HotKey>R</HotKey>
+		<IsBuilding>True</IsBuilding>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>150</Aladdium>
+		<Alagene>50</Alagene>
+		<SpawnTime>200</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Researcher>
+		<Technologies>
+			<Item>SwiftSmurf</Item>
+			<Item>ImportJeanMarc</Item>
+			<Item>HolyTrinity</Item>
+			<Item>HeftySmurf</Item>
+			<Item>SpaghettiAlfredo</Item>
+			<Item>IslamForce</Item>
+			<Item>Pandemic</Item>
+		</Technologies>
+	</Researcher>
+	
+	<Trainer>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>DietCoke</Item>
+			<Item>Mentos</Item>
+		</TrainableTypes>
+	</Trainer>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>200</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
+</Entity>

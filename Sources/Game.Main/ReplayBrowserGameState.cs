@@ -39,11 +39,11 @@ namespace Orion.Game.Main
             		.Select(filePath => Path.GetFileNameWithoutExtension(filePath))
             		.OrderBy(name => name);
                 foreach (string replayName in replayNames) this.ui.AddReplay(replayName);
-            }
+        }
             catch (DirectoryNotFoundException)
-            {
+        {
             	// This happens if no replay has been saved.
-            }
+        }
             catch (IOException exception)
             {
             	Debug.Fail("Unexpected exception while attempting to enumerate replays: \n" + exception.ToString());
@@ -68,9 +68,9 @@ namespace Orion.Game.Main
             OnEntered();
         }
 
-        protected internal override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(TimeSpan timeDelta)
         {
-            Graphics.UpdateGui(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDelta);
         }
 
         protected internal override void Draw(GameGraphics Graphics)
@@ -117,7 +117,7 @@ namespace Orion.Game.Main
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
             }
 
-            generator.PrepareWorld(world, match.UnitTypes);
+            generator.PrepareWorld(world, match.Prototypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

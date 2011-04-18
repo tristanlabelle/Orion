@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Pyramid</Name>
+		<HotKey>P</HotKey>
+		<IsBuilding>True</IsBuilding>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>250</Aladdium>
+		<SpawnTime>400</SpawnTime>
+	</Cost>
+	
+	<FactionMembership>
+		<ProvidedFood>10</ProvidedFood>
+	</FactionMembership>
+	
+	<Trainer>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>Smurf</Item>
+		</TrainableTypes>
+	</Trainer>
+	
+	<ResourceDepot/>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>400</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>4</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
+</Entity>

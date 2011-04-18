@@ -6,7 +6,7 @@ using Orion.Game.Simulation;
 namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
-    /// Provides the buttons to build each <see cref="UnitType"/> that is supported by a builder unit.
+    /// Provides the buttons to build each <see cref="Entity"/> that is supported by a builder unit.
     /// </summary>
     public sealed class UpgradeActionProvider : IActionProvider
     {
@@ -14,23 +14,23 @@ namespace Orion.Game.Presentation.Actions
         private readonly ActionPanel actionPanel;
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
-        private readonly UnitType unitType;
+        private readonly Entity prototype;
         private readonly ActionDescriptor[,] buttons = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
         public UpgradeActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
-            GameGraphics graphics, UnitType unitType)
+            GameGraphics graphics, Entity prototype)
         {
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(graphics, "graphics");
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(prototype, "prototype");
 
             this.actionPanel = actionPanel;
             this.inputManager = inputManager;
             this.graphics = graphics;
-            this.unitType = unitType;
+            this.prototype = prototype;
 
             CreateButtons();
         }
@@ -58,18 +58,18 @@ namespace Orion.Game.Presentation.Actions
             int x = 0;
             int y = 3;
 
-            foreach (UnitTypeUpgrade upgrade in unitType.Upgrades.Where(u => !u.IsFree))
+            foreach (EntityUpgrade upgrade in prototype.Identity.Upgrades.Where(u => !u.IsFree))
             {
-                UnitType targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
-                if (targetType == null) continue;
+                Entity targetPrototype = inputManager.Match.Prototypes.FromName(upgrade.Target);
+                if (targetPrototype == null) continue;
 
                 buttons[x, y] = new ActionDescriptor()
-	            {
+                {
                     Name = upgrade.Target,
                     Cost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost),
-	            	Texture = graphics.GetUnitTexture(targetType),
-	            	Action = () => inputManager.LaunchUpgrade(targetType)
-	            };
+                    Texture = graphics.GetEntityTexture(targetPrototype),
+                    Action = () => inputManager.LaunchUpgrade(targetPrototype)
+                };
 
                 x++;
                 if (x == 4)

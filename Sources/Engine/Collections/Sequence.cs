@@ -153,6 +153,23 @@ namespace Orion.Engine.Collections
         #endregion
         #endregion
 
+        #region AddRange
+        /// <summary>
+        /// Adds each items from a sequence to a collection.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the collection.</typeparam>
+        /// <typeparam name="U">The type of the items in the sequence.</typeparam>
+        /// <param name="collection">The sequence to which items should be added.</param>
+        /// <param name="items">The items to be added.</param>
+        public static void AddRange<T, U>(this ICollection<T> collection, IEnumerable<U> items) where U : T
+        {
+            Argument.EnsureNotNull(collection, "collection");
+            Argument.EnsureNotNull(items, "items");
+
+            foreach (T item in items) collection.Add(item);
+        }
+        #endregion
+
         #region RemoveLast
         /// <summary>
         /// Removes the last item from a given list.
@@ -754,6 +771,22 @@ namespace Orion.Engine.Collections
                 TElement firstElement = enumerator.Current;
                 return firstElement == null ? int.MaxValue : firstElement.GetHashCode();
             }
+        }
+        #endregion
+
+        #region Non-Deferred
+        /// <summary>
+        /// Accumulates the results from a sequence into a buffer so subsequent
+        /// operations are not deferred.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the sequence.</typeparam>
+        /// <param name="sequence">The sequence to be buffered.</param>
+        /// <returns>The resulting non-deferred sequence.</returns>
+        public static IEnumerable<T> NonDeferred<T>(this IEnumerable<T> sequence)
+        {
+            Argument.EnsureNotNull(sequence, "sequence");
+
+            return new ChunkList<T>(sequence);
         }
         #endregion
         #endregion

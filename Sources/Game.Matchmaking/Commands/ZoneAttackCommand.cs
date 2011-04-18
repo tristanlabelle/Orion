@@ -8,11 +8,12 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
+    /// A <see cref="Command"/> which causes one or many <see cref="Entity"/>s
     /// to move to a location and attack enemies on their way.
     /// </summary>
     public sealed class ZoneAttackCommand : Command
@@ -65,8 +66,8 @@ namespace Orion.Game.Matchmaking.Commands
 
             foreach (Handle attackerHandle in attackerHandles)
             {
-                Unit attacker = (Unit)match.World.Entities.FromHandle(attackerHandle);
-                attacker.TaskQueue.Enqueue(new ZoneAttackTask(attacker, destination));
+                Entity attacker = match.World.Entities.FromHandle(attackerHandle);
+                attacker.Components.Get<TaskQueue>().Enqueue(new ZoneAttackTask(attacker, destination));
             }
         }
 

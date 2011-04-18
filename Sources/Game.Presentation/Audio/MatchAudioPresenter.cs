@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
@@ -10,7 +9,7 @@ using Orion.Engine.Geometry;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Utilities;
 
 namespace Orion.Game.Presentation.Audio
@@ -30,7 +29,7 @@ namespace Orion.Game.Presentation.Audio
         /// </summary>
         private readonly HashSet<Entity> previousSelection = new HashSet<Entity>();
 
-        private readonly Action<Unit> buildingConstructionCompletedEventHandler;
+        private readonly Dictionary<string, int> tempTemplateCounts = new Dictionary<string, int>();
 
         private bool isGameStarted;
         private bool hasExplosionOccuredInFrame;
@@ -44,16 +43,15 @@ namespace Orion.Game.Presentation.Audio
 
             this.audio = audio;
             this.userInputManager = userInputManager;
-            this.buildingConstructionCompletedEventHandler = OnBuildingConstructionCompleted;
 
             this.userInputManager.UnderAttackMonitor.Warning += OnUnderAttackWarning;
             this.World.EntityAdded += OnEntityAdded;
-            this.World.EntityRemoved += OnEntityRemoved;
             this.World.EntityDied += OnEntityDied;
-            this.World.UnitHitting += OnUnitHitting;
+            this.World.HitOccured += OnUnitHitting;
+            this.World.BuildingConstructed += OnBuildingConstructed;
+            this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.World.Updated += OnWorldUpdated;
             this.World.ExplosionOccured += OnExplosionOccured;
-            this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.userInputManager.LocalCommander.CommandIssued += OnCommandIssued;
         }
         #endregion
@@ -109,50 +107,35 @@ namespace Orion.Game.Presentation.Audio
         {
             if (!isGameStarted) return;
 
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-            
-            if (unit.Type.Name == "Chuck Norris")
+            Identity identity = entity.Identity;
+            if (identity.Name == "Chuck Norris")
             {
                 audio.PlayUISound("Chuck Norris.Spawn");
                 return;
             }
 
-            if (unit.Faction != LocalFaction) return;
+            Faction faction = FactionMembership.GetFaction(entity);
+            if (faction != LocalFaction) return;
 
-            if (unit.IsBuilding && unit.IsUnderConstruction)
+            if (entity.Components.Has<BuildProgress>())
             {
-                unit.ConstructionCompleted += OnBuildingConstructionCompleted;
-                audio.PlaySfx("UnderConstruction", unit.Center);
+                audio.PlaySfx("UnderConstruction", entity.Center);
                 return;
             }
 
-            string soundName = audio.GetUnitSoundName(unit.Type, "Select");
-            audio.PlaySfx(soundName, unit.Center);
+            string soundName = audio.GetUnitSoundName(entity, "Select");
+            Spatial spatial = entity.Spatial;
+            audio.PlaySfx(soundName, spatial.Center);
         }
 
-        private void OnEntityDied(World arg1, Entity arg2)
+        private void OnEntityDied(World world, Entity entity)
         {
-            Unit unit = arg2 as Unit;
-            if (unit == null) return;
-
-            string soundName = audio.GetUnitSoundName(unit.Type, "Die");
-            audio.PlaySfx(soundName, unit.Center);
-        }
-
-        private void OnEntityRemoved(World sender, Entity entity)
-        {
-            Unit unit = entity as Unit;
-            if (unit != null && unit.Faction == LocalFaction && unit.IsUnderConstruction)
-                unit.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
-        }
-
-        private void OnBuildingConstructionCompleted(Unit building)
-        {
-            building.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
-
-            string soundName = audio.GetUnitSoundName(building.Type, "Select");
-            audio.PlaySfx(soundName, building.Center);
+            Spatial spatial = entity.Spatial;
+            if (spatial != null)
+            {
+                string soundName = audio.GetUnitSoundName(entity, "Die");
+                audio.PlaySfx(soundName, spatial.Center);
+            }
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)
@@ -168,40 +151,52 @@ namespace Orion.Game.Presentation.Audio
             }
         }
 
+        private string GetLeadingTemplate(IEnumerable<Entity> entities)
+        {
+            // Find the most frequent entity prototype in the newly selected entities.
+            tempTemplateCounts.Clear();
+            foreach (Entity entity in entities)
+            {
+                if (previousSelection.Contains(entity)) continue;
+
+                Identity identity = entity.Identity;
+                if (identity == null || identity.SoundIdentity == null) continue;
+
+                int count = 0;
+                tempTemplateCounts.TryGetValue(identity.SoundIdentity, out count);
+                tempTemplateCounts[identity.SoundIdentity] = count + 1;
+            }
+            if (tempTemplateCounts.Count == 0) return null;
+
+            var maxEntry = tempTemplateCounts
+                .WithMaxOrDefault(entry => entry.Value);
+
+            tempTemplateCounts.Clear();
+
+            return maxEntry.Key;
+        }
+
         private void OnSelectionChanged(Selection sender)
         {
-            if (sender.Type != SelectionType.Units)
-            {
-                previousSelection.Clear();
-                return;
-            }
-
-            // Find the most frequent unit type in the newly selected units.
-            var unitTypeGroup = sender.Except(previousSelection)
-                .Cast<Unit>()
-                .GroupBy(unit => unit.Type)
-                .WithMaxOrDefault(group => group.Count());
-
-            UnitType unitType = unitTypeGroup == null ? null : unitTypeGroup.Key;
+            string template = GetLeadingTemplate(sender);
 
             previousSelection.Clear();
             previousSelection.UnionWith(sender);
 
-            if (unitType == null) return;
+            if (template == null) return;
 
-            string soundName = audio.GetUnitSoundName(unitType, "Select");
-            audio.PlayUISound(soundName);
+            audio.PlayUISound(template + ".Select");
         }
 
         private void OnCommandIssued(Commander sender, Command args)
         {
             Debug.Assert(args != null);
 
-            UnitType unitType = userInputManager.SelectionManager.FocusedUnitType;
-            if (unitType == null) return;
+            Entity prototype = userInputManager.SelectionManager.FocusedPrototype;
+            if (prototype == null) return;
 
             string commandName = args.GetType().Name.Replace("Command", string.Empty);
-            string soundName = audio.GetUnitSoundName(unitType, commandName);
+            string soundName = audio.GetUnitSoundName(prototype, commandName);
             audio.PlayUISound(soundName);
         }
 
@@ -210,18 +205,25 @@ namespace Orion.Game.Presentation.Audio
             bool isVisible = LocalFaction.CanSee(args.Hitter) || LocalFaction.CanSee(args.Target);
             if (!isVisible) return;
 
-            bool isMelee = args.Hitter.GetStat(AttackSkill.RangeStat) == 0;
+            bool isMelee = args.Hitter.Components.Get<Attacker>().IsMelee;
             string soundName = isMelee ? "MeleeAttack" : "RangeAttack";
 
             audio.PlaySfx(soundName, args.Hitter.Center);
         }
 
+        private void OnBuildingConstructed(World world, Entity building)
+        {
+            if (FactionMembership.GetFaction(building) != LocalFaction) return;
+
+            string soundName = audio.GetUnitSoundName(building, "Select");
+            audio.PlaySfx(soundName, building.Center);
+        }
+
         private void OnUnderAttackWarning(UnderAttackMonitor sender, Vector2 position)
         {
-            bool isNearBase = World.Entities
+            bool isNearBase = World.SpatialManager
                 .Intersecting(new Circle(position, 6))
-                .OfType<Unit>()
-                .Any(unit => unit.IsBuilding && unit.Faction == LocalFaction);
+                .Any(spatial => spatial.Entity.Identity.IsBuilding && FactionMembership.GetFaction(spatial.Entity) == LocalFaction);
 
             string soundName = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
             audio.PlayUISound(soundName);

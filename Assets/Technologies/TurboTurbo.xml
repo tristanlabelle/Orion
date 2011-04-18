@@ -7,6 +7,6 @@
   <Target>DemonicTemple</Target>
   <Target>PropagandaCenter</Target>
   <Target>TristansHous</Target>
-  <Effect Stat="Build.Speed" Change="150"/>
-  <Effect Stat="Train.Speed" Change="100"/>
+  <Effect Stat="Builder.Speed" Delta="150"/>
+  <Effect Stat="Trainer.Speed" Delta="100"/>
 </Technology>

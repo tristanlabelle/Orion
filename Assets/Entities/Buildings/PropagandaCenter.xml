@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>PropagandaCenter</Name>
+		<HotKey>C</HotKey>
+		<IsBuilding>True</IsBuilding>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>125</Aladdium>
+		<Alagene>200</Alagene>
+		<SpawnTime>200</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Trainer>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>Jedihad</Item>
+			<Item>Jesus</Item>
+			<Item>FlyingSpaghettiMonster</Item>
+			<Item>TvaHelicopter</Item>
+		</TrainableTypes>
+	</Trainer>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>200</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
+</Entity>

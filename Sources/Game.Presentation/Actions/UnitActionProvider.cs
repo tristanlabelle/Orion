@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Localization;
-using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Technologies;
 using Key = OpenTK.Input.Key;
 
@@ -20,25 +16,26 @@ namespace Orion.Game.Presentation.Actions
         private readonly UserInputManager userInputManager;
         private readonly GameGraphics graphics;
         private readonly Localizer localizer;
-        private readonly UnitType unitType;
+        private readonly Entity prototype;
         private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
         public UnitActionProvider(ActionPanel actionPanel, UserInputManager userInputManager,
-            GameGraphics graphics, Localizer localizer, UnitType unitType)
+            GameGraphics graphics, Localizer localizer, Entity prototype)
         {
+            Argument.EnsureNotNull(prototype, "unitType");
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(userInputManager, "userInputManager");
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(localizer, "localizer");
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(prototype, "prototype");
             
             this.actionPanel = actionPanel;
             this.userInputManager = userInputManager;
             this.graphics = graphics;
             this.localizer = localizer;
-            this.unitType = unitType;
+            this.prototype = prototype;
 
             CreateButtons();
         }
@@ -63,7 +60,7 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            if (unitType.HasSkill<AttackSkill>())
+            if (prototype.Components.Has<Attacker>())
             {
                 actions[2, 3] = new ActionDescriptor()
                 {
@@ -78,9 +75,9 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<BuildSkill>())
+            if (prototype.Components.Has<Builder>())
             {
-                var buildActionProvider = new BuildActionProvider(actionPanel, userInputManager, graphics, localizer, unitType);
+                var buildActionProvider = new BuildActionProvider(actionPanel, userInputManager, graphics, localizer, prototype);
                 actions[0, 0] = new ActionDescriptor()
                 {
                     Name = localizer.GetNoun("Build"),
@@ -102,18 +99,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<TransportSkill>())
-            {
-                actions[3, 0] = new ActionDescriptor()
-                {
-                    Name = localizer.GetNoun("Disembark"),
-                    Texture = graphics.GetActionTexture("Disembark"),
-                    HotKey = Key.D,
-                    Action = () => userInputManager.LaunchDisembark()
-                };
-            }
-
-            if (unitType.HasSkill<HarvestSkill>())
+            if (prototype.Components.Has<Harvester>())
             {
                 actions[1, 2] = new ActionDescriptor()
                 {
@@ -128,7 +114,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<HealSkill>())
+            if (prototype.Components.Has<Healer>())
             {
                 actions[3, 2] = new ActionDescriptor()
                 {
@@ -143,7 +129,28 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<MoveSkill>())
+            if (prototype.Components.Has<Transporter>())
+            {
+                actions[2, 2] = new ActionDescriptor()
+                {
+                    Name = localizer.GetNoun("Load"),
+                    Texture = graphics.GetActionTexture("Load"),
+                    HotKey = Key.L,
+                    Action = () =>
+                    {
+                        userInputManager.SelectedCommand = new LoadUserCommand(userInputManager);
+                    }
+                };
+                actions[2, 3] = new ActionDescriptor()
+                {
+                    Name = localizer.GetNoun("Unload"),
+                    Texture = graphics.GetActionTexture("Unload"),
+                    HotKey = Key.K,
+                    Action = () => userInputManager.LaunchUnload()
+                };
+            }
+
+            if (prototype.Components.Has<Mobile>())
             {
                 actions[0, 3] = new ActionDescriptor()
                 {
@@ -158,7 +165,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<SellableSkill>())
+            if (prototype.Components.Has<Sellable>())
             {
                 actions[3, 0] = new ActionDescriptor()
                 {
@@ -168,7 +175,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<AttackSkill>() && unitType.HasSkill<MoveSkill>())
+            if (prototype.Components.Has<Attacker>() && prototype.Components.Has<Mobile>())
             {
                 actions[3, 3] = new ActionDescriptor()
                 {
@@ -179,13 +186,13 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Upgrades.Any(u => !u.IsFree))
+            if (prototype.Identity.Upgrades.Any(u => !u.IsFree))
             {
                 actions[2, 0] = new ActionDescriptor()
                 {
                     Name = localizer.GetNoun("Upgrade"),
                     Texture = graphics.GetActionTexture("Upgrade"),
-                    Action = () => actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, unitType))
+                    Action = () => actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, prototype))
                 };
             }
 
@@ -195,42 +202,44 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateTrainButtons()
         {
-            TrainSkill trainSkill = unitType.TryGetSkill<TrainSkill>();
-            if (trainSkill == null) return;
+            Trainer trainer = prototype.Components.TryGet<Trainer>();
+            if (trainer == null) return;
 
-            var traineeTypes = userInputManager.Match.UnitTypes
-                .Where(traineeType => trainSkill.Supports(traineeType))
-                .OrderBy(traineeType => traineeType.GetBaseStat(BasicSkill.AladdiumCostStat) + traineeType.GetBaseStat(BasicSkill.AlageneCostStat));
+            var traineePrototypes = userInputManager.Match.Prototypes
+                .Where(traineeType => trainer.Supports(traineeType))
+                .OrderBy(traineeType => (int)traineeType.GetStatValue(Cost.AladdiumStat)
+                    + (int)traineeType.GetStatValue(Cost.AlageneStat));
 
-            foreach (UnitType traineeType in traineeTypes)
+            foreach (Entity traineePrototype in traineePrototypes)
             {
                 Point point = FindUnusedButton();
 
-                int aladdiumCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
-                int alageneCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
-                int foodCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.FoodCostStat);
+                int aladdiumCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Cost.AladdiumStat);
+                int alageneCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Cost.AlageneStat);
+                int foodCost = (int)userInputManager.LocalFaction.GetStat(traineePrototype, Cost.FoodStat);
 
-                UnitType traineeTypeForClosure = traineeType;
+                Entity traineePrototypeForClosure = traineePrototype;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    Name = localizer.GetNoun(traineeType.Name),
+                    Name = localizer.GetNoun(traineePrototype.Identity.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
-                    Texture = graphics.GetUnitTexture(traineeType),
-                    Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
+                    HotKey = traineePrototype.Identity.HotKey,
+                    Texture = graphics.GetEntityTexture(traineePrototype),
+                    Action = () => userInputManager.LaunchTrain(traineePrototypeForClosure)
                 };
             }
         }
 
         private void CreateResearchButtons()
         {
-            ResearchSkill researchSkill = unitType.TryGetSkill<ResearchSkill>();
-            if (researchSkill == null) return;
+            Researcher researcher = prototype.Components.TryGet<Researcher>();
+            if (researcher == null) return;
 
-            var technologies = userInputManager.Match.TechnologyTree.Technologies
-                .Where(tech => userInputManager.LocalFaction.IsResearchable(tech) && researchSkill.Supports(tech));
-
-            foreach (Technology technology in technologies)
+            foreach (Technology technology in userInputManager.Match.TechnologyTree.Technologies)
             {
+                if (!userInputManager.LocalFaction.IsResearchable(technology) || !researcher.Supports(technology))
+                    continue;
+
                 Point point = FindUnusedButton();
                 Technology technologyForClosure = technology;
                 actions[point.X, point.Y] = new ActionDescriptor()
@@ -264,7 +273,7 @@ namespace Orion.Game.Presentation.Actions
         {
             for (int y = 0; y < actions.GetLength(1); ++y)
                 for (int x = 0; x < actions.GetLength(0); ++x)
-                        actions[x, y] = null;
+                    actions[x, y] = null;
         }
         #endregion
     }

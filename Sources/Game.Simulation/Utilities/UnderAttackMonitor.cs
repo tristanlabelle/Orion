@@ -7,6 +7,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Utilities
 {
@@ -19,12 +20,12 @@ namespace Orion.Game.Simulation.Utilities
         private struct Entry
         {
             #region Fields
-            public readonly float SpawnTime;
+            public readonly TimeSpan SpawnTime;
             public readonly Vector2 Position;
             #endregion
 
             #region Constructors
-            public Entry(float spawnTime, Vector2 position)
+            public Entry(TimeSpan spawnTime, Vector2 position)
             {
                 this.SpawnTime = spawnTime;
                 this.Position = position;
@@ -35,11 +36,10 @@ namespace Orion.Game.Simulation.Utilities
 
         #region Fields
         private const float warningRadius = 10;
-        private const float warningLifeSpan = 30;
+        private static readonly TimeSpan warningLifeSpan = TimeSpan.FromSeconds(30);
 
         private readonly Faction faction;
         private readonly Queue<Entry> entries = new Queue<Entry>();
-        private float time;
         #endregion
 
         #region Constructors
@@ -48,8 +48,7 @@ namespace Orion.Game.Simulation.Utilities
             Argument.EnsureNotNull(faction, "faction");
 
             this.faction = faction;
-            this.faction.World.UnitHitting += OnWorldUnitHit;
-            this.faction.World.Updated += OnWorldUpdated;
+            this.faction.World.HitOccured += OnWorldUnitHit;
         }
         #endregion
 
@@ -65,45 +64,36 @@ namespace Orion.Game.Simulation.Utilities
         {
             get { return faction; }
         }
+
+        private TimeSpan SimulationTime
+        {
+            get { return faction.World.SimulationTime; }
+        }
         #endregion
 
         #region Methods
-        private void Update(SimulationStep step)
-        {
-            time = step.TimeInSeconds;
-
-            while (entries.Count > 0 && (step.TimeInSeconds - entries.Peek().SpawnTime) >= warningLifeSpan)
-                entries.Dequeue();
-        }
-
-        private void AddWarning(Vector2 position)
-        {
-            if (entries.Any(w => (w.Position - position).LengthFast < warningRadius))
-                return;
-
-            Entry entry = new Entry(time, position);
-            entries.Enqueue(entry);
-
-            if (Warning != null) Warning(this, position);
-        }
-
         private void OnWorldUnitHit(World sender, HitEventArgs args)
         {
             Debug.Assert(sender == faction.World);
             Debug.Assert(args.Hitter != null);
             Debug.Assert(args.Target != null);
 
-            if (args.Hitter.Faction == faction) return;
-            if (args.Target.Faction != faction) return;
+            if (FactionMembership.GetFaction(args.Hitter) == faction) return;
+            if (FactionMembership.GetFaction(args.Target) != faction) return;
 
-            AddWarning(args.Target.Center);
+            AddWarning(args.Target.Spatial.Center);
         }
 
-        private void OnWorldUpdated(World sender, SimulationStep step)
+        private void AddWarning(Vector2 position)
         {
-            Debug.Assert(sender == faction.World);
+            while (entries.Count > 0 && (SimulationTime - entries.Peek().SpawnTime) >= warningLifeSpan)
+                entries.Dequeue();
 
-            Update(step);
+            if (entries.Any(w => (w.Position - position).LengthFast < warningRadius)) return;
+
+            entries.Enqueue(new Entry(SimulationTime, position));
+
+            Warning.Raise(this, position);
         }
         #endregion
     }

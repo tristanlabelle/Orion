@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
@@ -6,28 +7,31 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
+using System.Diagnostics;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
     public sealed class BuildUserCommand : UserInputCommand, IRenderableUserCommand
     {
         #region Fields
-        private readonly UnitType buildingType;
+        private readonly Entity prototype;
         private readonly Texture texture;
         private Point? minLocation;
         #endregion
 
         #region Constructors
         public BuildUserCommand(UserInputManager inputManager, GameGraphics gameGraphics,
-            UnitType buildingType)
+            Entity prototype)
             : base(inputManager)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
-            Argument.EnsureNotNull(buildingType, "buildingType");
+            Argument.EnsureNotNull(prototype, "prototype");
 
-            this.buildingType = buildingType;
-            this.texture = gameGraphics.GetUnitTexture(buildingType);
+            this.prototype = prototype;
+            this.texture = gameGraphics.GetEntityTexture(prototype);
+
+            Debug.Assert(prototype.Components.Has<Spatial>(), "Cannot position a building without a spatial component.");
         }
         #endregion
 
@@ -38,28 +42,33 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             {
                 if (!minLocation.HasValue) return false;
 
-                int aladdiumCost = LocalFaction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
-                int alageneCost = LocalFaction.GetStat(buildingType, BasicSkill.AlageneCostStat);
+                int aladdiumCost = (int)LocalFaction.GetStat(prototype, Cost.AladdiumStat);
+                int alageneCost = (int)LocalFaction.GetStat(prototype, Cost.AlageneStat);
+
+                Region region = new Region(minLocation.Value, prototype.Spatial.Size);
                 if (aladdiumCost > LocalFaction.AladdiumAmount
-                    || alageneCost > LocalFaction.AlageneAmount)
+                    || alageneCost > LocalFaction.AlageneAmount
+                    || !LocalFaction.HasFullySeen(region))
                     return false;
 
-                Region region = new Region(minLocation.Value, buildingType.Size);
-                if (!Match.CanBuild(region))
-                    return false;
-
-                if (!LocalFaction.HasFullySeen(region))
-                    return false;
-
-                if (!buildingType.HasSkill<ExtractAlageneSkill>())
+                if (!prototype.Components.Has<AlageneExtractor>())
                     return true;
 
                 // Special case for alagene extractors:
                 // They can only be build on alagene nodes.
-                return World.Entities
-                    .Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One))
-                    .OfType<ResourceNode>()
-                    .Any(node => node.Type == ResourceType.Alagene && (Point)node.Position == minLocation.Value);
+                foreach (Spatial entitySpatial in World.SpatialManager.Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One)))
+                {
+                    Entity entity = entitySpatial.Entity;
+                    Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+                    if (harvestable != null
+                        && harvestable.Type == ResourceType.Alagene
+                        && entitySpatial.Position == minLocation.Value)
+                    {
+                        return true;
+                    }
+                }
+                
+                return false;
             }
         }
         #endregion
@@ -75,23 +84,25 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             OnMouseMoved(location);
             if (!IsLocationValid) return;
 
-            InputManager.LaunchBuild(minLocation.Value, buildingType);
+            InputManager.LaunchBuild(minLocation.Value, prototype);
         }
 
         private Point GetMinLocation(Vector2 location)
         {
-            int minX = (int)Math.Round(location.X - buildingType.Width * 0.5f);
-            int minY = (int)Math.Round(location.Y - buildingType.Height * 0.5f);
+            Size size = prototype.Spatial.Size;
+
+            int minX = (int)Math.Round(location.X - size.Width * 0.5f);
+            int minY = (int)Math.Round(location.Y - size.Height * 0.5f);
 
             if (minX < 0)
                 minX = 0;
-            else if (minX >= World.Width - buildingType.Width)
-                minX = World.Width - buildingType.Width;
+            else if (minX >= World.Width - size.Width)
+                minX = World.Width - size.Width;
 
             if (minY < 0)
                 minY = 0;
-            else if (minY >= World.Height - buildingType.Height)
-                minY = World.Height - buildingType.Height;
+            else if (minY >= World.Height - size.Height)
+                minY = World.Height - size.Height;
 
             return new Point(minX, minY);
         }
@@ -100,10 +111,11 @@ namespace Orion.Game.Presentation.Actions.UserCommands
         {
             if (!minLocation.HasValue) return;
 
+            Size size = prototype.Spatial.Size;
             ColorRgb tint = IsLocationValid ? Colors.LightBlue : Colors.Red;
             Rectangle rectangle = new Rectangle(
                 minLocation.Value.X, minLocation.Value.Y,
-                buildingType.Width, buildingType.Height);
+                size.Width, size.Height);
             context.Fill(rectangle, tint.ToRgba(0.4f));
             context.Fill(rectangle, texture, tint);
         }

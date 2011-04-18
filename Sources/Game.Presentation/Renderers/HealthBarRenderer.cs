@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -23,38 +24,49 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Methods
-        public static void Draw(GraphicsContext context, Unit unit)
+        public static void Draw(GraphicsContext context, Entity entity)
         {
-            float healthbarWidth = (float)Math.Log(unit.MaxHealth);
-            Rectangle unitBoundingRectangle = unit.BoundingRectangle;
+            Spatial spatial = entity.Spatial;
+            Health health = entity.Components.TryGet<Health>();
+            if (spatial == null || health == null) return;
+            
+            float healthbarWidth = (float)Math.Log((int)entity.GetStatValue(Health.MaxValueStat));
+            Rectangle unitBoundingRectangle = spatial.BoundingRectangle;
             float y = unitBoundingRectangle.CenterY - unitBoundingRectangle.Height * 0.75f;
             float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
-            Draw(context, unit, new Vector2(x, y));
+            Draw(context, entity, new Vector2(x, y));
         }
 
-        public static void Draw(GraphicsContext context, Unit unit, Vector2 origin)
+        public static void Draw(GraphicsContext context, Entity entity, Vector2 origin)
         {
-            float healthbarWidth = (float)Math.Log(unit.MaxHealth);
-            float leftHealthWidth = unit.Health * 0.1f;
+            Health health = entity.Components.TryGet<Health>();
+            if (health == null) return;
+            
+            float healthbarWidth = (float)Math.Log((int)entity.GetStatValue(Health.MaxValueStat));
+            float leftHealthWidth = health.Value * 0.1f;
             Rectangle healthBarBounds = new Rectangle(origin, new Vector2(healthbarWidth, 0.15f));
-            Draw(context, unit, healthBarBounds);
+            Draw(context, entity, healthBarBounds);
         }
 
-        public static void Draw(GraphicsContext context, Unit unit, Rectangle into)
+        public static void Draw(GraphicsContext context, Entity entity, Rectangle into)
         {
-            float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
-            Vector2 origin = into.Min;
+            Health health = entity.Components.TryGet<Health>();
+            if (health != null)
+            {
+                float healthFraction = health.Value / (float)entity.GetStatValue(Health.MaxValueStat);
+                float leftHealthWidth = into.Width * healthFraction;
+                Vector2 origin = into.Min;
 
-            float healthFraction = unit.Health / unit.MaxHealth;
-            ColorRgb healthColor = GetColor(healthFraction);
+                ColorRgb healthColor = GetColor(healthFraction);
 
-            Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
-            context.Fill(lifeRect, healthColor);
-            Rectangle damageRect = new Rectangle(
-                origin.X + leftHealthWidth, origin.Y,
-                into.Width - leftHealthWidth, into.Height);
+                Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
+                context.Fill(lifeRect, healthColor);
+                Rectangle damageRect = new Rectangle(
+                    origin.X + leftHealthWidth, origin.Y,
+                    into.Width - leftHealthWidth, into.Height);
 
-            context.Fill(damageRect, borderColor);
+                context.Fill(damageRect, borderColor);
+            }
         }
 
         public static ColorRgb GetColor(float healthFraction)

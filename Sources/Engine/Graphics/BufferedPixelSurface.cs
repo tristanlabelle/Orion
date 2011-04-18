@@ -156,20 +156,20 @@ namespace Orion.Engine.Graphics
             if (bitmap == null) bitmap = new Bitmap(image);
             try
             {
-                BitmapData bitmapData = bitmap.LockBits(
-                    new Rectangle(0, 0, image.Width, image.Height),
-                    ImageLockMode.ReadOnly, bitmap.PixelFormat);
-                try
-                {
-                    return FromBitmapData(bitmapData);
+                    BitmapData bitmapData = bitmap.LockBits(
+                        new Rectangle(0, 0, image.Width, image.Height),
+                        ImageLockMode.ReadOnly, bitmap.PixelFormat);
+                    try
+                    {
+                        return FromBitmapData(bitmapData);
+                    }
+                    finally
+                    {
+                        bitmap.UnlockBits(bitmapData);
+                    }
                 }
                 finally
                 {
-                    bitmap.UnlockBits(bitmapData);
-                }
-            }
-            finally
-            {
                 if (bitmap != image)
                     bitmap.Dispose();
             }

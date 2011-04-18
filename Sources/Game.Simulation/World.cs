@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Pathfinding;
 using Orion.Game.Simulation.Technologies;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -23,6 +24,7 @@ namespace Orion.Game.Simulation
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
         private readonly EntityCollection entities;
+        private readonly SpatialManager spatialManager;
         private readonly Pathfinder pathfinder;
         private readonly Random random;
         private readonly int maxFoodAmount;
@@ -34,6 +36,8 @@ namespace Orion.Game.Simulation
         /// Initializes a new <see cref="World"/>.
         /// </summary>
         /// <param name="terrain">The <see cref="Terrain"/> of this world.</param>
+        /// <param name="random">The random number generator that can be used within the simulation.</param>
+        /// <param name="maxFood">The maximum allowed amount of food per faction.</param>
         public World(Terrain terrain, Random random, int maxFood)
         {
             Argument.EnsureNotNull(terrain, "terrain");
@@ -41,6 +45,7 @@ namespace Orion.Game.Simulation
             this.maxFoodAmount = maxFood;
             this.terrain = terrain;
             this.entities = new EntityCollection(this);
+            this.spatialManager = new SpatialManager(terrain.Size, maxFood * 5);
             this.pathfinder = new Pathfinder(terrain.Size);
             this.random = random;
         }
@@ -63,20 +68,19 @@ namespace Orion.Game.Simulation
         public event Action<World, SimulationStep> Updated;
 
         /// <summary>
-        /// Raised when a unit hits another unit.
+        /// Raised when an <see cref="Entity"/> hits another one.
         /// </summary>
-        /// <remarks>
-        /// Convenience aggregator of the <see cref="Unit.Hitting"/> event.
-        /// </remarks>
-        public event Action<World, HitEventArgs> UnitHitting;
+        public event Action<World, HitEventArgs> HitOccured;
 
         /// <summary>
-        /// Raised when an entity has died.
+        /// Raised when an <see cref="Entity"/> has died.
         /// </summary>
-        /// <remarks>
-        /// Convenience aggregator of the <see cref="Entity.Died"/> event.
-        /// </remarks>
         public event Action<World, Entity> EntityDied;
+
+        /// <summary>
+        /// Raised when a building <see cref="Entity"/>'s construction completes.
+        /// </summary>
+        public event Action<World, Entity> BuildingConstructed;
 
         /// <summary>
         /// Raised when an explosion occurs.
@@ -115,6 +119,22 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
+        /// Gets the current game time.
+        /// </summary>
+        public TimeSpan SimulationTime
+        {
+            get { return lastSimulationStep.Time; }
+        }
+
+        /// <summary>
+        /// Gets the current game time, in seconds.
+        /// </summary>
+        public float SimulationTimeInSeconds
+        {
+            get { return lastSimulationStep.TimeInSeconds; }
+        }
+
+        /// <summary>
         /// Gets the random number generator used within this world.
         /// </summary>
         internal Random Random
@@ -136,6 +156,15 @@ namespace Orion.Game.Simulation
         public EntityCollection Entities
         {
             get { return entities; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="SpatialManager"/> which allows optimized spatial queries
+        /// within this world's <see cref="Entity">entities</see> with a <see cref="Spatial"/> component.
+        /// </summary>
+        public SpatialManager SpatialManager
+        {
+            get { return spatialManager; }
         }
 
         #region Size/Bounds
@@ -182,7 +211,7 @@ namespace Orion.Game.Simulation
                 return false;
             }
             if (layer == CollisionLayer.Ground && !terrain.IsWalkable(point)) return false;
-            return entities.GetEntityAt(point, layer) == null;
+            return spatialManager.GetGridObstacleAt(point, layer) == null;
         }
 
         public bool IsFree(Region region, CollisionLayer layer)
@@ -302,7 +331,7 @@ namespace Orion.Game.Simulation
         #endregion
 
         /// <summary>
-        /// Updates this <see cref="World"/> and its <see cref="Unit"/>s for a frame.
+        /// Updates this <see cref="World"/> and its <see cref="Entity"/>s for a frame.
         /// </summary>
         /// <param name="step">Information on this simulation step.</param>
         public void Update(SimulationStep step)
@@ -319,40 +348,86 @@ namespace Orion.Game.Simulation
             EntityAdded.Raise(this, entity);
         }
 
-        /// <remarks>Invoked by World.EntityCollection.</remarks>
+        /// <remarks>Invoked by <see cref="World.EntityCollection"/>.</remarks>
         private void OnEntityRemoved(Entity entity)
         {
             EntityRemoved.Raise(this, entity);
         }
 
-        /// <remarks>Invoked by Entity.</remarks>
-        internal void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
-        {
-            entities.MoveFrom(entity, oldPosition);
-        }
-
-        /// <remarks>Invoked by Entity.</remarks>
+        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
         internal void OnEntityDied(Entity entity)
         {
             EntityDied.Raise(this, entity);
+            entities.Remove(entity);
 
-            bool isEmbarkedUnit = entity is Unit && ((Unit)entity).IsEmbarked;
-            if (!isEmbarkedUnit) entities.Remove(entity);
+            if (entity.Components.Has<Health>())
+                CreateRuinsForEntity(entity);
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitHitting(HitEventArgs args)
+        internal void RaiseBuildingConstructed(Entity entity)
         {
-            UnitHitting.Raise(this, args);
+            Argument.EnsureNotNull(entity, "entity");
+
+            BuildingConstructed.Raise(this, entity);
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
+        private void CreateRuinsForEntity(Entity entity)
+        {
+            Spatial spatial = entity.Spatial;
+            if (spatial == null)
+            {
+                Debug.Fail("Cannot create ruins for an entity without a spatial component.");
+                return;
+            }
+
+            Entity ruins = entities.CreateEmpty();
+
+            ruins.Components.Add(new Identity(ruins)
+            {
+                IsSelectable = false,
+                Name = entity.Identity.IsBuilding ? "Ruins" : "Skeleton"
+            });
+
+            ruins.Components.Add(new Sprite(ruins)
+            {
+                Rotates = false
+            });
+
+            ruins.Components.Add(new TimedExistence(ruins)
+            {
+                LifeSpan = entity.Identity.IsBuilding ? 30 : 120
+            });
+
+            ruins.Components.Add(new Spatial(ruins)
+            {
+                Position = spatial.Position,
+                CollisionLayer = CollisionLayer.None,
+                Size = spatial.Size
+            });
+
+            if (entity.Components.Has<FactionMembership>())
+            {
+                FactionMembership membership = new FactionMembership(ruins);
+                membership.Faction = entity.Components.Get<FactionMembership>().Faction;
+                ruins.Components.Add(membership);
+            }
+
+            entities.Add(ruins);
+        }
+
+        /// <remarks>Invoked by <see cref="Attacker"/>.</remarks>
+        internal void RaiseHitOccured(HitEventArgs args)
+        {
+            HitOccured.Raise(this, args);
+        }
+
+        /// <remarks>Invoked by <see cref="Kamikaze"/>.</remarks>
         internal void OnExplosionOccured(Circle circle)
         {
             if (ExplosionOccured != null) ExplosionOccured(this, circle);
         }
 
-        /// <remarks>Invoked by Faction.</remarks>
+        /// <remarks>Invoked by <see cref="Faction"/>.</remarks>
         internal void OnFactionDefeated(Faction faction)
         {
             FactionDefeated.Raise(this, faction);

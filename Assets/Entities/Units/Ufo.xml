@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Ufo</Name>
+		<HotKey>U</HotKey>
+		<Upgrades>
+			<Item>Mothership</Item>
+		</Upgrades>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>140</Aladdium>
+		<Alagene>140</Alagene>
+		<Food>2</Food>
+		<SpawnTime>100</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Attacker>
+		<Power>7</Power>
+		<Range>8</Range>
+		<Delay>3</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Heavy</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Heavy armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attacker>
+	
+	<Health>
+		<MaxValue>100</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	
+	<Mobile>
+		<Speed>8</Speed>
+	</Mobile>
+	
+	<Spatial>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite/>
+	
+	<Vision>
+		<Range>10</Range>
+	</Vision>
+	
+	<Tags/>
+</Entity>

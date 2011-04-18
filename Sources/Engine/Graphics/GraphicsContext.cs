@@ -282,19 +282,19 @@ namespace Orion.Engine.Graphics
         /// Reverts the scissor rectangle to its value prior to the last <see cref="PushScissorRegion"/> call.
         /// </summary>
         public void PopScissorRegion()
-        {
-            scissorStack.Pop();
-            if (scissorStack.Count == 0)
             {
-                GL.Disable(EnableCap.ScissorTest);
-            }
-            else
-            {
-                Region oldRegion = scissorStack.Peek();
-                GL.Scissor(
+                scissorStack.Pop();
+                if (scissorStack.Count == 0)
+                {
+                    GL.Disable(EnableCap.ScissorTest);
+                }
+                else
+                {
+                    Region oldRegion = scissorStack.Peek();
+                    GL.Scissor(
                     oldRegion.MinX, ViewportSize.Height - oldRegion.ExclusiveMaxY,
-                    oldRegion.Width, oldRegion.Height);
-            }
+                        oldRegion.Width, oldRegion.Height);
+                }
         }
         #endregion
 

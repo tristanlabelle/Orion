@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Tasks;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Utilities
 {
@@ -17,8 +14,8 @@ namespace Orion.Game.Simulation.Utilities
     {
         #region Fields
         private readonly Faction faction;
-        private readonly HashSet<Unit> activeWorkers = new HashSet<Unit>();
-        private readonly HashSet<Unit> inactiveWorkers = new HashSet<Unit>();
+        private readonly HashSet<Entity> activeWorkers = new HashSet<Entity>();
+        private readonly HashSet<Entity> inactiveWorkers = new HashSet<Entity>();
         private readonly Action<TaskQueue> workerTaskQueueChangedEventHandler;
         #endregion
 
@@ -33,7 +30,7 @@ namespace Orion.Game.Simulation.Utilities
 
             this.workerTaskQueueChangedEventHandler = OnWorkerTaskQueueChanged;
 
-            foreach (Unit worker in faction.Units.Where(unit => IsWorker(unit)))
+            foreach (Entity worker in faction.Entities.Where(entity => IsWorker(entity)))
                 AddWorker(worker);
         }
         #endregion
@@ -42,7 +39,7 @@ namespace Orion.Game.Simulation.Utilities
         /// <summary>
         /// Raised when a worker's activity state changed.
         /// </summary>
-        public event Action<WorkerActivityMonitor, Unit> WorkerActivityStateChanged;
+        public event Action<WorkerActivityMonitor, Entity> WorkerActivityStateChanged;
         #endregion
 
         #region Properties
@@ -56,7 +53,7 @@ namespace Orion.Game.Simulation.Utilities
             get { return activeWorkers.Count + inactiveWorkers.Count; }
         }
 
-        public IEnumerable<Unit> ActiveWorkers
+        public IEnumerable<Entity> ActiveWorkers
         {
             get { return activeWorkers; }
         }
@@ -67,7 +64,7 @@ namespace Orion.Game.Simulation.Utilities
             get { return activeWorkers.Count; }
         }
 
-        public IEnumerable<Unit> InactiveWorkers
+        public IEnumerable<Entity> InactiveWorkers
         {
             get { return inactiveWorkers; }
         }
@@ -80,38 +77,37 @@ namespace Orion.Game.Simulation.Utilities
         #endregion
 
         #region Methods
-        private void AddWorker(Unit worker)
+        private void AddWorker(Entity worker)
         {
-            HashSet<Unit> pool = worker.TaskQueue.IsEmpty ? inactiveWorkers : activeWorkers;
+            TaskQueue taskQueue = worker.Components.Get<TaskQueue>();
+
+            HashSet<Entity> pool = taskQueue.IsEmpty ? inactiveWorkers : activeWorkers;
             pool.Add(worker);
-            worker.TaskQueue.Changed += workerTaskQueueChangedEventHandler;
+            taskQueue.Changed += workerTaskQueueChangedEventHandler;
         }
 
         private void OnEntityAdded(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != faction || !IsWorker(unit)) return;
+            if (FactionMembership.GetFaction(entity) != faction || !IsWorker(entity)) return;
 
-            AddWorker(unit);
-
-            WorkerActivityStateChanged.Raise(this, unit);
+            AddWorker(entity);
+            WorkerActivityStateChanged.Raise(this, entity);
         }
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != faction || !IsWorker(unit)) return;
+            if (FactionMembership.GetFaction(entity) != faction || !IsWorker(entity)) return;
 
-            inactiveWorkers.Remove(unit);
-            activeWorkers.Remove(unit);
-            unit.TaskQueue.Changed -= workerTaskQueueChangedEventHandler;
+            inactiveWorkers.Remove(entity);
+            activeWorkers.Remove(entity);
+            entity.Components.Get<TaskQueue>().Changed -= workerTaskQueueChangedEventHandler;
 
-            WorkerActivityStateChanged.Raise(this, unit);
+            WorkerActivityStateChanged.Raise(this, entity);
         }
 
         private void OnWorkerTaskQueueChanged(TaskQueue taskQueue)
         {
-            Unit worker = taskQueue.Unit;
+            Entity worker = taskQueue.Entity;
             if (taskQueue.IsEmpty)
             {
                 bool wasActive = activeWorkers.Remove(worker);
@@ -131,9 +127,9 @@ namespace Orion.Game.Simulation.Utilities
             }
         }
 
-        private static bool IsWorker(Unit unit)
+        private static bool IsWorker(Entity entity)
         {
-            return unit.HasSkill<BuildSkill>();
+            return entity.Components.Has<Builder>();
         }
         #endregion
     }

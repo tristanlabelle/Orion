@@ -41,8 +41,8 @@ namespace Orion.Game.Matchmaking.Networking
 
             try
             {
-                httpClient = new HttpRequest(serverUri.DnsSafeHost);
-            }
+            httpClient = new HttpRequest(serverUri.DnsSafeHost);
+        }
             catch (SocketException)
             {
                 // The master server was not found, this object will act as a null object.

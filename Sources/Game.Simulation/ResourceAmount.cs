@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -105,19 +102,19 @@ namespace Orion.Game.Simulation
 
         #region Methods
         /// <summary>
-        /// Creates a new instance from the cost of a unit.
+        /// Creates a new instance from the cost of an <see cref="Entity"/>.
         /// </summary>
-        /// <param name="unitType">The type of the unit.</param>
-        /// <param name="faction">The faction to which the unit belongs.</param>
-        /// <returns>A new instance based on the cost of that unit.</returns>
-        public static ResourceAmount FromUnitCost(UnitType unitType, Faction faction)
+        /// <param name="prototype">An <see cref="Entity"/> prototype.</param>
+        /// <param name="faction">The faction to which the <see cref="Entity"/> belongs.</param>
+        /// <returns>A new instance based on the cost of that <see cref="Entity"/>.</returns>
+        public static ResourceAmount FromEntityCost(Entity prototype, Faction faction)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(prototype, "prototype");
             Argument.EnsureNotNull(faction, "faction");
 
-            int aladdiumCost = faction.GetStat(unitType, BasicSkill.AladdiumCostStat);
-            int alageneCost = faction.GetStat(unitType, BasicSkill.AlageneCostStat);
-            int foodCost = faction.GetStat(unitType, BasicSkill.FoodCostStat);
+            int aladdiumCost = (int)faction.GetStat(prototype, Cost.AladdiumStat);
+            int alageneCost = (int)faction.GetStat(prototype, Cost.AlageneStat);
+            int foodCost = (int)faction.GetStat(prototype, Cost.FoodStat);
 
             return new ResourceAmount(aladdiumCost, alageneCost, foodCost);
         }

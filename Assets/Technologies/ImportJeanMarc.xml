@@ -2,5 +2,5 @@
 <Technology Name="ImportJeanMarc" AladdiumCost="250" AlageneCost="200">
   <Target>JeanMarc</Target>
   <Target>BritishJeanMarc</Target>
-  <Effect Stat="Attack.Power" Change="3"/>
+  <Effect Stat="Attacker.Power" Delta="3"/>
 </Technology>

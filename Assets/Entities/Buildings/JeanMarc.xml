@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>JeanMarc</Name>
+		<HotKey>J</HotKey>
+		<IsBuilding>True</IsBuilding>
+		<Upgrades>
+			<Item>
+				<Target>BritishJeanMarc</Target>
+				<AladdiumCost>220</AladdiumCost>
+				<AlageneCost>140</AlageneCost>
+			</Item>
+		</Upgrades>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>120</Aladdium>
+		<Alagene>40</Alagene>
+		<SpawnTime>120</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Attacker>
+		<Power>8</Power>
+		<Range>7</Range>
+		<Delay>2</Delay>
+	</Attacker>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>120</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>7</Range>
+	</Vision>
+</Entity>

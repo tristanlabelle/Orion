@@ -1,36 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes a <see cref="Unit"/>
+    /// A <see cref="Command"/> which causes a <see cref="Entity"/>
     /// to be assigned the <see cref="BuildTask"/> task.
     /// </summary>
     public sealed class BuildCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> builderHandles;
-        private readonly Handle buildingTypeHandle;
+        private readonly Handle buildingPrototypeHandle;
         private readonly Point location;
         #endregion
 
         #region Constructors
-        public BuildCommand(Handle factionHandle, IEnumerable<Handle> builderHandles, Handle buildingTypeHandle, Point location)
+        public BuildCommand(Handle factionHandle, IEnumerable<Handle> builderHandles, Handle buildingPrototypeHandle, Point location)
             : base(factionHandle)
         {
             this.builderHandles = builderHandles.ToList().AsReadOnly();
-            this.buildingTypeHandle = buildingTypeHandle;
+            this.buildingPrototypeHandle = buildingPrototypeHandle;
             this.location = location;
         }
 
@@ -51,7 +49,7 @@ namespace Orion.Game.Matchmaking.Commands
 
         public Handle BuildingTypeHandle
         {
-            get { return buildingTypeHandle; }
+            get { return buildingPrototypeHandle; }
         }
 
         public Point Destination
@@ -67,7 +65,7 @@ namespace Orion.Game.Matchmaking.Commands
 
             return IsValidFactionHandle(match, FactionHandle)
                 && builderHandles.All(builderHandle => IsValidEntityHandle(match, builderHandle))
-                && IsValidUnitTypeHandle(match, buildingTypeHandle);
+                && IsValidUnitTypeHandle(match, buildingPrototypeHandle);
         }
 
         public override void Execute(Match match)
@@ -75,29 +73,31 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
 
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
-            UnitType buildingType = match.UnitTypes.FromHandle(buildingTypeHandle);
+            Entity buildingPrototype = match.Prototypes.FromHandle(buildingPrototypeHandle);
 
-            if (buildingType.HasSkill<ExtractAlageneSkill>())
+            if (buildingPrototype.Components.Has<AlageneExtractor>())
             {
-                ResourceNode node = match.World.Entities
-                    .OfType<ResourceNode>()
-                    .FirstOrDefault(n => n.BoundingRectangle.ContainsPoint(location) && n.Type == ResourceType.Alagene);
-                Debug.Assert(node != null, "Extractors can only be built on resource node  of Alagene.");
+                Harvestable harvestingInfo = match.World.Entities
+                    .Where(e => e.Components.Has<Harvestable>())
+                    .Select(e => e.Components.Get<Harvestable>())
+                    .Where(h => h.Type == ResourceType.Alagene)
+                    .FirstOrDefault(h => !h.IsEmpty);
+                Debug.Assert(harvestingInfo != null, "Extractors can only be built on resource node of Alagene.");
             }
 
-            BuildingPlan plan = new BuildingPlan(faction, buildingType, location);
+            BuildingPlan plan = new BuildingPlan(faction, buildingPrototype, location);
 
             foreach (Handle unit in builderHandles)
             {
-                Unit builder = (Unit)match.World.Entities.FromHandle(unit);
-                builder.TaskQueue.Enqueue(new BuildTask(builder, plan));
+                Entity builder = match.World.Entities.FromHandle(unit);
+                builder.Components.Get<TaskQueue>().Enqueue(new BuildTask(builder, plan));
             }
         }
 
         public override string ToString()
         {
             return "Faction {0} builds {1} with {2} at {3}"
-                .FormatInvariant(FactionHandle, buildingTypeHandle,
+                .FormatInvariant(FactionHandle, buildingPrototypeHandle,
                 builderHandles.ToCommaSeparatedValues(), location);
         }
 
@@ -109,7 +109,7 @@ namespace Orion.Game.Matchmaking.Commands
 
             WriteHandle(writer, command.FactionHandle);
             WriteLengthPrefixedHandleArray(writer, command.builderHandles);
-            WriteHandle(writer, command.buildingTypeHandle);
+            WriteHandle(writer, command.buildingPrototypeHandle);
             writer.Write((short)command.location.X);
             writer.Write((short)command.location.Y);
         }

@@ -1,35 +1,36 @@
 ﻿using System;
 using Orion.Engine;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// Abstract base class for tasks, which represent the basic building blocks of <see cref="Unit"/> behavior.
+    /// Abstract base class for tasks, which represent the basic building blocks of <see cref="Entity"/> behavior.
     /// </summary>
     [Serializable]
     public abstract class Task : IDisposable
     {
         #region Fields
-        private readonly Unit unit;
+        private readonly Entity entity;
         private bool hasEnded;
         #endregion
 
         #region Constructors
-        protected Task(Unit unit)
+        protected Task(Entity entity)
         {
-            Argument.EnsureNotNull(unit, "unit");
-            this.unit = unit;
+            Argument.EnsureNotNull(entity, "unit");
+            this.entity = entity;
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets the <see cref="Unit"/> accomplishing this task.
+        /// Gets the <see cref="Entity"/> accomplishing this task.
         /// </summary>
-        public Unit Unit
+        public Entity Entity
         {
-            get { return unit; }
+            get { return entity; }
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace Orion.Game.Simulation.Tasks
         }
 
         /// <summary>
-        /// Gets a human-readable string describing this <see cref="Task"/>.
+        /// Gets a string describing this <see cref="Task"/>, for logging and debugging purposes.
         /// </summary>
         public abstract string Description { get; }
 
@@ -55,14 +56,23 @@ namespace Orion.Game.Simulation.Tasks
             get { return float.NaN; }
         }
 
-        protected Faction Faction
+        /// <summary>
+        /// Obtains the <see cref="TaskQueue"/> of the <see cref="Entity"/> doing this task.
+        /// </summary>
+        protected TaskQueue TaskQueue
         {
-            get { return unit.Faction; }
+            get
+            {
+                // As it is TaskQueue which updates the Tasks,
+                // it should be safe to assume that the entity has a TaskQueue component,
+                // hence the Get instead of TryGet.
+                return entity.Components.Get<TaskQueue>();
+            }
         }
 
         protected World World
         {
-            get { return unit.World; }
+            get { return entity.World; }
         }
         #endregion
 

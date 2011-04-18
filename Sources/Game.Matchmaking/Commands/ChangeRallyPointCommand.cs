@@ -8,11 +8,12 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes the rally point of a <see cref="Unit"/> to be changed to a new value.
+    /// A <see cref="Command"/> which causes the rally point of a <see cref="Entity"/> to be changed to a new value.
     /// </summary>
     [Serializable]
     public sealed class ChangeRallyPointCommand : Command
@@ -55,8 +56,9 @@ namespace Orion.Game.Matchmaking.Commands
 
             foreach (Handle buildingHandle in buildingHandles)
             {
-                Unit building = (Unit)match.World.Entities.FromHandle(buildingHandle);
-                if (!building.IsUnderConstruction) building.RallyPoint = position;
+                Entity entity = match.World.Entities.FromHandle(buildingHandle);
+                Trainer trainer = entity.Components.TryGet<Trainer>();
+                if (trainer != null) trainer.RallyPoint = position;
             }
         }
 

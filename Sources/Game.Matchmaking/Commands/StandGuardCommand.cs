@@ -7,12 +7,13 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using StandGuardTask = Orion.Game.Simulation.Tasks.StandGuardTask;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
-    /// to attack another <see cref="Unit"/> without ever following it.
+    /// A <see cref="Command"/> which causes one or many <see cref="Entity"/>s
+    /// to attack another <see cref="Entity"/> without ever following it.
     /// </summary>
     public sealed class StandGuardCommand : Command
     {
@@ -56,8 +57,8 @@ namespace Orion.Game.Matchmaking.Commands
 
             foreach (Handle guardHandle in guardHandles)
             {
-                Unit guard = (Unit)match.World.Entities.FromHandle(guardHandle);
-                guard.TaskQueue.Enqueue(new StandGuardTask(guard));
+                Entity guard = match.World.Entities.FromHandle(guardHandle);
+                guard.Components.Get<TaskQueue>().Enqueue(new StandGuardTask(guard));
             }
         }
 

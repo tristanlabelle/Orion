@@ -16,6 +16,7 @@ using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Utilities;
 using Input = Orion.Engine.Input;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Main
 {
@@ -38,7 +39,7 @@ namespace Orion.Game.Main
         private readonly Camera camera;
         private readonly IMatchRenderer matchRenderer;
         private readonly MatchAudioPresenter audioPresenter;
-        private SimulationStep lastSimulationStep;
+        private SimulationStep lastSimulationStep = new SimulationStep(-1, TimeSpan.Zero, TimeSpan.Zero);
         #endregion
 
         #region Constructors
@@ -64,7 +65,7 @@ namespace Orion.Game.Main
 
             this.userInputManager = new UserInputManager(match, localCommander);
             this.userInputManager.Selection.Changed += OnSelectionChanged;
-            this.userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
+            this.userInputManager.SelectionManager.FocusedPrototypeChanged += OnFocusedUnitTypeChanged;
 
             this.ui = new MatchUI(Graphics, userInputManager.LocalFaction, Localizer);
             this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
@@ -85,8 +86,8 @@ namespace Orion.Game.Main
             this.singleEntitySelectionPanel.TaskCancelled += (sender, task) => userInputManager.LaunchCancelTask(task);
 
             this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(Graphics);
-            this.multipleUnitSelectionPanel.UnitSelected += OnMultipleSelectionPanelUnitSelected;
-            this.multipleUnitSelectionPanel.UnitDeselected += OnMultipleSelectionPanelUnitDeselected;
+            this.multipleUnitSelectionPanel.EntityFocused += OnMultipleSelectionPanelUnitSelected;
+            this.multipleUnitSelectionPanel.EntityDeselected += OnMultipleSelectionPanelUnitDeselected;
 
             this.actionPanel = new ActionPanel(ui);
             
@@ -101,13 +102,12 @@ namespace Orion.Game.Main
             this.camera = new Camera(match.World.Size, Graphics.Window.ClientAreaSize);
 
             // Center the camera on the player's largest unit, favoring buildings
-            Unit cameraTargetUnit = localCommander.Faction.Units
-                .WithMaxOrDefault(unit => (unit.IsBuilding ? 1000 : 0) + unit.Size.Area);
-            if (cameraTargetUnit != null) this.camera.Target = cameraTargetUnit.Position;
+            Entity cameraTargetEntity = localCommander.Faction.Entities
+                .WithMaxOrDefault(entity => (entity.Identity.IsBuilding ? 1000 : 0) + entity.Spatial.Size.Area);
+            if (cameraTargetEntity != null) this.camera.Target = cameraTargetEntity.Spatial.Center;
 
             this.matchRenderer = new DeathmatchRenderer(userInputManager, Graphics);
             this.audioPresenter = new MatchAudioPresenter(Audio, userInputManager);
-            this.lastSimulationStep = new SimulationStep(-1, 0, 0);
         }
         #endregion
 
@@ -149,14 +149,14 @@ namespace Orion.Game.Main
             OnEntered();
         }
 
-        protected internal override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(TimeSpan timeDelta)
         {
             if (match.IsRunning)
             {
                 SimulationStep step = new SimulationStep(
                     lastSimulationStep.Number + 1,
-                    lastSimulationStep.TimeInSeconds + timeDeltaInSeconds,
-                    timeDeltaInSeconds);
+                    lastSimulationStep.Time + timeDelta,
+                    timeDelta);
 
                 match.World.Update(step);
 
@@ -165,26 +165,26 @@ namespace Orion.Game.Main
 
             commandPipeline.Update(lastSimulationStep);
 
-            Graphics.UpdateGui(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDelta);
 
-            UpdateCamera(timeDeltaInSeconds);
+            UpdateCamera(timeDelta);
             audioPresenter.SetViewBounds(camera.ViewBounds);
         }
 
-        private void UpdateCamera(float timeDeltaInSeconds)
-       { 
+        private void UpdateCamera(TimeSpan timeDelta)
+        { 
             Entity firstSelectedEntity = Selection.FirstOrDefault();
             if (ui.IsFollowingSelection && firstSelectedEntity != null)
             {
                 camera.ScrollDirection = Point.Zero;
-                camera.Target = firstSelectedEntity.Position;
+                camera.Target = firstSelectedEntity.Spatial.Center;
             }
             else
             {
                 camera.ScrollDirection = ui.ScrollDirection;
             }
 
-            camera.Update(timeDeltaInSeconds);
+            camera.Update(timeDelta);
         }
 
         protected internal override void Draw(GameGraphics Graphics)
@@ -216,11 +216,18 @@ namespace Orion.Game.Main
             actionPanel.Clear();
             ui.ClearActionButtons();
 
-            bool allSelectedUnitsAllied = Selection.Units.All(u => u.Faction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl));
-            if (SelectionManager.FocusedUnitType == null || !allSelectedUnitsAllied) return;
+            bool allSelectedEntitiesControllable = Selection
+                .All(entity => 
+                {
+                    Faction entityFaction = FactionMembership.GetFaction(entity);
+                    return entityFaction != null
+                        && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl)
+                        && entity.Components.Has<TaskQueue>();
+                });
+            if (SelectionManager.FocusedPrototype == null || !allSelectedEntitiesControllable) return;
 
             var actionProvider = new UnitActionProvider(actionPanel, userInputManager,
-                Graphics, Localizer, SelectionManager.FocusedUnitType);
+                Graphics, Localizer, SelectionManager.FocusedPrototype);
             actionPanel.Push(actionProvider);
         }
 
@@ -228,7 +235,7 @@ namespace Orion.Game.Main
         {
             ui.SelectionInfoPanel = null;
             singleEntitySelectionPanel.Clear();
-            multipleUnitSelectionPanel.ClearUnits();
+            multipleUnitSelectionPanel.ClearEntities();
 
             if (selection.Count == 0)
             {
@@ -238,25 +245,14 @@ namespace Orion.Game.Main
             else if (selection.Count == 1)
             {
                 Entity entity = selection.Single();
-
-                Unit unit = entity as Unit;
-                if (unit != null)
-                {
-                    bool isAllied = (LocalFaction.GetDiplomaticStance(unit.Faction) & DiplomaticStance.SharedVision) != 0;
-                    singleEntitySelectionPanel.ShowUnit(unit, isAllied);
-                    ui.SelectionInfoPanel = singleEntitySelectionPanel;
-                }
-
-                ResourceNode resourceNode = entity as ResourceNode;
-                if (resourceNode != null)
-                {
-                    singleEntitySelectionPanel.ShowResourceNode(resourceNode);
-                    ui.SelectionInfoPanel = singleEntitySelectionPanel;
-                }
+                Faction entityFaction = FactionMembership.GetFaction(entity);
+                bool isAllied = entityFaction != null && (LocalFaction.GetDiplomaticStance(entityFaction) & DiplomaticStance.SharedVision) != 0;
+                singleEntitySelectionPanel.Show(entity, isAllied);
+                ui.SelectionInfoPanel = singleEntitySelectionPanel;
             }
             else
             {
-                multipleUnitSelectionPanel.SetUnits(Selection.OfType<Unit>());
+                multipleUnitSelectionPanel.SetEntities(Selection);
                 ui.SelectionInfoPanel = multipleUnitSelectionPanel;
             }
         }
@@ -266,14 +262,14 @@ namespace Orion.Game.Main
             UpdateActionPanel();
         }
 
-        private void OnMultipleSelectionPanelUnitSelected(MultipleUnitSelectionPanel sender, Unit unit)
+        private void OnMultipleSelectionPanelUnitSelected(MultipleUnitSelectionPanel sender, Entity entity)
         {
-            Selection.Set(unit);
+            Selection.Set(entity);
         }
 
-        private void OnMultipleSelectionPanelUnitDeselected(MultipleUnitSelectionPanel sender, Unit unit)
+        private void OnMultipleSelectionPanelUnitDeselected(MultipleUnitSelectionPanel sender, Entity entity)
         {
-            Selection.Remove(unit);
+            Selection.Remove(entity);
         }
 
         private void OnMinimapCameraMoved(MatchUI sender, Vector2 normalizedPosition)
@@ -319,24 +315,23 @@ namespace Orion.Game.Main
             if (all)
             {
                 Selection.Set(inactiveWorkers);
-                camera.Target = inactiveWorkers.First().Position;
+                camera.Target = inactiveWorkers.First().Spatial.Position;
             }
             else
             {
-                Unit unitToSelect;
-                if (Selection.Type == SelectionType.Units && Selection.Count == 1)
+                Entity entityToSelect = Selection.SingleOrDefault();
+                if (entityToSelect == null)
                 {
-                    Unit selectedUnit = Selection.Units.First();
-                    int index = (inactiveWorkers.IndexOf(selectedUnit) + 1) % workerActivityMonitor.InactiveWorkerCount;
-                    unitToSelect = inactiveWorkers.ElementAt(index);
+                    entityToSelect = inactiveWorkers.First();
                 }
                 else
                 {
-                    unitToSelect = inactiveWorkers.First();
+                    int index = (inactiveWorkers.IndexOf(entityToSelect) + 1) % workerActivityMonitor.InactiveWorkerCount;
+                    entityToSelect = inactiveWorkers.ElementAt(index);
                 }
 
-                Selection.Set(unitToSelect);
-                camera.Target = unitToSelect.Position;
+                Selection.Set(entityToSelect);
+                camera.Target = entityToSelect.Spatial.Center;
             }
         }
 
@@ -477,14 +472,15 @@ namespace Orion.Game.Main
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null) return;
+            Faction faction = FactionMembership.GetFaction(entity);
+            if (faction == null || faction.Status == FactionStatus.Defeated) return;
 
-            Faction faction = unit.Faction;
-            if (faction.Status == FactionStatus.Defeated) return;
-
-            bool hasKeepAliveUnit = faction.Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
-            if (hasKeepAliveUnit) return;
+            bool hasKeepAliveEntity = faction.Entities.Any(e => 
+            {
+                FactionMembership factionMembership = e.Components.TryGet<FactionMembership>();
+                return e.IsAlive && factionMembership != null && factionMembership.IsKeepAlive;
+            });
+            if (hasKeepAliveEntity) return;
             
             faction.MarkAsDefeated();
         }

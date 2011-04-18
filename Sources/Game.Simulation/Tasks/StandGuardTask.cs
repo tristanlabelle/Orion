@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Linq;
-using OpenTK;
 using Orion.Engine;
-using Orion.Engine.Geometry;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which makes an <see cref="Unit"/> attack enemy units within range, without following.
+    /// A <see cref="Task"/> which makes an <see cref="Entity"/> attack enemy units within range, without following.
     /// </summary>
     [Serializable]
     public sealed class StandGuardTask : Task
@@ -20,11 +17,11 @@ namespace Orion.Game.Simulation.Tasks
         /// </summary>
         private static int enemyCheckInterval = 6;
 
-        private Unit target;
+        private Entity target;
         #endregion
 
         #region Constructors
-        public StandGuardTask(Unit guard)
+        public StandGuardTask(Entity guard)
             : base(guard) {}
         #endregion
 
@@ -38,35 +35,30 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!Unit.HasSkill<AttackSkill>()) return;
-
-            if (!IsTargetValid(target))
+            Spatial spatial = Entity.Spatial;
+            Attacker attacker = Entity.Components.TryGet<Attacker>();
+            if (spatial == null || attacker == null)
             {
-                bool canAttemptFindingTarget = ((step.Number + Unit.Handle.Value) % enemyCheckInterval) == 0;
-                if (canAttemptFindingTarget)
-                {
-                    target = Unit.World.Entities
-                        .Intersecting(Unit.LineOfSight)
-                        .OfType<Unit>()
-                        .FirstOrDefault(other => Unit.IsWithinAttackRange(other)
-                            && !Unit.Faction.GetDiplomaticStance(other.Faction).HasFlag(DiplomaticStance.AlliedVictory));
-                }
-                else
-                {
-                    target = null;
-                }
+                MarkAsEnded();
+                return;
+            }
+
+            if (!IsTargetValid(attacker, target))
+            {
+                bool canAttemptFindingTarget = ((step.Number + Entity.Handle.Value) % enemyCheckInterval) == 0;
+                target = canAttemptFindingTarget ? attacker.FindVisibleTarget() : null;
             }
 
             if (target != null)
             {
-                Unit.LookAt(target.Center);
-                Unit.TryHit(target);
+                spatial.LookAt(target.Center);
+                attacker.TryHit(target);
             }
         }
 
-        private bool IsTargetValid(Unit target)
+        private bool IsTargetValid(Attacker attacker, Entity target)
         {
-            return target != null && target.IsAliveInWorld && Unit.IsWithinAttackRange(target);
+            return target != null && target.IsAlive && attacker.IsInRange(target);
         }
         #endregion
     }

@@ -5,6 +5,7 @@ using Orion.Engine.Graphics;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -51,7 +52,7 @@ namespace Orion.Game.Presentation.Renderers
 
         #region Methods
         /// <summary>
-        /// Draws the selection markers under the <see cref="Unit"/>s.
+        /// Draws the selection markers under the <see cref="Entity"/>.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> to be used for rendering.</param>
         public void DrawSelectionMarkers(GraphicsContext graphics)
@@ -60,8 +61,10 @@ namespace Orion.Game.Presentation.Renderers
 
             foreach (Entity entity in Selection)
             {
-                if (!Faction.CanSee(entity)) continue;
-                graphics.Stroke(entity.BoundingRectangle, selectionMarkerColor);
+                Spatial spatial = entity.Spatial;
+                if (spatial == null || !Faction.CanSee(entity)) continue;
+
+                graphics.Stroke(spatial.BoundingRectangle, selectionMarkerColor);
             }
         }
 
@@ -71,17 +74,19 @@ namespace Orion.Game.Presentation.Renderers
 
             foreach (Entity entity in Selection)
             {
-                Unit unit = entity as Unit;
-                if (unit != null && unit.Faction == Faction && unit.HasRallyPoint)
+                Faction faction = FactionMembership.GetFaction(entity);
+                Trainer trainer = entity.Components.TryGet<Trainer>();
+                if (faction != null && trainer != null && trainer.HasRallyPoint)
                 {
-                    LineSegment lineSegment = new LineSegment(unit.Center, unit.RallyPoint);
+                    Spatial spatial = entity.Spatial;
+                    LineSegment lineSegment = new LineSegment(spatial.Center, trainer.RallyPoint.Value);
                     graphics.Stroke(lineSegment, selectionMarkerColor);
                 }
             }
         }
 
         /// <summary>
-        /// Draws the selection markers over the <see cref="Unit"/>s.
+        /// Draws the selection markers over the <see cref="Entity"/>s.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> to be used for rendering.</param>
         public void DrawSelectionRectangle(GraphicsContext graphics)

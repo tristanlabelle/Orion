@@ -2,6 +2,6 @@
 <Technology Name="SpaghettiAlfredo" AladdiumCost="200" AlageneCost="150">
   <Target>FlyingSpaghettiMonster</Target>
   <Target>YourMom</Target>
-  <Effect Stat="Move.Speed" Change="2"/>
-  <Effect Stat="Attack.Delay" Change="-1"/>
+  <Effect Stat="Mobile.Speed" Delta="2"/>
+  <Effect Stat="Attacker.Delay" Delta="-1"/>
 </Technology>

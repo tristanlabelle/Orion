@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>RaptorJesus</Name>
+		<Upgrades>
+			<Item>ChuckNorris</Item>
+		</Upgrades>
+		<SoundIdentity>Jesus</SoundIdentity>
+	</Identity>
+	
+	<Cost>
+		<Food>2</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Attacker>
+		<Power>14</Power>
+		<Range>0</Range>
+		<Delay>3</Delay>
+	</Attacker>
+	
+	<Healer>
+		<Speed>6</Speed>
+		<Range>6</Range>
+	</Healer>
+	
+	<Health>
+		<MaxValue>160</MaxValue>
+		<ArmorType>Supernatural</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	
+	<Mobile>
+		<Speed>14</Speed>
+	</Mobile>
+	
+	<Spatial>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite/>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
+	
+	<Tags/>
+</Entity>

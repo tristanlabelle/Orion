@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which cause some <see cref="Unit"/>s to suicide.
+    /// A <see cref="Command"/> which cause some <see cref="Entity"/>s to suicide.
     /// </summary>
     public sealed class SuicideCommand : Command
     {
@@ -50,17 +48,8 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-
-                if (unit.HasSkill<SellableSkill>())
-                {
-                    int aladdiumValue = unit.GetStat(SellableSkill.AladdiumValueStat);
-                    int alageneValue = unit.GetStat(SellableSkill.AlageneValueStat);
-                    unit.Faction.AladdiumAmount += aladdiumValue;
-                    unit.Faction.AlageneAmount += alageneValue;
-                }
-
-                unit.Suicide();
+                Entity entity = match.World.Entities.FromHandle(unitHandle);
+                entity.Components.Get<Health>().Suicide();
             }
         }
 

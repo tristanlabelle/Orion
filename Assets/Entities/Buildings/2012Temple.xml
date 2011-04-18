@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>2012Temple</Name>
+		<HotKey>T</HotKey>
+		<IsBuilding>True</IsBuilding>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>150</Aladdium>
+		<SpawnTime>200</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Trainer>
+		<Speed>10</Speed>
+		<TrainableTypes>
+			<Item>Pirate</Item>
+			<Item>Ninja</Item>
+			<Item>Viking</Item>
+			<Item>Chocobo</Item>
+		</TrainableTypes>
+	</Trainer>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>200</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>8</Range>
+	</Vision>
+</Entity>

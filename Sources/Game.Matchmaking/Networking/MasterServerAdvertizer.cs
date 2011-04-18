@@ -35,8 +35,8 @@ namespace Orion.Game.Matchmaking.Networking
 
             try
             {
-                masterServerRequest = new HttpRequest(masterServerUri.DnsSafeHost);
-            }
+            masterServerRequest = new HttpRequest(masterServerUri.DnsSafeHost);
+        }
             catch (SocketException)
             {
                 // The server is not reacheable, this object will act as a null object.

@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using System.IO;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.IO
 {
@@ -47,19 +48,20 @@ namespace Orion.Game.Simulation.IO
             numberOfFactions = world.Factions.Count();
             terrain = world.Terrain;
 
-            IEnumerable<ResourceNode> concreteResourceNodes = world.Entities.OfType<ResourceNode>();
-            foreach (ResourceNode node in concreteResourceNodes)
+            IEnumerable<Entity> concreteResourceNodes = world.Entities.Where(e => e.Components.Has<Harvestable>());
+            foreach (Entity node in concreteResourceNodes)
             {
-                ResourceNodeTemplate template = new ResourceNodeTemplate(node.Type, node.Position, node.RemainingAmount);
+                Harvestable harvestData = node.Components.Get<Harvestable>();
+                ResourceNodeTemplate template = new ResourceNodeTemplate(harvestData.Type, Point.Truncate(node.Spatial.Position), harvestData.Amount);
                 resourceNodes.Add(template);
             }
 
             foreach (Faction faction in world.Factions)
             {
                 List<UnitTemplate> units = new List<UnitTemplate>();
-                foreach (Unit unit in faction.Units)
+                foreach (Entity entity in faction.Entities)
                 {
-                    UnitTemplate template = new UnitTemplate(Point.Truncate(unit.Position), unit.Type.Name);
+                    UnitTemplate template = new UnitTemplate(Point.Truncate(entity.Spatial.Position), entity.Identity.Name);
                     units.Add(template);
                 }
                 unitsByFaction.Add(units);

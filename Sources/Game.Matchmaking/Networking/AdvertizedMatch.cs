@@ -84,9 +84,9 @@ namespace Orion.Game.Matchmaking.Networking
         }
         
 		public override bool Equals(object obj)
-		{
+        {
 			return Equals(obj as AdvertizedMatch);
-		}
+        }
 		
 		public override int GetHashCode()
 		{

@@ -151,7 +151,7 @@ namespace Orion.Game.Main
             }
             Debug.Assert(localCommander != null, "No local player slot.");
 
-            generator.PrepareWorld(world, match.UnitTypes);
+            generator.PrepareWorld(world, match.Prototypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));
@@ -189,13 +189,13 @@ namespace Orion.Game.Main
             OnEntered();
         }
 
-        protected internal override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(TimeSpan timeDelta)
         {
-            Graphics.UpdateGui(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDelta);
             networking.Poll();
             if (IsHost)
             {
-                elapsedTimeSinceLastAdvertize += TimeSpan.FromSeconds(timeDeltaInSeconds);
+                elapsedTimeSinceLastAdvertize += timeDelta;
                 if (elapsedTimeSinceLastAdvertize > advertizePeriod)
                 {
                     elapsedTimeSinceLastAdvertize = TimeSpan.Zero;
@@ -235,7 +235,7 @@ namespace Orion.Game.Main
             else if (player is LocalPlayer)
             {
                 networking.Send(new ColorChangeRequestPacket(newColor), hostEndPoint.Value);
-            }
+        }
         }
 
         private void Exit()
@@ -476,11 +476,11 @@ namespace Orion.Game.Main
 
             CompositeMatchAdvertizer advertizer = new CompositeMatchAdvertizer();
             advertizer.AddAdvertiser(new LocalNetworkAdvertizer(networking));
-            advertizer.AddAdvertiser(new MasterServerAdvertizer("http://www.laissemoichercherca.com/ets/orion.php"));
+            	advertizer.AddAdvertiser(new MasterServerAdvertizer("http://www.laissemoichercherca.com/ets/orion.php"));
 
             return new MultiplayerDeathmatchSetupGameState(manager,
                 networking, advertizer, matchName, playerName, null);
-        }
+            }
 
         public static MultiplayerDeathmatchSetupGameState CreateAsClient(
             GameStateManager manager, GameNetworking networking, string playerName, IPv4EndPoint hostEndPoint)

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>BritishJeanMarc</Name>
+		<IsBuilding>True</IsBuilding>
+	</Identity>
+	
+	<Cost>
+		<SpawnTime>220</SpawnTime>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Attacker>
+		<Power>12</Power>
+		<Range>8</Range>
+		<Delay>1</Delay>
+	</Attacker>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>220</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>9</Range>
+	</Vision>
+</Entity>

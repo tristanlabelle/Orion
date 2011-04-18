@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Xml;
-using System.Reflection;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Xml;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Technologies
 {
@@ -16,6 +15,12 @@ namespace Orion.Game.Simulation.Technologies
     /// </summary>
     public static class TechnologyReader
     {
+        #region Fields
+        private static readonly Regex statNameRegex = new Regex(
+            @"\A ([a-zA-Z]+) \. ([a-zA-Z]+) \Z",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace);
+        #endregion
+
         #region Methods
         public static TechnologyBuilder Read(string path)
         {
@@ -81,15 +86,52 @@ namespace Orion.Game.Simulation.Technologies
             foreach (XmlElement effectElement in technologyElement.SelectNodes("Effect"))
             {
                 string fullStatName = effectElement.GetAttribute("Stat");
-                UnitStat stat = UnitSkill.GetStat(fullStatName);
-                if (stat == null)
+                Match match = statNameRegex.Match(fullStatName);
+                if (!match.Success)
                 {
-                    throw new InvalidDataException("Invalid unit stat name: {0}.".FormatInvariant(fullStatName));
+                    Debug.Fail("Invalid stat name format: " + fullStatName);
+                    continue;
                 }
 
-                int change = int.Parse(effectElement.GetAttribute("Change"), NumberFormatInfo.InvariantInfo);
+                string componentName = match.Groups[1].Value;
+                Type componentType = Assembly.GetExecutingAssembly().GetType(typeof(Identity).Namespace + "." + componentName, false, false);
+                if (componentType == null)
+                {
+                    Debug.Fail("No such component for stat " + fullStatName);
+                    continue;
+                }
 
-                TechnologyEffect effect = new TechnologyEffect(stat, change);
+                string statName = match.Groups[2].Value;
+                FieldInfo statField = componentType.GetField(statName + "Stat", BindingFlags.Public | BindingFlags.Static);
+                if (statField == null)
+                {
+                    Debug.Fail("No such component stat for stat " + fullStatName);
+                    continue;
+                }
+
+                Stat stat = (Stat)statField.GetValue(null);
+
+                string deltaString = effectElement.GetAttribute("Delta");
+                if (deltaString == null)
+                {
+                    Debug.Fail("Effect has no Delta attribute");
+                    continue;
+                }
+
+                StatValue delta;
+                try
+                {
+                    delta = stat.Type == StatType.Integer
+                        ? StatValue.CreateInteger(int.Parse(deltaString, NumberFormatInfo.InvariantInfo))
+                        : StatValue.CreateReal(float.Parse(deltaString, NumberFormatInfo.InvariantInfo));
+                }
+                catch (FormatException)
+                {
+                    Debug.Fail("Invalid effect Delta value:" + deltaString);
+                    continue;
+                }
+
+                TechnologyEffect effect = new TechnologyEffect(stat, delta);
                 technologyBuilder.Effects.Add(effect);
             }
         }

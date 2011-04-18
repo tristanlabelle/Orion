@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Supply</Name>
+		<HotKey>S</HotKey>
+		<IsBuilding>True</IsBuilding>
+	</Identity>
+	
+	<Cost>
+		<Aladdium>50</Aladdium>
+		<SpawnTime>80</SpawnTime>
+	</Cost>
+	
+	<FactionMembership>
+		<ProvidedFood>10</ProvidedFood>
+	</FactionMembership>
+	
+	<Health>
+		<Constitution>Mechanical</Constitution>
+		<MaxValue>80</MaxValue>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite>
+		<Rotates>False</Rotates>
+	</Sprite>
+	
+	<Vision>
+		<Range>4</Range>
+	</Vision>
+</Entity>

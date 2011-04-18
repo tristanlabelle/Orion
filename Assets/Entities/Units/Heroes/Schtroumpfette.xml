@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entity>
+	<Identity>
+		<Name>Smurfette</Name>
+		<Upgrades>
+			<Item>ChuckNorris</Item>
+		</Upgrades>
+	</Identity>
+
+	<Cost>
+		<Food>1</Food>
+	</Cost>
+	
+	<FactionMembership/>
+	
+	<Healer>
+		<Speed>4</Speed>
+		<Range>2</Range>
+	</Healer>
+	
+	<Builder>
+		<Speed>40</Speed>
+		<BuildableTypes>
+			<Item>Pyramid</Item>
+			<Item>2012Temple</Item>
+			<Item>DemonicPortal</Item>
+			<Item>PropagandaCenter</Item>
+			<Item>TristansHouse</Item>
+			<Item>JeanMarc</Item>
+			<Item>SauronsEye</Item>
+			<Item>AlageneExtractor</Item>
+			<Item>Supply</Item>
+			<Item>HellsCostco</Item>
+			<Item>CarrefourLaval</Item>
+		</BuildableTypes>
+	</Builder>
+	
+	<Health>
+		<MaxValue>60</MaxValue>
+		<ArmorType>Light</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	
+	<Harvester>
+		<Speed>2</Speed>
+		<MaxCarryingAmount>6</MaxCarryingAmount>
+	</Harvester>
+	
+	<Mobile>
+		<Speed>8</Speed>
+	</Mobile>
+	
+	<Spatial>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+	</Spatial>
+	
+	<Sprite/>
+	
+	<Vision>
+		<Range>6</Range>
+	</Vision>
+	
+	<Tags>
+		<List>
+			<Item>worker</Item>
+		</List>
+	</Tags>
+</Entity>

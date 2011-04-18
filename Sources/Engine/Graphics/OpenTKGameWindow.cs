@@ -218,6 +218,7 @@ namespace Orion.Engine.Graphics
 
         private void OnMouseWheelChanged(object sender, MouseWheelEventArgs e)
         {
+            if (e.DeltaPrecise == 0) return;
             RaiseMouseEvent(MouseEventType.WheelScrolled, e.Position,
                 Orion.Engine.Input.MouseButton.None, 0, e.DeltaPrecise);
         }

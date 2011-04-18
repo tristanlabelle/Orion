@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="SauronsEye" Width="2" Height="2">
-	<Skills>
-		<Basic SightRange="16" MaxHealth="100" ArmorType="Surnatural" Armor="1" AladdiumCost="100" AlageneCost="25"/>
-	</Skills>
-</UnitType>

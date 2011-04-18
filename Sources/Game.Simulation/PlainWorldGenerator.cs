@@ -26,7 +26,7 @@ namespace Orion.Game.Simulation
             return new Terrain(new BitArray2D(size, false));
         }
 
-        public override void PrepareWorld(World world, UnitTypeRegistry unitTypes)
+        public override void PrepareWorld(World world, PrototypeRegistry unitTypes)
         {
             // do nothing
         }

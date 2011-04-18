@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation.Renderers
@@ -19,8 +19,7 @@ namespace Orion.Game.Presentation.Renderers
         private readonly GameGraphics gameGraphics;
 
         private readonly TerrainRenderer terrainRenderer;
-        private readonly ResourcesRenderer resourcesRenderer;
-        private readonly UnitsRenderer unitsRenderer;
+        private readonly EntityRenderer entityRenderer;
         private readonly ExplosionRenderer explosionRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
         #endregion
@@ -42,8 +41,7 @@ namespace Orion.Game.Presentation.Renderers
             this.gameGraphics = gameGraphics;
 
             this.terrainRenderer = new TerrainRenderer(World.Terrain, gameGraphics);
-            this.resourcesRenderer = new ResourcesRenderer(faction, gameGraphics);
-            this.unitsRenderer = new UnitsRenderer(faction, gameGraphics);
+            this.entityRenderer = new EntityRenderer(faction, gameGraphics);
             this.explosionRenderer = new ExplosionRenderer(faction.World, gameGraphics);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
         }
@@ -62,8 +60,8 @@ namespace Orion.Game.Presentation.Renderers
 
         public bool DrawHealthBars
         {
-            get { return unitsRenderer.DrawHealthBars; }
-            set { unitsRenderer.DrawHealthBars = value; }
+            get { return entityRenderer.DrawHealthBars; }
+            set { entityRenderer.DrawHealthBars = value; }
         }
 
         public World World
@@ -85,28 +83,16 @@ namespace Orion.Game.Presentation.Renderers
             terrainRenderer.DrawMiniature(graphicsContext);
         }
 
-        public void DrawResources(GraphicsContext graphicsContext, Rectangle viewBounds)
+        public void DrawEntities(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            resourcesRenderer.Draw(graphicsContext, viewBounds);
+            entityRenderer.Draw(graphicsContext, viewBounds);
         }
 
-        public void DrawMiniatureResources(GraphicsContext graphicsContext)
+        public void DrawMiniatureEntities(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            resourcesRenderer.DrawMiniature(graphicsContext);
-        }
-
-        public void DrawUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
-        {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            unitsRenderer.Draw(graphicsContext, viewBounds);
-        }
-
-        public void DrawMiniatureUnits(GraphicsContext graphicsContext)
-        {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            unitsRenderer.DrawMiniature(graphicsContext);
+            entityRenderer.DrawMiniature(graphicsContext);
         }
 
         public void DrawExplosions(GraphicsContext graphicsContext, Rectangle viewBounds)
@@ -123,19 +109,29 @@ namespace Orion.Game.Presentation.Renderers
 
         public void DrawBlueprints(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            var plans = World.Entities
-                .OfType<Unit>()
-                .Where(u => u.Faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
-                    && u.HasSkill<BuildSkill>())
-                .SelectMany(u => u.TaskQueue)
-                .OfType<BuildTask>()
-                .Select(t => t.BuildingPlan)
-                .Distinct();
+            HashSet<BuildingPlan> plans = new HashSet<BuildingPlan>();
+            foreach (Entity entity in World.Entities)
+            {
+                Faction faction = FactionMembership.GetFaction(entity);
+                TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+                if (faction == null
+                    || !faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
+                    || taskQueue == null)
+                {
+                    continue;
+                }
+
+                foreach (Task task in taskQueue)
+                {
+                    BuildTask buildTask = task as BuildTask;
+                    if (buildTask != null) plans.Add(buildTask.Plan);
+                }
+            }
 
             ColorRgba tint = new ColorRgba(Colors.DarkBlue, 0.5f);
             foreach (BuildingPlan plan in plans)
             {
-                Texture buildingTexture = gameGraphics.GetUnitTexture(plan.BuildingType.Name);
+                Texture buildingTexture = gameGraphics.GetEntityTexture(plan.BuildingPrototype);
                 Rectangle buildingRectangle = plan.GridRegion.ToRectangle();
                 graphicsContext.Fill(buildingRectangle, buildingTexture, tint);
             }

@@ -43,7 +43,7 @@ namespace Orion.Game.Main
             this.ui.AddSettings(matchSettings);
 
             this.ui.AddAIBuilder("Ramasseur", () =>
-            {
+        {
                 if (!playerSettings.AvailableColors.Any()) return;
                 AIPlayer player = new AIPlayer("Ramasseur", playerSettings.AvailableColors.First());
                 playerSettings.AddPlayer(player);
@@ -84,9 +84,9 @@ namespace Orion.Game.Main
             OnEntered();
         }
 
-        protected internal override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(TimeSpan timeDelta)
         {
-            Graphics.UpdateGui(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDelta);
         }
 
         protected internal override void Draw(GameGraphics Graphics)
@@ -134,7 +134,7 @@ namespace Orion.Game.Main
 
             Debug.Assert(localCommander != null, "No local player slot.");
 
-            generator.PrepareWorld(world, match.UnitTypes);
+            generator.PrepareWorld(world, match.Prototypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

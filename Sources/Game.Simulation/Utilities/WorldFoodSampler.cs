@@ -14,9 +14,8 @@ namespace Orion.Game.Simulation.Utilities
     {
         #region Fields
         private readonly World world;
-        private readonly float samplingPeriod;
+        private readonly TimeSpan samplingPeriod;
         private readonly Dictionary<Faction, List<int>> samples = new Dictionary<Faction,List<int>>();
-        private float lastSimulationTime;
         #endregion
 
         #region Constructors
@@ -24,11 +23,11 @@ namespace Orion.Game.Simulation.Utilities
         /// Initializes a new world food monitor from the world to be sampled and the sampling period.
         /// </summary>
         /// <param name="world">The world to be sampled.</param>
-        /// <param name="samplingPeriod">The amount of time, in seconds, between samples.</param>
-        public WorldFoodSampler(World world, float samplingPeriod)
+        /// <param name="samplingPeriod">The amount of time, between samples.</param>
+        public WorldFoodSampler(World world, TimeSpan samplingPeriod)
         {
             Argument.EnsureNotNull(world, "world");
-            Argument.EnsureStrictlyPositive(samplingPeriod, "samplingPeriod");
+            Argument.EnsureStrictlyPositive(samplingPeriod.Ticks, "samplingPeriod");
             
             this.world = world;
             this.samplingPeriod = samplingPeriod;
@@ -45,7 +44,7 @@ namespace Orion.Game.Simulation.Utilities
         /// <summary>
         /// Gets the time between successive samples, in seconds.
         /// </summary>
-        public float SamplingPeriod
+        public TimeSpan SamplingPeriod
         {
             get { return samplingPeriod; }
         }
@@ -64,6 +63,11 @@ namespace Orion.Game.Simulation.Utilities
         public IEnumerable<Faction> SampledFactions
         {
             get { return samples.Keys; }
+        }
+
+        private TimeSpan SimulationTime
+        {
+            get { return world.SimulationTime; }
         }
         #endregion
 
@@ -101,7 +105,7 @@ namespace Orion.Game.Simulation.Utilities
             var firstFactionSamples = samples.First().Value;
             for (int i = 0; i < firstFactionSamples.Count; i++)
             {
-                TimeSpan sampleTime = TimeSpan.FromSeconds(i * samplingPeriod);
+                TimeSpan sampleTime = TimeSpan.FromTicks(i * samplingPeriod.Ticks);
                 textWriter.Write(',');
                 textWriter.Write(sampleTime.ToString());
             }
@@ -127,8 +131,8 @@ namespace Orion.Game.Simulation.Utilities
 
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
-            bool shouldSample = (int)(step.TimeInSeconds / samplingPeriod) != (int)(lastSimulationTime / samplingPeriod);
-            lastSimulationTime = step.TimeInSeconds;
+            bool shouldSample = (int)(step.TimeInSeconds / samplingPeriod.TotalSeconds)
+                != (int)((step.TimeInSeconds - step.TimeDeltaInSeconds) / samplingPeriod.TotalSeconds);
             if (!shouldSample) return;
 
             Sample();

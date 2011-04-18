@@ -6,11 +6,12 @@ using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which cancels all <see cref="Task"/>s of a set of <see cref="Unit"/>s.
+    /// A <see cref="Command"/> which cancels all <see cref="Task"/>s of a set of <see cref="Entity"/>s.
     /// </summary>
     [Serializable]
     public sealed class CancelAllTasksCommand : Command
@@ -54,8 +55,8 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.TaskQueue.Clear();
+                Entity entity = match.World.Entities.FromHandle(unitHandle);
+                entity.Components.Get<TaskQueue>().Clear();
             }
         }
 

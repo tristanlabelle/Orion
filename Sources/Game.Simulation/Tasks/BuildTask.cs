@@ -1,59 +1,65 @@
 ﻿using System;
-using System.Linq;
 using System.Diagnostics;
-using OpenTK;
 using Orion.Engine;
-using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which makes a <see cref="Unit"/> build a building of a given type.
+    /// A <see cref="Task"/> which makes a <see cref="Entity"/> build a building of a given type.
     /// </summary>
     [Serializable]
     public sealed class BuildTask : Task
     {
         #region Fields
-        private readonly BuildingPlan buildingPlan;
+        private readonly BuildingPlan plan;
         private MoveTask move;
         #endregion
 
         #region Constructors
-        public BuildTask(Unit builder, BuildingPlan buildingPlan)
-            : base(builder)
+        public BuildTask(Entity entity, BuildingPlan plan)
+            : base(entity)
         {
-            Argument.EnsureNotNull(builder, "builder");
-            Argument.EnsureNotNull(buildingPlan, "buildingPlan");
+            Argument.EnsureNotNull(entity, "entity");
+            Argument.EnsureNotNull(plan, "plan");
 
-            BuildSkill buildSkill = builder.Type.TryGetSkill<BuildSkill>();
-            if (buildSkill == null)
-                throw new ArgumentException("Cannot build without the build skill.", "builder");
-            if (!buildSkill.Supports(buildingPlan.BuildingType))
+            Builder builder = entity.Components.TryGet<Builder>();
+            if (builder == null || !builder.Supports(plan.BuildingPrototype))
             {
-                throw new ArgumentException("Builder {0} cannot build {1}."
-                    .FormatInvariant(builder, buildingPlan.BuildingType));
+                throw new ArgumentException("{0} cannot build {1}."
+                    .FormatInvariant(entity, plan.BuildingPrototype));
             }
 
-            this.buildingPlan = buildingPlan;
-            this.move = MoveTask.ToNearRegion(builder, buildingPlan.GridRegion);
+            this.plan = plan;
+            this.move = MoveTask.ToNearRegion(entity, plan.GridRegion);
         }
         #endregion
 
         #region Properties
         public override string Description
         {
-            get { return "Building {0}".FormatInvariant(buildingPlan.BuildingType); }
+            get { return "Building {0}".FormatInvariant(plan.BuildingPrototype); }
         }
 
-        public BuildingPlan BuildingPlan
+        public BuildingPlan Plan
         {
-            get { return buildingPlan; }
+            get { return plan; }
         }
         #endregion
 
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            Spatial spatial = Entity.Spatial;
+            Builder builder = Entity.Components.TryGet<Builder>();
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (spatial == null || builder == null || faction == null)
+            {
+                Debug.Assert(faction != null, "Building without a faction is unimplemented.");
+                MarkAsEnded();
+                return;
+            }
+
             if (!move.HasEnded)
             {
                 move.Update(step);
@@ -61,48 +67,55 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             // Test if we're in the building's surrounding area
-            if (!Region.AreAdjacentOrIntersecting(buildingPlan.GridRegion, Unit.GridRegion))
+            if (!Region.AreAdjacentOrIntersecting(plan.GridRegion, spatial.GridRegion))
             {
                 MarkAsEnded();
                 return;
             }
 
-            if (buildingPlan.IsBuildingCreated)
+            if (plan.IsBuildingCreated)
             {
-                if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth && Unit.TaskQueue.Count == 1)
-                    Unit.TaskQueue.OverrideWith(new RepairTask(Unit, buildingPlan.Building));
+                Health buildingHealth = plan.Building.Components.TryGet<Health>();
+                if (TaskQueue.Count == 1
+                    && (plan.Building.Components.Has<BuildProgress>()
+                    || (buildingHealth != null && buildingHealth.Damage > 0)))
+                {
+                    TaskQueue.OverrideWith(new RepairTask(Entity, plan.Building));
+                }
+
                 MarkAsEnded();
                 return;
             }
 
-            if (!Unit.World.IsFree(buildingPlan.GridRegion, buildingPlan.BuildingType.CollisionLayer))
+            CollisionLayer layer = plan.BuildingPrototype.Spatial.CollisionLayer;
+            if (!World.IsFree(plan.GridRegion, layer))
             {
-                string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);
-                Faction.RaiseWarning(warning);
+                string warning = "Pas de place pour construire le bâtiment {0}"
+                    .FormatInvariant(plan.BuildingPrototype.Identity.Name);
+                faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;
             }
 
-            int aladdiumCost = Unit.Faction.GetStat(buildingPlan.BuildingType, BasicSkill.AladdiumCostStat);
-            int alageneCost = Unit.Faction.GetStat(buildingPlan.BuildingType, BasicSkill.AlageneCostStat);
-            bool hasEnoughResources = Unit.Faction.AladdiumAmount >= aladdiumCost
-                && Unit.Faction.AlageneAmount >= alageneCost;
+            int aladdiumCost = (int)faction.GetStat(plan.BuildingPrototype, Cost.AladdiumStat);
+            int alageneCost = (int)faction.GetStat(plan.BuildingPrototype, Cost.AlageneStat);
+            bool hasEnoughResources = faction.AladdiumAmount >= aladdiumCost
+                && faction.AlageneAmount >= alageneCost;
 
             if (!hasEnoughResources)
             {
                 string warning = "Pas assez de ressources pour construire le bâtiment {0}"
-                    .FormatInvariant(buildingPlan.BuildingType.Name);
-                Faction.RaiseWarning(warning);
+                    .FormatInvariant(plan.BuildingPrototype.Identity.Name);
+                faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;
             }
 
-            Unit.Faction.AladdiumAmount -= aladdiumCost;
-            Unit.Faction.AlageneAmount -= alageneCost;
+            faction.AladdiumAmount -= aladdiumCost;
+            faction.AlageneAmount -= alageneCost;
 
-            buildingPlan.CreateBuilding();
-
-            Unit.TaskQueue.ReplaceWith(new RepairTask(Unit, buildingPlan.Building));
+            Entity building = plan.CreateBuilding();
+            TaskQueue.ReplaceWith(new RepairTask(Entity, building));
             MarkAsEnded();
         }
         #endregion

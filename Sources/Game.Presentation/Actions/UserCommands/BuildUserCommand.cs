@@ -48,7 +48,8 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 Region region = new Region(minLocation.Value, prototype.Spatial.Size);
                 if (aladdiumCost > LocalFaction.AladdiumAmount
                     || alageneCost > LocalFaction.AlageneAmount
-                    || !LocalFaction.HasFullySeen(region))
+                    || !LocalFaction.HasFullySeen(region)
+                    || !World.IsFree(region, CollisionLayer.Ground))
                     return false;
 
                 if (!prototype.Components.Has<AlageneExtractor>())

@@ -319,17 +319,8 @@ namespace Orion.Game.Main
             }
             else
             {
-                Entity entityToSelect = Selection.SingleOrDefault();
-                if (entityToSelect == null)
-                {
-                    entityToSelect = inactiveWorkers.First();
-                }
-                else
-                {
-                    int index = (inactiveWorkers.IndexOf(entityToSelect) + 1) % workerActivityMonitor.InactiveWorkerCount;
-                    entityToSelect = inactiveWorkers.ElementAt(index);
-                }
-
+                Entity singleSelectedEntity = Selection.Count == 1 ? Selection.FirstOrDefault() : null;
+                Entity entityToSelect = workerActivityMonitor.GetNextIdleWorker(singleSelectedEntity);
                 Selection.Set(entityToSelect);
                 camera.Target = entityToSelect.Spatial.Center;
             }

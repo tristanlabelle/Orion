@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Utilities
@@ -84,6 +85,12 @@ namespace Orion.Game.Simulation.Utilities
             HashSet<Entity> pool = taskQueue.IsEmpty ? inactiveWorkers : activeWorkers;
             pool.Add(worker);
             taskQueue.Changed += workerTaskQueueChangedEventHandler;
+        }
+
+        public Entity GetNextIdleWorker(Entity worker)
+        {
+            int index = (InactiveWorkers.IndexOf(worker) + 1)  % InactiveWorkerCount;
+            return inactiveWorkers.ElementAt(index);
         }
 
         private void OnEntityAdded(World sender, Entity entity)

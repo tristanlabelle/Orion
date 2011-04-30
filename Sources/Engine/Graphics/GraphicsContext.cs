@@ -40,7 +40,6 @@ namespace Orion.Engine.Graphics
         private Size viewportSize;
 
         private Rectangle projectionBounds = Rectangle.FromCenterExtent(0, 0, 1, 1);
-        private Font font = defaultFont;
         #endregion
 
         #region Constructors
@@ -110,15 +109,6 @@ namespace Orion.Engine.Graphics
                     projectionBounds.MaxY, projectionBounds.MinY, -1, 1);
                 GL.MatrixMode(MatrixMode.Modelview);
             }
-        }
-
-        /// <summary>
-        /// Accesses the <see cref="Font"/> currently used to render text.
-        /// </summary>
-        public Font Font
-        {
-            get { return font; }
-            set { font = value; }
         }
         #endregion
 
@@ -576,32 +566,6 @@ namespace Orion.Engine.Graphics
         public Size Draw(Substring text, ref TextRenderingOptions options)
         {
             return textRenderer.Draw(text, ref options);
-        }
-
-        [Obsolete("Superseded by Measure(Substring, TextRenderingOptions&)")]
-        public void Draw(Text text, Rectangle clippingRect, ColorRgba color)
-        {
-            Draw(text, Vector2.Zero, clippingRect, color);
-        }
-
-        /// <summary>
-        /// Draws a Text object inside a clipping rectangle.
-        /// </summary>
-        /// <remarks>Words or lines not fitting in the rectangle will be completely trimmed.</remarks>
-        /// <param name="text">The <see cref="Text"/> object to draw</param>
-        /// <param name="clippingRect">The rectangle clipping the text</param>
-        /// <param name="color">The color with which to draw the text.</param>
-        [Obsolete("Superseded by Measure(Substring, TextRenderingOptions&)")]
-        public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
-        {
-            var options = new TextRenderingOptions
-            {
-                Font = text.Font ?? font ?? textRendererFont,
-                Origin = (Point)origin,
-                Color = color
-            };
-
-            textRenderer.Draw((Substring)text.Value, ref options);
         }
         #endregion
 

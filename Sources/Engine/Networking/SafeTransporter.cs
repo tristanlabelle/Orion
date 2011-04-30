@@ -60,7 +60,7 @@ namespace Orion.Engine.Networking
         /// <remarks>
         /// Accessed only from the worker thread.
         /// </remarks>
-        private readonly byte[] receptionBuffer = new byte[2048];
+        private byte[] receptionBuffer = new byte[2048];
 
         /// <remarks>
         /// Read and written by the main thread, only read by the worker thread.
@@ -204,9 +204,9 @@ namespace Orion.Engine.Networking
                 {
                     if (receptionBuffer.Length < packetLength)
                     {
-                        string message = "Cannot receive a packet of {0} bytes, the reception buffer is {1} bytes long."
-                            .FormatInvariant(packetLength, receptionBuffer.Length);
-                        throw new NotImplementedException(message);
+                        receptionBuffer = new byte[packetLength];
+                        Debug.Fail("Increased the size of the reception buffer to {0} bytes."
+                            .FormatInvariant(packetLength));
                     }
 
                     socket.Receive(receptionBuffer, out senderEndPoint);

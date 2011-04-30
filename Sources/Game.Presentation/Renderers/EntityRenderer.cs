@@ -330,8 +330,8 @@ namespace Orion.Game.Presentation.Renderers
                     && !Rectangle.Intersects(targetSpatial.BoundingRectangle, bounds))
                     continue;
 
-                Vector2 normalizedDelta = Vector2.Normalize(delta);
                 float distance = delta.LengthFast;
+                Vector2 normalizedDelta = distance < 0.001f ? Vector2.Zero : delta / distance;
 
                 Vector2 laserCenter = shooterSpatial.Center + normalizedDelta * laserProgress * distance;
                 if (!faction.CanSee(new Region((int)laserCenter.X, (int)laserCenter.Y, 1, 1)))

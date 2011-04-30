@@ -239,6 +239,7 @@ namespace Orion.Game.Simulation.Components
                     if (isAllied) continue;
 
                     Health splashedEntityHealth = splashedEntity.Components.TryGet<Health>();
+                    if (splashedEntityHealth == null) continue;
 
                     float distance = (splashCircle.Center - splashedEntitySpatial.Center).LengthFast;
                     if (distance > splashRadius) continue;

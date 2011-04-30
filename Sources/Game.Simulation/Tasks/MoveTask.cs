@@ -22,8 +22,8 @@ namespace Orion.Game.Simulation.Tasks
         private readonly Func<Point, float> destinationDistanceEvaluator;
         private Path path;
         private int targetPathPointIndex;
-        private TimeSpan lastPathingTime;
-        private TimeSpan lastSuccessfulPathingTime;
+        private TimeSpan timeSinceLastPathing;
+        private TimeSpan timeSinceLastSuccessfulPathing;
         #endregion
 
         #region Constructors
@@ -48,8 +48,8 @@ namespace Orion.Game.Simulation.Tasks
                 "Ground entities bigger than 1x1 are not supported.");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
-            this.lastPathingTime = World.SimulationTime - timeBetweenRepathings;
-            this.lastSuccessfulPathingTime = World.SimulationTime;
+            this.timeSinceLastPathing = timeBetweenRepathings;
+            this.timeSinceLastSuccessfulPathing = TimeSpan.Zero;
         }
 
         public MoveTask(Entity entity, Point destination)
@@ -83,6 +83,9 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            timeSinceLastPathing += step.TimeDelta;
+            timeSinceLastSuccessfulPathing += step.TimeDelta;
+
             Spatial spatial = Entity.Spatial;
             if (spatial == null || !Entity.Components.Has<Mobile>())
             {
@@ -91,7 +94,7 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             if (HasReachedDestination
-                || (path == null && step.Time - lastSuccessfulPathingTime >= maxPathingFailureTime))
+                || (path == null && timeSinceLastSuccessfulPathing >= maxPathingFailureTime))
             {
                 MarkAsEnded();
                 return;
@@ -151,17 +154,17 @@ namespace Orion.Game.Simulation.Tasks
         private bool Repath(Spatial spatial)
         {
             path = null;
-            if ((World.SimulationTime - lastPathingTime) < timeBetweenRepathings)
+            if (timeSinceLastPathing < timeBetweenRepathings)
                 return false;
 
             path = Entity.World.FindPath(spatial.GridRegion.Min, destinationDistanceEvaluator, GetWalkabilityTester());
             targetPathPointIndex = (path.PointCount > 1) ? 1 : 0;
-            lastPathingTime = World.SimulationTime;
+            timeSinceLastPathing = TimeSpan.Zero;
 
             if (!path.IsComplete && path.Source == path.End)
                 return false;
 
-            lastPathingTime = World.SimulationTime;
+            timeSinceLastSuccessfulPathing = TimeSpan.Zero;
 
             return true;
         }

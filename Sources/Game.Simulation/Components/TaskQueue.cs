@@ -63,6 +63,15 @@ namespace Orion.Game.Simulation.Components
         {
             get { return IsEmpty ? null : tasks[0]; }
         }
+
+        /// <summary>
+        /// Gets the <see cref="Task"/> type that can currently be seen as being executed by an external, 
+        /// non-ally observer.
+        /// </summary>
+        public Type CurrentPublicType
+        {
+            get { return IsEmpty ? null : tasks[0].PublicType; }
+        }
         #endregion
 
         #region Indexers
@@ -345,7 +354,15 @@ namespace Orion.Game.Simulation.Components
             Argument.EnsureNotNull(entity, "entity");
 
             TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
-            return taskQueue == null ? null : taskQueue.FirstOrDefault();
+            return taskQueue == null ? null : taskQueue.Current;
+        }
+
+        public static Type GetCurrentPublicType(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+            return taskQueue == null ? null : taskQueue.CurrentPublicType;
         }
         #endregion
         #endregion

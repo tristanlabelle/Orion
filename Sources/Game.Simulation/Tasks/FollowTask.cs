@@ -53,6 +53,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "following {0}".FormatInvariant(target); }
         }
+
+        public override Type PublicType
+        {
+            get { return typeof(MoveTask); }
+        }
         #endregion
 
         #region Methods

@@ -69,6 +69,15 @@ namespace Orion.Game.Simulation.Tasks
                     : targetHealth.Value / (float)target.GetStatValue(Health.MaxValueStat);
             }
         }
+
+        public override Type PublicType
+        {
+            get
+            {
+                if (!move.HasEnded) return typeof(MoveTask);
+                return target.Components.Has<BuildProgress>() ? typeof(BuildTask) : typeof(RepairTask);
+            }
+        }
         #endregion
 
         #region Methods

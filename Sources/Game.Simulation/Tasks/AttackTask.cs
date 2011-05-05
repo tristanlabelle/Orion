@@ -15,6 +15,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Fields
         private readonly Entity target;
         private readonly FollowTask follow;
+        private bool isHitting;
         #endregion
 
         #region Constructors
@@ -35,6 +36,11 @@ namespace Orion.Game.Simulation.Tasks
         public override string Description
         {
             get { return "Attacking {0}".FormatInvariant(target); }
+        }
+
+        public override Type PublicType
+        {
+            get { return isHitting ? typeof(AttackTask) : typeof(MoveTask); }
         }
         #endregion
 
@@ -63,12 +69,15 @@ namespace Orion.Game.Simulation.Tasks
 
             if (attacker.IsInRange(target))
             {
+                isHitting = true;
+
                 spatial.LookAt(targetSpatial.Center);
                 attacker.TryHit(target);
-                return;
             }
             else
             {
+                isHitting = false;
+
                 if (follow == null || follow.HasEnded)
                 {
                     MarkAsEnded();

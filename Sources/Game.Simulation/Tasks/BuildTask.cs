@@ -45,6 +45,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return plan; }
         }
+
+        public override Type PublicType
+        {
+            get { return typeof(MoveTask); }
+        }
         #endregion
 
         #region Methods

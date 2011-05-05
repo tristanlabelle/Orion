@@ -13,7 +13,8 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Fields
         private readonly Entity target;
-        private readonly FollowTask follow;    
+        private readonly FollowTask follow;
+        private bool isHealing;
         #endregion
 
         #region Constructors
@@ -41,6 +42,11 @@ namespace Orion.Game.Simulation.Tasks
         public override string Description
         {
             get { return "healing {0}".FormatInvariant(target); }
+        }
+
+        public override Type PublicType
+        {
+            get { return isHealing ? typeof(HealTask) : typeof(MoveTask); }
         }
         #endregion
 
@@ -76,14 +82,17 @@ namespace Orion.Game.Simulation.Tasks
 
             if (healer.IsInRange(target))
             {
+                isHealing = true;
+
                 spatial.LookAt(targetSpatial.Center);
                 float speed = (float)Entity.GetStatValue(Healer.SpeedStat);
                 targetHealth.Damage -= speed * step.TimeDeltaInSeconds;
                 if (targetHealth.Value == (int)target.GetStatValue(Health.MaxValueStat)) MarkAsEnded();
-                return;
             }
             else
             {
+                isHealing = false;
+
                 if (follow == null || follow.HasEnded)
                 {
                     MarkAsEnded();

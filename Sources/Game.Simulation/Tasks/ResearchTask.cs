@@ -58,6 +58,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return Math.Min(timeElapsed / researchTimeInSeconds, 1); }
         }
+
+        public override Type PublicType
+        {
+            get { return null; }
+        }
         #endregion
 
         #region Methods

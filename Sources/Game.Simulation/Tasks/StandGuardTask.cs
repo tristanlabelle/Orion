@@ -30,6 +30,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "standing guard"; }
         }
+
+        public override Type PublicType
+        {
+            get { return null; }
+        }
         #endregion
 
         #region Methods

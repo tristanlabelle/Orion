@@ -65,6 +65,11 @@ namespace Orion.Game.Simulation.Tasks
             get { return "harvesting " + resourceType; }
         }
 
+        public override Type PublicType
+        {
+            get { return move == null && mode == Mode.Extracting ? typeof(Harvester) : typeof(MoveTask); }
+        }
+
         private bool IsResourceNodeValid
         {
             get

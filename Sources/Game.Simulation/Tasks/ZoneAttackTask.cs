@@ -39,6 +39,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "attacking while moving to {0}".FormatInvariant(destination); }
         }
+
+        public override Type PublicType
+        {
+            get { return attack == null ? typeof(MoveTask) : attack.PublicType; }
+        }
         #endregion
 
         #region Methods

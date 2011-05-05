@@ -57,6 +57,15 @@ namespace Orion.Game.Simulation.Tasks
         }
 
         /// <summary>
+        /// Gets the "public" <see cref="Type"/> of this <see cref="Task"/>,
+        /// this is the task type that can be seen externally from a non-allied observer.
+        /// </summary>
+        /// <remarks>
+        /// Abstract because there is no sane default, it seldom matches the type of the <see cref="Task"/>.
+        /// </remarks>
+        public abstract Type PublicType { get; }
+
+        /// <summary>
         /// Obtains the <see cref="TaskQueue"/> of the <see cref="Entity"/> doing this task.
         /// </summary>
         protected TaskQueue TaskQueue

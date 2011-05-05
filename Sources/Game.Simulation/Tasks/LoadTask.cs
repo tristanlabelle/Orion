@@ -33,6 +33,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "reaching {0} for transport".FormatInvariant(target); }
         }
+
+        public override Type PublicType
+        {
+            get { return typeof(MoveTask); }
+        }
         #endregion
 
         #region Methods

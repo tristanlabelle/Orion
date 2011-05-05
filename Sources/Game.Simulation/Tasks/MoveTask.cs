@@ -78,6 +78,11 @@ namespace Orion.Game.Simulation.Tasks
                 return "moving to " + path.End.ToStringInvariant();
             }
         }
+
+        public override Type PublicType
+        {
+            get { return typeof(MoveTask); }
+        }
         #endregion
 
         #region Methods

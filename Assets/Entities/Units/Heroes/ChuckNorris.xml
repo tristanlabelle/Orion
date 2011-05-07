@@ -12,10 +12,10 @@
 	<FactionMembership/>
 	
 	<Attacker>
-		<Power>75</Power>
+		<Power>50</Power>
 		<Range>0</Range>
-		<Delay>1</Delay>
-		<SplashRadius>15</SplashRadius>
+		<Delay>2</Delay>
+		<SplashRadius>5</SplashRadius>
 		<DamageFilters>
 			<Item>
 				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
@@ -48,7 +48,7 @@
 	</Health>
 	
 	<Mobile>
-		<Speed>20</Speed>
+		<Speed>16</Speed>
 	</Mobile>
 	
 	<Spatial>

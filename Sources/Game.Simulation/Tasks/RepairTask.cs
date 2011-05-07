@@ -116,6 +116,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 float timeSpentInSeconds = (float)Entity.GetStatValue(Builder.SpeedStat) * step.TimeDeltaInSeconds;
                 buildProgress.SpendTime(TimeSpan.FromSeconds(timeSpentInSeconds));
+                if (buildProgress.IsComplete) Complete();
             }
         }
 
@@ -124,6 +125,12 @@ namespace Orion.Game.Simulation.Tasks
             Spatial targetSpatial = target.Spatial;
             Health targetHealth = target.Components.TryGet<Health>();
             if (targetSpatial == null || targetHealth == null) return;
+
+            if (targetHealth.Damage < 0.001f)
+            {
+                Complete();
+                return;
+            }
 
             if (!TryGetCredit()) return;
 
@@ -153,28 +160,6 @@ namespace Orion.Game.Simulation.Tasks
             targetHealth.Damage -= healthToRepair;
             aladdiumCreditRemaining -= frameAladdiumCost;
             alageneCreditRemaining -= frameAlageneCost;
-
-            if (targetHealth.Damage >= 0.001f) return;
-
-            // If we just built an alagene extractor, start harvesting.
-            if (Entity.Components.Has<Harvester>() && target.Components.Has<AlageneExtractor>())
-            {
-                // HACK: Find the resource node from the alagene extractor position.
-                Spatial nodeSpatial = World.SpatialManager
-                    .Intersecting(targetSpatial.BoundingRectangle)
-                    .First(entitySpatial =>
-                    {
-                        Harvestable harvestable = entitySpatial.Entity.Components.TryGet<Harvestable>();
-                        return harvestable != null
-                            && !harvestable.IsEmpty
-                            && Region.Intersects(entitySpatial.GridRegion, targetSpatial.GridRegion);
-                    });
-
-                if (TaskQueue.Count == 1)
-                    TaskQueue.OverrideWith(new HarvestTask(Entity, nodeSpatial.Entity));
-            }
-
-            MarkAsEnded();
         }
 
         private bool TryGetCredit()
@@ -210,6 +195,32 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             return true;
+        }
+
+        private void Complete()
+        {
+            // If we just built an alagene extractor, start harvesting.
+            Spatial targetSpatial = target.Spatial;
+            if (Entity.Components.Has<Harvester>()
+                && targetSpatial != null
+                && target.Components.Has<AlageneExtractor>())
+            {
+                // HACK: Find the resource node from the alagene extractor position.
+                Spatial nodeSpatial = World.SpatialManager
+                    .Intersecting(targetSpatial.BoundingRectangle)
+                    .First(entitySpatial =>
+                    {
+                        Harvestable harvestable = entitySpatial.Entity.Components.TryGet<Harvestable>();
+                        return harvestable != null
+                            && !harvestable.IsEmpty
+                            && Region.Intersects(entitySpatial.GridRegion, targetSpatial.GridRegion);
+                    });
+
+                if (TaskQueue.Count == 1)
+                    TaskQueue.OverrideWith(new HarvestTask(Entity, nodeSpatial.Entity));
+            }
+
+            MarkAsEnded();
         }
         #endregion
     }

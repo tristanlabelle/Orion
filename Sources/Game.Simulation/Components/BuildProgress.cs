@@ -30,6 +30,8 @@ namespace Orion.Game.Simulation.Components
         #region Properties
         /// <summary>
         /// Accesses the amount of time that has been spent building this <see cref="Entity"/>.
+        /// Completion is not checked when setting this property, as it could be problematic
+        /// when deserializing.
         /// </summary>
         public TimeSpan TimeSpent
         {
@@ -53,6 +55,14 @@ namespace Orion.Game.Simulation.Components
                 requiredTime = value;
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating if the build has completed.
+        /// </summary>
+        public bool IsComplete
+        {
+            get { return timeSpent >= requiredTime; }
+        }
         #endregion
 
         #region Methods
@@ -67,14 +77,14 @@ namespace Orion.Game.Simulation.Components
 
             timeSpent += time;
 
-            Identity identity = Entity.Identity;
             Health health = Entity.Components.TryGet<Health>();
-
             if (health != null)
             {
                 float ratio = (float)(time.TotalSeconds / requiredTime.TotalSeconds);
                 health.Damage -= ratio * (float)Entity.GetStatValue(Health.MaxValueStat);
             }
+
+            CheckCompletion();
         }
 
         protected override void Update(SimulationStep step)
@@ -84,8 +94,7 @@ namespace Orion.Game.Simulation.Components
                 Debug.Fail("{0} has a task queue while being built.".FormatInvariant(Entity));
             }
 
-            if (timeSpent >= RequiredTime)
-                Complete();
+            CheckCompletion();
         }
 
         /// <summary>
@@ -96,10 +105,15 @@ namespace Orion.Game.Simulation.Components
             Health health = Entity.Components.TryGet<Health>();
             if (health != null) health.Damage = 0;
 
-            Entity.Components.Add(new TaskQueue(Entity));
             Entity.Components.Remove(this);
+            Entity.Components.Add(new TaskQueue(Entity));
 
             World.RaiseBuildingConstructed(Entity);
+        }
+
+        private void CheckCompletion()
+        {
+            if (IsComplete) Complete();
         }
         #endregion
     }

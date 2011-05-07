@@ -161,8 +161,8 @@ namespace Orion.Engine.Gui
             int middleTextureSize = 2;
             int cornerWidth = texture.Width / 2 - 1;
             int cornerHeight = texture.Height / 2 - 1;
-            int middleWidth = rectangle.Width - cornerWidth * 2;
-            int middleHeight = rectangle.Height - cornerHeight * 2;
+            int middleWidth = Math.Max(0, rectangle.Width - cornerWidth * 2);
+            int middleHeight = Math.Max(0, rectangle.Height - cornerHeight * 2);
 
             // Min Row
             FillPart(texture, color, rectangle.MinX, rectangle.MinY, cornerWidth, cornerHeight,

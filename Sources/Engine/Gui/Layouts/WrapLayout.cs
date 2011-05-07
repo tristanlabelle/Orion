@@ -128,11 +128,11 @@ namespace Orion.Engine.Gui
                 if (arrange)
                 {
                     childSize = child.DesiredOuterSize;
-                    availableChildSize = new Size(rectangle.Width - x, rectangle.Height - y);
+                    availableChildSize = Size.CreateClamped(rectangle.Width - x, rectangle.Height - y);
                 }
                 else
                 {
-                    availableChildSize = new Size(availableSize.Width - x, availableSize.Height - y);
+                    availableChildSize = Size.CreateClamped(availableSize.Width - x, availableSize.Height - y);
                     childSize = child.Measure(availableChildSize);
                 }
 

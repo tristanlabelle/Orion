@@ -65,6 +65,8 @@ namespace Orion.Game.Simulation.Components
         /// </remarks>
         internal void InvokeUpdate(SimulationStep step)
         {
+            Debug.Assert(entity.IsAlive && entity.IsActive && isActive,
+                "A component was updated when it wasn't active.");
             Update(step);
         }
 

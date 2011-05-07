@@ -19,13 +19,12 @@ namespace Orion.Game.Simulation
     [Serializable]
     public sealed partial class Entity
     {
-        #region Instance
         #region Fields
         private readonly World world;
         private readonly Handle handle;
         private readonly ComponentCollection components;
         private bool isActive;
-        private bool isDead;
+        private bool isAlive = true;
         #endregion
 
         #region Constructors
@@ -117,7 +116,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool IsAlive
         {
-            get { return !isDead; }
+            get { return isAlive; }
         }
 
         /// <summary>
@@ -193,13 +192,13 @@ namespace Orion.Game.Simulation
         /// </summary>
         public void Die()
         {
-            if (isDead)
+            if (!isAlive)
             {
                 Debug.Fail("{0} attempted to die twice.".FormatInvariant(this));
                 return;
             }
 
-            isDead = true;
+            isAlive = false;
             if (isActive) Deactivate();
 
             World.OnEntityDied(this);
@@ -226,6 +225,8 @@ namespace Orion.Game.Simulation
                 return;
             }
 
+            components.CancelUpdate();
+
             foreach (Component component in components)
                 component.InvokeDeactivate();
             isActive = false;
@@ -240,33 +241,13 @@ namespace Orion.Game.Simulation
         /// </remarks>
         internal void Update(SimulationStep step)
         {
-            if (!IsAlive)
+            if (!isAlive || !isActive)
             {
-                Debug.Fail("{0} was updated when it wasn't alive and in the world.".FormatInvariant(this));
+                Debug.Fail("{0} was updated when it wasn't alive or active.".FormatInvariant(this));
                 return;
             }
 
-            // Components are copied to a temporary buffer before being updated
-            // so any modifications to the component collection while iterating
-            // does not raise collection modification during iteration exceptions.
-            if (tempComponents == null) tempComponents = new List<Component>();
-            else tempComponents.Clear();
-
-            foreach (Component component in components)
-                tempComponents.Add(component);
-
-            try
-            {
-                foreach (Component component in tempComponents)
-                {
-                    component.InvokeUpdate(step);
-                    if (isDead) break;
-                }
-            }
-            finally
-            {
-                tempComponents.Clear();
-            }
+            components.Update(step);
         }
 
         #region Object Model
@@ -303,12 +284,6 @@ namespace Orion.Game.Simulation
             return stringBuilder.ToString();
         }
         #endregion
-        #endregion
-        #endregion
-
-        #region Static
-        [ThreadStatic]
-        private static List<Component> tempComponents;
         #endregion
     }
 }

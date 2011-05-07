@@ -17,9 +17,23 @@ namespace Orion.Game.Simulation
         public sealed class ComponentCollection : ICollection<Component>
         {
             #region Fields
+            /// <summary>
+            /// A component list shared between entities, which use it to update their components.
+            /// This being static disallows reentrancy and concurrency.
+            /// </summary>
+            private static List<Component> sharedUpdatedComponentList = new List<Component>();
+
             private readonly Entity entity;
             private readonly Dictionary<Type, Component> components
                 = new Dictionary<Type, Component>();
+
+            /// <summary>
+            /// The index of the currently updated component in <see cref="sharedUpdatedComponentList"/>.
+            /// This is <c>-1</c> if the entity is not being updated,
+            /// in which case <see cref="sharedUpdatedComponentList"/> might be in use by another entity.
+            /// Used in the logic to prevent removed components to be updated in the frame.
+            /// </summary>
+            private int updatedComponentIndex = -1;
 
             /// <summary>
             /// Cache for the <see cref="Spatial"/> component as it is queried very often.
@@ -48,6 +62,11 @@ namespace Orion.Game.Simulation
             internal Spatial Spatial
             {
                 get { return spatial; }
+            }
+
+            internal bool IsUpdating
+            {
+                get { return updatedComponentIndex != -1; }
             }
             #endregion
 
@@ -107,6 +126,21 @@ namespace Orion.Game.Simulation
                     return false;
 
                 components.Remove(componentType);
+
+                // In the case where an updated component removes another one,
+                // prevent the removed component from being updated.
+                if (IsUpdating)
+                {
+                    for (int i = updatedComponentIndex + 1; i < sharedUpdatedComponentList.Count; ++i)
+                    {
+                        if (sharedUpdatedComponentList[i] == component)
+                        {
+                            sharedUpdatedComponentList.RemoveAt(i);
+                            break;
+                        }
+                    }
+                }
+
                 if (componentType == typeof(Spatial)) spatial = null;
 
                 if (entity.IsActive) component.InvokeDeactivate();
@@ -225,6 +259,49 @@ namespace Orion.Game.Simulation
             public Dictionary<Type, Component>.ValueCollection.Enumerator GetEnumerator()
             {
                 return components.Values.GetEnumerator();
+            }
+
+            /// <summary>
+            /// Updates the <see cref="Component"/>s in this collection.
+            /// </summary>
+            /// <param name="step">The simulation step.</param>
+            /// <remarks>
+            /// This method's logic uses a static component list because
+            /// a single entity can be updated at a time. Care is taken to handle
+            /// the situation where a component being updated removes an other component,
+            /// in which case that other component should not be updated afterwards.
+            /// </remarks>
+            internal void Update(SimulationStep step)
+            {
+                if (sharedUpdatedComponentList.Count > 0)
+                    throw new InvalidOperationException("Reentrant or concurrent entity update.");
+
+                try
+                {
+                    foreach (var component in components.Values)
+                        sharedUpdatedComponentList.Add(component);
+
+                    updatedComponentIndex = 0;
+                    while (updatedComponentIndex < sharedUpdatedComponentList.Count)
+                    {
+                        sharedUpdatedComponentList[updatedComponentIndex].InvokeUpdate(step);
+                        ++updatedComponentIndex;
+                    }
+                }
+                finally
+                {
+                    updatedComponentIndex = -1;
+                    sharedUpdatedComponentList.Clear();
+                }
+            }
+
+            /// <summary>
+            /// Prevents any other <see cref="Component"/>s from being updated if an update
+            /// was in progress.
+            /// </summary>
+            internal void CancelUpdate()
+            {
+                if (IsUpdating) sharedUpdatedComponentList.Clear();
             }
             #endregion
 

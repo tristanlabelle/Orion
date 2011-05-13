@@ -26,6 +26,8 @@ namespace Orion.Game.Simulation.Tasks
             if (!attacker.Components.Has<Attacker>())
                 throw new ArgumentException("Cannot attack without the attack skill.", "attacker");
             Argument.EnsureNotNull(target, "target");
+            if (target == attacker)
+                throw new ArgumentException("The attacker and its target should be different.");
             
             this.target = target;
             if (attacker.Components.Has<Mobile>()) this.follow = new FollowTask(attacker, target);

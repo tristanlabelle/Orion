@@ -61,7 +61,7 @@ namespace Orion.Game.Simulation.Tasks
                 bool isRanged = attacker.IsRanged;
 
                 Entity target = attacker.FindVisibleTarget();
-                if (target != null) attack = new AttackTask(target, target);
+                if (target != null) attack = new AttackTask(Entity, target);
             }
 
             if (attack == null)

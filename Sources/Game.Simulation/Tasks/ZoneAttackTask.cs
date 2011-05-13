@@ -72,7 +72,13 @@ namespace Orion.Game.Simulation.Tasks
             else
             {
                 attack.Update(step);
-                if (attack.HasEnded) attack = null;
+                if (attack.HasEnded)
+                {
+                    attack = null;
+
+                    // Repath as the entity might have moved while attacking
+                    move = new MoveTask(Entity, (Point)destination);
+                }
             }
         }
         #endregion

@@ -27,14 +27,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public float Speed
         {
             get { return speed; }
             set { speed = value; }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public int MaxCarryingAmount
         {
             get { return maxCarryingAmount; }

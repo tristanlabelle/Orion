@@ -27,7 +27,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Gets the collection of technologies this <see cref="Entity"/> can research.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public ICollection<string> Technologies
         {
             get { return technologies; }

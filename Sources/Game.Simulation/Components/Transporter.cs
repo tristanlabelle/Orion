@@ -25,7 +25,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public int Capacity
         {
             get { return capacity; }
@@ -36,19 +36,16 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        [Transient]
         public int LoadSize
         {
             get { return passengers.Keys.Sum(entity => Cost.GetResourceAmount(entity).Food); }
         }
 
-        [Transient]
         public int RemainingSpace
         {
             get { return (int)Entity.GetStatValue(CapacityStat) - LoadSize; }
         }
 
-        [Transient]
         public IEnumerable<Entity> Passengers
         {
             get { return passengers.Keys; }

@@ -26,7 +26,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public float Speed
         {
             get { return speed; }
@@ -37,7 +37,7 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public ICollection<string> TrainableTypes
         {
             get { return trainableTypes; }

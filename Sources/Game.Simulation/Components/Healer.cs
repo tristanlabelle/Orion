@@ -29,7 +29,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the speed at which the host <see cref="Entity"/> heals.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public float Speed
         {
             get { return speed; }
@@ -43,7 +43,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the healing range of the host <see cref="Entity"/>.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public float Range
         {
             get { return range; }

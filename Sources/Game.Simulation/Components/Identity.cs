@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public string Name
         {
             get { return name; }

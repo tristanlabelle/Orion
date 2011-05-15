@@ -7,6 +7,10 @@ using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
+    /// <summary>
+    /// A <see cref="Task"/> which makes an <see cref="Entity"/> extract
+    /// resources and deposit them in a resource depot.
+    /// </summary>
     [Serializable]
     public sealed class HarvestTask : Task
     {
@@ -147,18 +151,22 @@ namespace Orion.Game.Simulation.Tasks
             while (amountAccumulator >= 1)
             {
                 Harvestable harvestable = resourceNode.Components.Get<Harvestable>();
-                if (!resourceNode.IsAlive)
+                if (harvestable.IsEmpty || !resourceNode.IsAlive)
                 {
-                    faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvestable.Type));
                     TransitionToDelivering();
                     return;
                 }
 
-                if (!harvestable.IsEmpty)
+#warning Unshit this
+                harvestable.Harvest(1);
+                --amountAccumulator;
+                ++amountCarrying;
+
+                if (harvestable.IsEmpty)
                 {
-                    harvestable.Harvest(1);
-                    --amountAccumulator;
-                    ++amountCarrying;
+                    faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvestable.Type));
+                    TransitionToDelivering();
+                    return;
                 }
 
                 if (amountCarrying >= maxCarryingAmount)
@@ -194,8 +202,7 @@ namespace Orion.Game.Simulation.Tasks
             Entity.Spatial.LookAt(depot.Spatial.Center);
 
             // Add resources to the entity's faction
-            Faction faction = FactionMembership.GetFaction(Entity);
-            faction.AddResources(resourceType, amountCarrying);
+            depot.Components.Get<ResourceDepot>().Deposit(resourceType, amountCarrying);
             amountCarrying = 0;
 
             if (!IsResourceNodeValid)

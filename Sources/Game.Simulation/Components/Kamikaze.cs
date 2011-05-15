@@ -31,13 +31,13 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public ICollection<string> Targets
         {
             get { return targets; }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public float Radius
         {
             get { return radius; }
@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public int Damage
         {
             get { return damage; }

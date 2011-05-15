@@ -74,10 +74,13 @@ namespace Orion.Game.Simulation.Components.Serialization
                     throw new InvalidOperationException("Trying to instantiate a class that isn't assignable to Component");
 
                 ConstructorInfo constructor = preciseComponentType.GetConstructor(componentConstructorTypeArguments);
+
                 Component component = (Component)constructor.Invoke(constructorArguments);
-                HashSet<PropertyInfo> mandatoryProperties = new HashSet<PropertyInfo>(baseComponentType
+                HashSet<PropertyInfo> mandatoryProperties = baseComponentType
                     .GetProperties()
-                    .Where(p => p.GetCustomAttributes(typeof(MandatoryAttribute), true).Length == 1));
+                    .Where(p => PersistentAttribute.IsPropertyMandatory(p))
+                    .ToHashSet();
+
                 foreach (XmlElement propertyElement in componentElement.ChildNodes.OfType<XmlElement>())
                 {
                     PropertyInfo property = preciseComponentType.GetProperty(propertyElement.Name);

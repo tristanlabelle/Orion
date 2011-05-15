@@ -29,7 +29,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public int MaximumEnergy
         {
             get { return maximumEnergy; }

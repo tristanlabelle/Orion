@@ -91,10 +91,8 @@
     <Compile Include="Components\Spatial.cs" />
     <Compile Include="Components\Harvestable.cs" />
     <Compile Include="Components\Sellable.cs" />
-    <Compile Include="Components\Serialization\MandatoryAttribute.cs" />
     <Compile Include="Components\Serialization\PersistentAttribute.cs" />
     <Compile Include="Components\Serialization\SerializationReferenceableAttribute.cs" />
-    <Compile Include="Components\Serialization\TransientAttribute.cs" />
     <Compile Include="Components\Serialization\TypeMismatchException.cs" />
     <Compile Include="Components\Serialization\XmlDeserializer.cs" />
     <Compile Include="Components\StatValue.cs" />

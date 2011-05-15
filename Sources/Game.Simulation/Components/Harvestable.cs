@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public int Amount
         {
             get { return amount; }
@@ -44,14 +44,13 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public ResourceType Type
         {
             get { return type; }
             set { type = value; }
         }
 
-        [Transient]
         public bool IsEmpty
         {
             get { return amount == 0; }

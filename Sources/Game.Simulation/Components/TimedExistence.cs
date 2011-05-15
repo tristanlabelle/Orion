@@ -36,7 +36,6 @@ namespace Orion.Game.Simulation.Components
             set { elapsedTime = value; }
         }
 
-        [Transient]
         public float TimeLeft
         {
             get { return lifeSpan - elapsedTime; }

@@ -59,7 +59,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the <see cref="CollisionLayer"/> on which this <see cref="Entity"/> lies.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public CollisionLayer CollisionLayer
         {
             get { return collisionLayer; }
@@ -75,7 +75,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the size of this <see cref="Entity"/>, in tiles.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public Size Size
         {
             get { return size; }
@@ -91,7 +91,6 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the width of this <see cref="Entity"/>, in tiles.
         /// </summary>
-        [Transient]
         public int Width
         {
             get { return size.Width; }
@@ -101,26 +100,22 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the height of this <see cref="Entity"/>, in tiles.
         /// </summary>
-        [Transient]
         public int Height
         {
             get { return size.Height; }
             set { size = new Size(size.Width, value); }
         }
 
-        [Transient]
         public Vector2 Center
         {
             get { return new Vector2(Position.X + size.Width * 0.5f, Position.Y + size.Height * 0.5f); }
         }
 
-        [Transient]
         public Rectangle BoundingRectangle
         {
             get { return new Rectangle(Position.X, Position.Y, size.Width, size.Height); }
         }
 
-        [Transient]
         public Rectangle CollisionRectangle
         {
             get
@@ -131,7 +126,6 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        [Transient]
         public Region GridRegion
         {
             get { return GetGridRegion(position, size); }

@@ -37,7 +37,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public float Power
         {
             get { return power; }
@@ -80,7 +80,7 @@ namespace Orion.Game.Simulation.Components
             get { return !IsMelee; }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public float Delay
         {
             get { return delay; }

@@ -26,7 +26,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the maximum movement speed of the host <see cref="Entity"/>.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public float Speed
         {
             get { return speed; }

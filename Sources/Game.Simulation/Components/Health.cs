@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the maximum number of health points that can be had by the host <see cref="Entity"/>.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public int MaxValue
         {
             get { return maxValue; }
@@ -74,21 +74,21 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public ArmorType ArmorType
         {
             get { return armorType; }
             set { armorType = value; }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public float Armor
         {
             get { return armor; }
             set { armor = value; }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public int ThreatLevel
         {
             get { return threatLevel; }

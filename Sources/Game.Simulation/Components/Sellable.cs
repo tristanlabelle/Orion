@@ -6,7 +6,10 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Sellable : Component
+    /// <summary>
+    /// Marks an <see cref="Entity"/> as being able to be sold for resources.
+    /// </summary>
+    public sealed class Sellable : Component
     {
         #region Fields
         public static readonly Stat AlageneValueStat = new Stat(typeof(Sellable), StatType.Integer, "AlageneValue");
@@ -21,14 +24,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public float AlageneValue
         {
             get { return alageneValue; }
             set { alageneValue = value; }
         }
 
-        [Mandatory]
+        [Persistent(true)]
         public float AladdiumValue
         {
             get { return aladdiumValue; }

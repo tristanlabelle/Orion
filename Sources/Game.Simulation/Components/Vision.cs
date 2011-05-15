@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the radius of the line-of-sight circle around this <see cref="Entity"/>.
         /// </summary>
-        [Mandatory]
+        [Persistent(true)]
         public int Range
         {
             get { return range; }
@@ -44,7 +44,6 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Gets the circle containing the part of the world seen by this <see cref="Entity"/>.
         /// </summary>
-        [Transient]
         public Circle LineOfSight
         {
             get

@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Mandatory]
+        [Persistent(true)]
         public float Speed
         {
             get { return speed; }

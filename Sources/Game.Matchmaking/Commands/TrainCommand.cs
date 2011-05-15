@@ -83,38 +83,47 @@ namespace Orion.Game.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
 
             Entity traineePrototype = match.Prototypes.FromHandle(traineePrototypeHandle);
-            int foodCost = (int)faction.GetStat(traineePrototype, Cost.FoodStat);
-            int aladdiumCost = (int)faction.GetStat(traineePrototype, Cost.AladdiumStat);
-            int alageneCost = (int)faction.GetStat(traineePrototype, Cost.AlageneStat);
+            ResourceAmount cost = ResourceAmount.FromEntityCost(traineePrototype, faction);
 
             for (int i = 0; i < traineeCount; ++i)
             {
+                // Find the trainer with the least amount of queued tasks.
+                TaskQueue mostFreeTaskQueue = null;
                 foreach (Handle trainerHandle in trainerHandles)
                 {
                     Entity trainer = match.World.Entities.FromHandle(trainerHandle);
-
-                    if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
+                    TaskQueue taskQueue = trainer.Components.TryGet<TaskQueue>();
+                    if (trainer.Components.Has<Trainer>()
+                        && taskQueue != null
+                        && (mostFreeTaskQueue == null || taskQueue.Count < mostFreeTaskQueue.Count))
                     {
-                        faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
-                            .FormatInvariant(traineePrototype.Identity.Name));
-                        return;
+                        mostFreeTaskQueue = taskQueue;
                     }
-
-                    if (foodCost > faction.RemainingFoodAmount)
-                    {
-                        faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
-                            .FormatInvariant(traineePrototype.Identity.Name));
-                        return;
-                    }
-
-                    faction.AlageneAmount -= alageneCost;
-                    faction.AladdiumAmount -= aladdiumCost;
-
-                    // The hero randomization must be done here to so that every individual train
-                    // an be a hero or not. Otherwise, heroes are created on all training units.
-                    var actualTraineeType = match.RandomizeHero(traineePrototype);
-                    trainer.Components.Get<TaskQueue>().Enqueue(new TrainTask(trainer, actualTraineeType));
                 }
+
+                if (mostFreeTaskQueue == null) break;
+
+                if (cost.Alagene > faction.AlageneAmount || cost.Aladdium > faction.AladdiumAmount)
+                {
+                    faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
+                        .FormatInvariant(traineePrototype.Identity.Name));
+                    break;
+                }
+
+                if (cost.Food > faction.RemainingFoodAmount)
+                {
+                    faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
+                        .FormatInvariant(traineePrototype.Identity.Name));
+                    break;
+                }
+
+                faction.AlageneAmount -= cost.Alagene;
+                faction.AladdiumAmount -= cost.Aladdium;
+
+                // The hero randomization must be done here to so that every individual train
+                // an be a hero or not. Otherwise, heroes are created on all training units.
+                var actualTraineeType = match.RandomizeHero(traineePrototype);
+                mostFreeTaskQueue.Enqueue(new TrainTask(mostFreeTaskQueue.Entity, actualTraineeType));
             }
         }
 

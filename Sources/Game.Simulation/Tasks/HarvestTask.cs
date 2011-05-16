@@ -26,8 +26,9 @@ namespace Orion.Game.Simulation.Tasks
         #region Fields
         private const float extractingDuration = 5;
 
-        private readonly Entity resourceNode;
         private readonly ResourceType resourceType;
+        private Entity resourceNode;
+        private Point resourceNodeLocation;
         private int amountCarrying;
         private float amountAccumulator;
         private MoveTask move;
@@ -43,8 +44,9 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot harvest without the harvester component.", "entity");
             Argument.EnsureNotNull(resourceNode, "node");
 
-            this.resourceNode = resourceNode;
             this.resourceType = resourceNode.Components.Get<Harvestable>().Type;
+            this.resourceNode = resourceNode;
+            this.resourceNodeLocation = (Point)resourceNode.Spatial.Center;
             this.move = MoveTask.ToNearRegion(entity, resourceNode.Spatial.GridRegion);
         }
         #endregion
@@ -134,7 +136,16 @@ namespace Orion.Game.Simulation.Tasks
             {
                 if (amountCarrying == 0)
                 {
-                    MarkAsEnded();
+                    resourceNode = FindNearbyNode();
+                    if (resourceNode == null)
+                    {
+                        MarkAsEnded();
+                    }
+                    else
+                    {
+                        resourceNodeLocation = (Point)resourceNode.Spatial.Center;
+                        move = MoveTask.ToNearRegion(Entity, resourceNode.Spatial.GridRegion);
+                    }
                     return;
                 }
 
@@ -148,6 +159,7 @@ namespace Orion.Game.Simulation.Tasks
             amountAccumulator += extractingSpeed * step.TimeDeltaInSeconds;
 
             int maxCarryingAmount = (int)Entity.GetStatValue(Harvester.MaxCarryingAmountStat);
+
             while (amountAccumulator >= 1)
             {
                 Harvestable harvestable = resourceNode.Components.Get<Harvestable>();
@@ -157,12 +169,9 @@ namespace Orion.Game.Simulation.Tasks
                     return;
                 }
 
-#warning Unshit this
-                harvestable.Harvest(1);
                 --amountAccumulator;
                 ++amountCarrying;
-
-                if (harvestable.IsEmpty)
+                if (harvestable.Extract(1))
                 {
                     faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvestable.Type));
                     TransitionToDelivering();
@@ -205,18 +214,22 @@ namespace Orion.Game.Simulation.Tasks
             depot.Components.Get<ResourceDepot>().Deposit(resourceType, amountCarrying);
             amountCarrying = 0;
 
-            if (!IsResourceNodeValid)
+            // If the entity was enqueued other tasks, stop harvesting
+            if (TaskQueue.Count > 1)
             {
-                if (TaskQueue.Count == 1) TaskQueue.OverrideWith(new MoveTask(Entity, (Point)resourceNode.Center));
                 MarkAsEnded();
                 return;
             }
 
-            // If the entity was enqueued other tasks, stop harvesting
-            if (TaskQueue.Count > 1) MarkAsEnded();
-
             mode = Mode.Extracting;
-            move = MoveTask.ToNearRegion(Entity, resourceNode.Spatial.GridRegion);
+            if (IsResourceNodeValid)
+            {
+                move = MoveTask.ToNearRegion(Entity, resourceNode.Spatial.GridRegion);
+            }
+            else
+            {
+                move = new MoveTask(Entity, resourceNodeLocation);
+            }
         }
 
         private static bool IsValidResourceDepot(Entity entity)
@@ -246,6 +259,25 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             return nearestDepot;
+        }
+
+        private Entity FindNearbyNode()
+        {
+            Vision vision = Entity.Components.TryGet<Vision>();
+            if (vision == null) return null;
+
+            foreach (Spatial spatial in World.SpatialManager.Intersecting(vision.LineOfSight))
+            {
+                Entity entity = spatial.Entity;
+                if (!vision.IsInRange(entity)) continue;
+
+                Harvestable harvestable = entity.Components.TryGet<Harvestable>();
+                if (harvestable == null || harvestable.IsEmpty) continue;
+
+                return entity;
+            }
+
+            return null;
         }
         #endregion
         #endregion

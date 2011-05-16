@@ -22,13 +22,6 @@ namespace Orion.Game.Simulation.Components
         public Harvestable(Entity entity) : base(entity) { }
         #endregion
 
-        #region Events
-        /// <summary>
-        /// Raised when the amount of resources available in this node changes.
-        /// </summary>
-        public event Action<Entity> AmountChanged;
-        #endregion
-
         #region Properties
         [Persistent(true)]
         public int Amount
@@ -37,10 +30,7 @@ namespace Orion.Game.Simulation.Components
             set
             {
                 Argument.EnsurePositive(value, "Amount");
-                if (value == amount) return;
-
                 amount = value;
-                AmountChanged.Raise(Entity);
             }
         }
 
@@ -51,6 +41,9 @@ namespace Orion.Game.Simulation.Components
             set { type = value; }
         }
 
+        /// <summary>
+        /// Gets a value indicating if the resources in this entity have been depleted.
+        /// </summary>
         public bool IsEmpty
         {
             get { return amount == 0; }
@@ -58,9 +51,21 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public void Harvest(int amount)
+        /// <summary>
+        /// Removes resources from this <see cref="Entity"/>.
+        /// </summary>
+        /// <param name="amount">The amount of resources to be removed.</param>
+        /// <returns>A value indicating if this <see cref="Entity"/> has been depleted.</returns>
+        public bool Extract(int amount)
         {
-            Amount = Math.Max(0, this.amount - amount);
+            Argument.EnsurePositive(amount, "amount");
+            if (amount > this.amount) throw new ArgumentException("Cannot extract more than the remaining amount.", "Amount");
+
+            this.amount -= amount;
+            if (!IsEmpty) return false;
+            
+            Entity.Die();
+            return true;
         }
         #endregion
     }

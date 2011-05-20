@@ -34,6 +34,9 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
+        /// <summary>
+        /// Accesses the type of resource provided by this <see cref="Harvestable"/>.
+        /// </summary>
         [Persistent(true)]
         public ResourceType Type
         {

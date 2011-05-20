@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Game.Simulation.Components.Serialization;
 using Orion.Engine.Geometry;
-using System.Diagnostics;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -28,8 +28,10 @@ namespace Orion.Game.Simulation.Components
         private float range;
         private float delay = 1;
         private float splashRadius;
-        private TimeSpan lastHitTime = TimeSpan.FromHours(-1); // Arbitrary long time in the past, MinValue can cause arythmetic problems
         private readonly List<DamageFilter> damageFilters = new List<DamageFilter>();
+
+        private TimeSpan lastHitTime = TimeSpan.FromHours(-1); // Arbitrary long time in the past, MinValue can cause arithmetic problems
+        private int killCount;
         #endregion
 
         #region Constructors
@@ -120,9 +122,28 @@ namespace Orion.Game.Simulation.Components
         {
             get { return (World == null ? TimeSpan.Zero : World.SimulationTime) - lastHitTime; }
         }
+        
+        /// <summary>
+        /// Gets the number of kills this <see cref="Entity"/> made.
+        /// </summary>
+        public int KillCount
+        {
+            get { return killCount; }
+        }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Increases the kill counter of this <see cref="Entity"/>.
+        /// </summary>
+        /// <param name="count">The number of kills to add to the kill counter.</param>
+        public void AddKills(int count)
+        {
+            Argument.EnsurePositive(count, "count");
+
+            this.killCount += count;
+        }
+
         public float ApplyDamageFilters(float initalDamage, Entity target)
         {
             float finalDamage = initalDamage;

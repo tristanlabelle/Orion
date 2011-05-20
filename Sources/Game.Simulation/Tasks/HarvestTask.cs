@@ -272,7 +272,9 @@ namespace Orion.Game.Simulation.Tasks
                 if (!vision.IsInRange(entity)) continue;
 
                 Harvestable harvestable = entity.Components.TryGet<Harvestable>();
-                if (harvestable == null || harvestable.IsEmpty) continue;
+                if (harvestable == null
+                    || harvestable.IsEmpty
+                    || harvestable.Type != resourceType) continue;
 
                 return entity;
             }

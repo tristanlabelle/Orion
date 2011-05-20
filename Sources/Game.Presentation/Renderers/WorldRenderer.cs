@@ -22,6 +22,8 @@ namespace Orion.Game.Presentation.Renderers
         private readonly EntityRenderer entityRenderer;
         private readonly ExplosionRenderer explosionRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
+
+        private readonly HashSet<BuildingPlan> tempPlans = new HashSet<BuildingPlan>();
         #endregion
 
         #region Constructors
@@ -109,13 +111,12 @@ namespace Orion.Game.Presentation.Renderers
 
         public void DrawBlueprints(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            HashSet<BuildingPlan> plans = new HashSet<BuildingPlan>();
             foreach (Entity entity in World.Entities)
             {
-                Faction faction = FactionMembership.GetFaction(entity);
+                Faction entityFaction = FactionMembership.GetFaction(entity);
                 TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
-                if (faction == null
-                    || !faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
+                if (entityFaction == null
+                    || !entityFaction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
                     || taskQueue == null)
                 {
                     continue;
@@ -124,17 +125,19 @@ namespace Orion.Game.Presentation.Renderers
                 foreach (Task task in taskQueue)
                 {
                     BuildTask buildTask = task as BuildTask;
-                    if (buildTask != null) plans.Add(buildTask.Plan);
+                    if (buildTask != null) tempPlans.Add(buildTask.Plan);
                 }
             }
 
             ColorRgba tint = new ColorRgba(Colors.DarkBlue, 0.5f);
-            foreach (BuildingPlan plan in plans)
+            foreach (BuildingPlan plan in tempPlans)
             {
                 Texture buildingTexture = gameGraphics.GetEntityTexture(plan.BuildingPrototype);
                 Rectangle buildingRectangle = plan.GridRegion.ToRectangle();
                 graphicsContext.Fill(buildingRectangle, buildingTexture, tint);
             }
+
+            tempPlans.Clear();
         }
 
         public void Dispose()

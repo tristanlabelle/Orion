@@ -154,7 +154,7 @@ namespace Orion.Game.Simulation.Components
                 else
                 {
                     // Warning! Black magic ahead :D
-                    // Generate a method returning the StatValue for a ComponentInstance
+                    // Generate a method returning the StatValue for a component instance
                     DynamicMethod generatedValueGetterMethod = new DynamicMethod(
                         "GeneratedGet" + type.Name + stat.Name + "StatValue",
                         typeof(StatValue), valueGetterMethodParameterTypes);

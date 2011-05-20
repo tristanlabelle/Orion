@@ -431,7 +431,7 @@ namespace Orion.Game.Simulation
                 }
             }
 
-            OnChanged(new Region(minX, minY, exclusiveMaxX, exclusiveMaxY));
+            OnChanged(Region.FromMinExclusiveMax(minX, minY, exclusiveMaxX, exclusiveMaxY));
         }
         #endregion
 

@@ -76,6 +76,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Static
+        #region Fields
+        public static readonly StatValue IntegerZero = CreateZero(StatType.Integer);
+        public static readonly StatValue RealZero = CreateZero(StatType.Real);
+        #endregion
+
         #region Methods
         /// <summary>
         /// Creates a <see cref="StatValue"/> of a given type with a value of zero.

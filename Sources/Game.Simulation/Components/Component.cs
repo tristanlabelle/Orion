@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Orion.Engine;
+using System.Reflection.Emit;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -14,8 +15,51 @@ namespace Orion.Game.Simulation.Components
     [Serializable]
     public abstract class Component
     {
+        #region StatGetterCacheKey Structure
+        /// <summary>
+        /// A component type and stat tuple used as a key in the stat value getter dictionary.
+        /// </summary>
+        private struct StatGetterCacheKey : IEquatable<StatGetterCacheKey>
+        {
+            public Type ComponentType;
+            public Stat Stat;
+
+            public bool Equals(StatGetterCacheKey other)
+            {
+                return other.ComponentType == ComponentType && other.Stat == Stat;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is StatGetterCacheKey && Equals((StatGetterCacheKey)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return ComponentType.GetHashCode() ^ Stat.GetHashCode();
+            }
+        }
+        #endregion
+
         #region Fields
-        private static readonly Type[] constructorArguments = new Type[] { typeof(Entity) };
+        // Null stat value getters that always return zero.
+        private static readonly Func<Component, StatValue> zeroIntegerStatValueGetter
+            = component => StatValue.IntegerZero;
+        private static readonly Func<Component, StatValue> zeroRealStatValueGetter
+            = component => StatValue.RealZero;
+
+        /// <summary>
+        /// The stat value getter cache.
+        /// This associates a delegate returning the stat value for a given component instance
+        /// to every (component type, stat) tuple.
+        /// </summary>
+        private static readonly Dictionary<StatGetterCacheKey, Func<Component, StatValue>> statValueGetterCache
+            = new Dictionary<StatGetterCacheKey, Func<Component, StatValue>>();
+
+        private static readonly Type[] valueGetterMethodParameterTypes = new[] { typeof(Component) };
+        private static readonly MethodInfo createIntegerStatValueMethod = typeof(StatValue).GetMethod("CreateInteger");
+        private static readonly MethodInfo createRealStatValueMethod = typeof(StatValue).GetMethod("CreateReal");
+
         private readonly Entity entity;
         private bool isActive;
         #endregion
@@ -80,18 +124,68 @@ namespace Orion.Game.Simulation.Components
             Type type = GetType();
             if (type != stat.ComponentType) return StatValue.CreateZero(stat.Type);
 
-            PropertyInfo property = type.GetProperty(stat.Name);
-            if (property == null)
+            // The default way to retrieve a stat bonus is to get the value from a property
+            // with the same name as the stat. Using reflection yields a performance which takes
+            // about 15% of the simulation update time, so this code instead caches delegates
+            // that retrieve directly the value of the properties for each (component type, stat) tuple.
+
+            StatGetterCacheKey key = new StatGetterCacheKey
             {
-                Debug.Fail("Component {0} defines stat {1} but does not implement a property for it."
-                    .FormatInvariant(GetType().FullName, stat.Name));
-                return StatValue.CreateZero(stat.Type);
+                ComponentType = type,
+                Stat = stat
+            };
+
+            // This is not thread-safe!
+            Func<Component, StatValue> valueGetterDelegate;
+            if (!statValueGetterCache.TryGetValue(key, out valueGetterDelegate))
+            {
+                PropertyInfo property = type.GetProperty(stat.Name);
+                MethodInfo propertyGetter = property == null
+                    ? null : property.GetGetMethod();
+                if (propertyGetter == null)
+                {
+                    Debug.Fail("Component {0} defines stat {1} but does not implement a gettable property for it."
+                        .FormatInvariant(GetType().FullName, stat.Name));
+
+                    // Insert a dummy value getter which always returns 0
+                    valueGetterDelegate = stat.Type == StatType.Integer ?
+                        zeroIntegerStatValueGetter : zeroRealStatValueGetter;
+                }
+                else
+                {
+                    // Warning! Black magic ahead :D
+                    // Generate a method returning the StatValue for a ComponentInstance
+                    DynamicMethod generatedValueGetterMethod = new DynamicMethod(
+                        "GeneratedGet" + type.Name + stat.Name + "StatValue",
+                        typeof(StatValue), valueGetterMethodParameterTypes);
+
+                    // Load the component instance argument
+                    ILGenerator ilGenerator = generatedValueGetterMethod.GetILGenerator();
+                    ilGenerator.Emit(OpCodes.Ldarg_0);
+                    // Cast it to its actual derived component type
+                    ilGenerator.Emit(OpCodes.Castclass, type);
+                    // Retrieve the value of the stat property
+                    ilGenerator.Emit(OpCodes.Callvirt, propertyGetter);
+                    // Wrap it in a StatValue structure
+                    ilGenerator.Emit(OpCodes.Call, stat.Type == StatType.Integer
+                        ? createIntegerStatValueMethod : createRealStatValueMethod);
+                    // Return it
+                    ilGenerator.Emit(OpCodes.Ret);
+
+                    // Make a delegate out of the generated dynamic method
+                    valueGetterDelegate = (Func<Component, StatValue>)
+                        generatedValueGetterMethod.CreateDelegate(typeof(Func<Component, StatValue>), null);
+                }
+
+                statValueGetterCache.Add(key, valueGetterDelegate);
             }
 
-            if (stat.Type == StatType.Integer)
-                return StatValue.CreateInteger((int)property.GetValue(this, null));
-            else
-                return StatValue.CreateReal((float)property.GetValue(this, null));
+            return valueGetterDelegate(this);
+        }
+
+        public static StatValue Foo(Component component)
+        {
+            return StatValue.CreateInteger(((Health)component).MaxValue);
         }
 
         /// <summary>

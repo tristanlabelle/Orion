@@ -412,7 +412,7 @@ namespace Orion.Game.Simulation
             {
                 for (int y = minY; y < exclusiveMaxY; ++y)
                 {
-                    for (int x = minY; x < exclusiveMaxX; ++x)
+                    for (int x = minX; x < exclusiveMaxX; ++x)
                     {
                         if (!lookup.IsSet(x, y)) continue;
                         AddSilently(x, y);
@@ -423,7 +423,7 @@ namespace Orion.Game.Simulation
             {
                 for (int y = minY; y < exclusiveMaxY; ++y)
                 {
-                    for (int x = minY; x < exclusiveMaxX; ++x)
+                    for (int x = minX; x < exclusiveMaxX; ++x)
                     {
                         if (!lookup.IsSet(x, y)) continue;
                         RemoveSilently(x, y);

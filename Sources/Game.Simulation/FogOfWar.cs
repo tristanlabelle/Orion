@@ -9,13 +9,17 @@ using Orion.Engine.Geometry;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Manages the visibility of world regions with regard to the viewpoint of a faction.
+    /// Manages a grid that indicates if each world tile is undiscovered, discovered or visible.
     /// </summary>
+    /// <remarks>
+    /// This class is performance-critical, so there are some dirty tricks here and there,
+    /// some willingly duplicated code and not much runtime validation.
+    /// </remarks>
     [Serializable]
     public sealed class FogOfWar
     {
         #region Nested Types
-        private struct IntegerCircle : IEquatable<IntegerCircle>
+        public struct IntegerCircle : IEquatable<IntegerCircle>
         {
             #region Instance
             #region Fields
@@ -156,11 +160,30 @@ namespace Orion.Game.Simulation
         #region Instance
         #region Fields
         /// <summary>
+        /// The value of undiscovered tiles in the <see cref="tiles"/> array.
+        /// </summary>
+        /// <remarks>
+        /// The topmost bit indicates undiscovery. When incremented,
+        /// that bit gets discarded so the tile is considered discovered.
+        /// </remarks>
+        private const ushort undiscoveredTileValue = 1 << 15;
+
+        /// <summary>
+        /// The mask to the reference count in a tile value.
+        /// </summary>
+        /// <remarks>
+        /// This includes all bits but the topmost, which indicates undiscovery.
+        /// </remarks>
+        private const ushort tileReferenceCountMask = 0x7FFF;
+
+        private readonly int width;
+        private readonly int height;
+        /// <summary>
         /// Holds the reference count of each tile in the fog of war.
-        /// Indexed by [x, y]. A value of <see cref="ushort.MaxValue"/>
+        /// A value of <see cref="undiscoveredTileValue"/>
         /// indicates that the tile has never been seen.
         /// </summary>
-        private readonly ushort[,] tiles;
+        private readonly ushort[] tiles;
         private readonly Dictionary<int, BitArray2D> cachedCircleBitmaps = new Dictionary<int, BitArray2D>();
         private bool isEnabled = true;
         #endregion
@@ -170,10 +193,11 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureStrictlyPositive(size.Area, "size.Area");
 
-            this.tiles = new ushort[size.Width, size.Height];
-            for (int i = 0; i < size.Width; i++)
-                for (int j = 0; j < size.Height; j++)
-                    this.tiles[i, j] = ushort.MaxValue; 
+            this.width = size.Width;
+            this.height = size.Height;
+            this.tiles = new ushort[size.Area];
+            for (int i = 0; i < size.Area; i++)
+                this.tiles[i] = undiscoveredTileValue; 
         }
         #endregion
 
@@ -196,11 +220,27 @@ namespace Orion.Game.Simulation
 
         #region Properties
         /// <summary>
-        /// Gets the size of the terrain, in tiles.
+        /// Gets the width of the fog of war grid, in tiles.
+        /// </summary>
+        public int Width
+        {
+            get { return width; }
+        }
+
+        /// <summary>
+        /// Gets the height of the fog of war grid, in tiles.
+        /// </summary>
+        public int Height
+        {
+            get { return height; }
+        }
+
+        /// <summary>
+        /// Gets the size of the fog of war grid, in tiles.
         /// </summary>
         public Size Size
         {
-            get { return new Size(tiles.GetLength(0), tiles.GetLength(1)); }
+            get { return new Size(width, height); }
         }
 
         /// <summary>
@@ -213,96 +253,118 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        #region Updating
-        #region Public Interface
-        public void UpdateLineOfSight(Circle oldLineOfSight, Circle newLineOfSight)
+        #region Points
+        /// <summary>
+        /// Adds a vision reference to a fog of war point without raising changed events.
+        /// </summary>
+        /// <param name="x">The x coordinate of the point.</param>
+        /// <param name="y">The y coordinate of the point.</param>
+        public void AddSilently(int x, int y)
         {
-            if (!isEnabled) return;
+            Debug.Assert(x >= 0 && x < width && y >= 0 && y < height,
+                "Fog of war point out of bounds.");
 
-            IntegerCircle roundedOldLineOfSight = new IntegerCircle(oldLineOfSight);
-            IntegerCircle roundedNewLineOfSight = new IntegerCircle(newLineOfSight);
+            int tileIndex = x + y * width;
 
-            if (roundedNewLineOfSight == roundedOldLineOfSight) return;
+            Debug.Assert(tiles[tileIndex] != tileReferenceCountMask,
+                "Fog of war tile reference count overflow.");
 
-            ModifyLineOfSight(roundedOldLineOfSight, false);
-            ModifyLineOfSight(roundedNewLineOfSight, true);
-        }
-
-        public void AddLineOfSight(Circle lineOfSight)
-        {
-            if (!isEnabled) return;
-
-            IntegerCircle roundedLineOfSight = new IntegerCircle(lineOfSight);
-            ModifyLineOfSight(roundedLineOfSight, true);
-        }
-
-        public void RemoveLineOfSight(Circle lineOfSight)
-        {
-            if (!isEnabled) return;
-
-            IntegerCircle roundedLineOfSight = new IntegerCircle(lineOfSight);
-            ModifyLineOfSight(roundedLineOfSight, false);
-        }
-
-        public void AddRegion(Region region)
-        {
-            ModifyRegion(region, true);
-        }
-
-        public void RemoveRegion(Region region)
-        {
-            ModifyRegion(region, false);
-        }
-
-        public void Reveal(Point point)
-        {
-            RevealWithoutRaisingEvent(point);
-            OnChanged(new Region(point, new Size(1, 1)));
-        }
-
-        public void RevealWithoutRaisingEvent(Point point)
-        {
-            RevealWithoutRaisingEvent(point.X, point.Y);
-        }
-
-        public void RevealWithoutRaisingEvent(int x, int y)
-        {
-            if (tiles[x, y] == ushort.MaxValue)
-                tiles[x, y] = 0;
+            // Clear the top bit, which indicates undiscovery, and increment
+            // the reference count.
+            tiles[tileIndex] = (ushort)((tiles[tileIndex] & tileReferenceCountMask) + 1);
         }
 
         /// <summary>
-        /// Reveals the map, as if the player had seen every tile at least once.
+        /// Removes a vision reference to a fog of war point without raising changed events.
         /// </summary>
-        public void Reveal()
+        /// <param name="x">The x coordinate of the point.</param>
+        /// <param name="y">The y coordinate of the point.</param>
+        public void RemoveSilently(int x, int y)
         {
-            if (!isEnabled) return;
+            Debug.Assert(x >= 0 && x < width && y >= 0 && y < height,
+                "Fog of war point out of bounds.");
 
-            for (int x = 0; x < Size.Width; x++)
-                for (int y = 0; y < Size.Height; y++)
-                    RevealWithoutRaisingEvent(x, y);
+            int tileIndex = x + y * width;
 
-            OnChanged();
+            Debug.Assert((tiles[tileIndex] & tileReferenceCountMask) > 0,
+                "Fog of war tile reference count underflow.");
+
+            tiles[tileIndex]--;
         }
 
         /// <summary>
-        /// Disables the fog of war, as if there were always units seeing every tile.
+        /// Reveals a fog of war point without raising changed events.
         /// </summary>
-        public void Disable()
+        /// <param name="x">The x coordinate of the point.</param>
+        /// <param name="y">The y coordinate of the point.</param>
+        public void RevealSilently(int x, int y)
         {
-            if (!isEnabled) return;
+            Debug.Assert(x >= 0 && x < width && y >= 0 && y < height,
+                "Fog of war point out of bounds.");
 
-            isEnabled = false;
+            int tileIndex = x + y * width;
+            tiles[tileIndex] &= tileReferenceCountMask;
+        }
 
-            for (int x = 0; x < Size.Width; x++)
-                for (int y = 0; y < Size.Height; y++)
-                    tiles[x, y] = 1;
+        public TileVisibility GetTileVisibility(int x, int y)
+        {
+            Debug.Assert(x >= 0 && x < width && y >= 0 && y < height,
+                "Fog of war point out of bounds.");
 
-            OnChanged();
+            int tileIndex = x + y * width;
+            ushort value = tiles[tileIndex];
+            if (value == undiscoveredTileValue) return TileVisibility.Undiscovered;
+            return value == 0 ? TileVisibility.Discovered : TileVisibility.Visible;
+        }
+
+        public bool IsDiscovered(int x, int y)
+        {
+            Debug.Assert(x >= 0 && x < width && y >= 0 && y < height,
+                "Fog of war point out of bounds.");
+
+            int tileIndex = x + y * width;
+            return tiles[tileIndex] != undiscoveredTileValue;
+        }
+
+        public bool IsVisible(int x, int y)
+        {
+            Debug.Assert(x >= 0 && x < width && y >= 0 && y < height,
+                "Fog of war point out of bounds.");
+
+            int tileIndex = x + y * width;
+            return (tiles[tileIndex] & tileReferenceCountMask) > 0;
         }
         #endregion
 
-        #region Private Implementation
+        #region Circles
+        /// <summary>
+        /// Adds or remove visibility to a given fog of war circle.
+        /// </summary>
+        /// <param name="circle">The circle to be modified.</param>
+        /// <param name="add">
+        /// True to add a new vision reference, false to remove one.
+        /// </param>
+        public void ModifyCircle(Circle circle, bool add)
+        {
+            if (!isEnabled) return;
+
+            IntegerCircle roundedCircle = new IntegerCircle(circle);
+            ModifyCircle(roundedCircle, add);
+        }
+
+        public void UpdateCircle(Circle oldCircle, Circle newCircle)
+        {
+            if (!isEnabled) return;
+
+            IntegerCircle oldRoundedCircle = new IntegerCircle(oldCircle);
+            IntegerCircle newRoundedCircle = new IntegerCircle(newCircle);
+
+            if (newRoundedCircle == oldRoundedCircle) return;
+
+            ModifyCircle(oldRoundedCircle, false);
+            ModifyCircle(newRoundedCircle, true);
+        }
+
         private BitArray2D GetCircleBitmap(int radius)
         {
             BitArray2D bitmap;
@@ -335,85 +397,103 @@ namespace Orion.Game.Simulation
             return new CircleLookup(minX, minY, bitmap);
         }
 
-        private void ModifyLineOfSight(IntegerCircle lineOfSight, bool addOrRemove)
+        private void ModifyCircle(IntegerCircle circle, bool add)
         {
             if (!isEnabled) return;
 
-            CircleLookup lookup = GetCircleLookup(lineOfSight);
-            Region region = Region.FromMinExclusiveMax(
-                Math.Max(lookup.MinX, 0), Math.Max(lookup.MinY, 0),
-                Math.Min(lookup.ExclusiveMaxX, Size.Width), Math.Min(lookup.ExclusiveMaxY, Size.Height));
+            CircleLookup lookup = GetCircleLookup(circle);
 
-            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+            int minX = Math.Max(lookup.MinX, 0);
+            int minY = Math.Max(lookup.MinY, 0);
+            int exclusiveMaxX = Math.Min(lookup.ExclusiveMaxX, width);
+            int exclusiveMaxY = Math.Min(lookup.ExclusiveMaxY, height);
+
+            if (add)
             {
-                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                for (int y = minY; y < exclusiveMaxY; ++y)
                 {
-                    if (!lookup.IsSet(x, y)) continue;
-                    ModifyAtWithoutRaisingChanged(x, y, addOrRemove);
-                }
-            }
-
-            OnChanged(region);
-        }
-
-        private void ModifyRegion(Region region, bool addOrRemove)
-        {
-            if (!isEnabled) return;
-
-            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-                    ModifyAtWithoutRaisingChanged(x, y, addOrRemove);
-
-            OnChanged(region);
-        }
-
-        private void ModifyAtWithoutRaisingChanged(int x, int y, bool addOrRemove)
-        {
-            if (addOrRemove)
-            {
-                if (tiles[x, y] == ushort.MaxValue)
-                {
-                    tiles[x, y] = 1;
-                }
-                else
-                {
-                    Debug.Assert(tiles[x, y] != ushort.MaxValue - 1,
-                        "Unit reference count overflow.");
-                    tiles[x, y]++;
+                    for (int x = minY; x < exclusiveMaxX; ++x)
+                    {
+                        if (!lookup.IsSet(x, y)) continue;
+                        AddSilently(x, y);
+                    }
                 }
             }
             else
             {
-                Debug.Assert(tiles[x, y] != ushort.MaxValue && tiles[x, y] != 0,
-                    "Unit reference count underflow.");
-                tiles[x, y]--;
+                for (int y = minY; y < exclusiveMaxY; ++y)
+                {
+                    for (int x = minY; x < exclusiveMaxX; ++x)
+                    {
+                        if (!lookup.IsSet(x, y)) continue;
+                        RemoveSilently(x, y);
+                    }
+                }
             }
+
+            OnChanged(new Region(minX, minY, exclusiveMaxX, exclusiveMaxY));
         }
         #endregion
-        #endregion
 
-        #region Testing
+        #region Regions
         /// <summary>
-        /// Gets the visibility status of a tile at the specified coordinates.
+        /// Adds or remove visibility to a given fog of war region.
         /// </summary>
-        /// <param name="point">The point where to check.</param>
-        /// <returns>A flag indicating the visibility state of that tile.</returns>
-        public TileVisibility GetTileVisibility(Point point)
+        /// <param name="region">The region to be modified.</param>
+        /// <param name="add">
+        /// True to add a new vision reference, false to remove one.
+        /// </param>
+        public void ModifyRegion(Region region, bool add)
         {
-            ushort value = tiles[point.X, point.Y];
-            if (value == ushort.MaxValue) return TileVisibility.Undiscovered;
-            return value == 0 ? TileVisibility.Discovered : TileVisibility.Visible;
+            if (!isEnabled) return;
+
+            int exclusiveMaxX = region.ExclusiveMaxX;
+            int exclusiveMaxY = region.ExclusiveMaxY;
+
+            if (add)
+            {
+                for (int y = region.MinY; y < exclusiveMaxY; ++y)
+                    for (int x = region.MinX; x < exclusiveMaxX; ++x)
+                        AddSilently(x, y);
+            }
+            else
+            {
+                for (int y = region.MinY; y < exclusiveMaxY; ++y)
+                    for (int x = region.MinX; x < exclusiveMaxX; ++x)
+                        RemoveSilently(x, y);
+            }
+
+            OnChanged(region);
+        }
+        #endregion
+
+        #region Full Grid
+        /// <summary>
+        /// Reveals the map, as if the player had seen every tile at least once.
+        /// </summary>
+        public void Reveal()
+        {
+            if (!isEnabled) return;
+
+            for (int i = 0; i < tiles.Length; ++i)
+                tiles[i] &= tileReferenceCountMask;
+
+            OnChanged();
         }
 
-        public bool IsDiscovered(Point point)
+        /// <summary>
+        /// Disables the fog of war, as if there were always entities seeing every tile.
+        /// </summary>
+        public void Disable()
         {
-            return tiles[point.X, point.Y] < ushort.MaxValue;
-        }
+            if (!isEnabled) return;
 
-        public bool IsVisible(Point point)
-        {
-            ushort value = tiles[point.X, point.Y];
-            return value > 0 && value < ushort.MaxValue;
+            isEnabled = false;
+
+            for (int i = 0; i < tiles.Length; ++i)
+                tiles[i] = 1;
+
+            OnChanged();
         }
         #endregion
         #endregion

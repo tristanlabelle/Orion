@@ -580,7 +580,7 @@ namespace Orion.Game.Simulation
         /// </remarks>
         public TileVisibility GetTileVisibility(Point point)
         {
-            TileVisibility visibility = localFogOfWar.GetTileVisibility(point);
+            TileVisibility visibility = localFogOfWar.GetTileVisibility(point.X, point.Y);
             if (visibility == TileVisibility.Visible) return TileVisibility.Visible;
 
             foreach (var pair in diplomaticStances)
@@ -589,9 +589,9 @@ namespace Orion.Game.Simulation
                 if (!faction.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
                     continue;
 
-                if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
+                if (faction.localFogOfWar.GetTileVisibility(point.X, point.Y) == TileVisibility.Visible)
                     return TileVisibility.Visible;
-                else if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Discovered)
+                else if (faction.localFogOfWar.GetTileVisibility(point.X, point.Y) == TileVisibility.Discovered)
                     visibility = TileVisibility.Discovered;
             }
 
@@ -609,7 +609,7 @@ namespace Orion.Game.Simulation
         /// </remarks>
         public bool HasSeen(Point point)
         {
-            if (localFogOfWar.IsDiscovered(point)) return true;
+            if (localFogOfWar.IsDiscovered(point.X, point.Y)) return true;
 
             foreach (var pair in diplomaticStances)
             {
@@ -617,7 +617,7 @@ namespace Orion.Game.Simulation
                 if (!faction.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
                     continue;
 
-                if (faction.localFogOfWar.IsDiscovered(point))
+                if (faction.localFogOfWar.IsDiscovered(point.X, point.Y))
                     return true;
             }
 
@@ -638,15 +638,13 @@ namespace Orion.Game.Simulation
 
         private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)
         {
-            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-            {
-                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-                {
-                    Point point = new Point(x, y);
-                    if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
-                        localFogOfWar.RevealWithoutRaisingEvent(point);
-                }
-            }
+            int exclusiveMaxX = region.ExclusiveMaxX;
+            int exclusiveMaxY = region.ExclusiveMaxY;
+
+            for (int y = region.MinY; y < exclusiveMaxY; ++y)
+                for (int x = region.MinX; x < exclusiveMaxX; ++x)
+                    if (other.IsDiscovered(x, y))
+                        localFogOfWar.RevealSilently(x, y);
         }
         #endregion
 

@@ -51,8 +51,8 @@ namespace Orion.Game.Presentation.Renderers
             get
             {
                 return new Rectangle(0, 0,
-                    faction.LocalFogOfWar.Size.Width / (float)texture.Width,
-                    faction.LocalFogOfWar.Size.Height / (float)texture.Height);
+                    faction.LocalFogOfWar.Width / (float)texture.Width,
+                    faction.LocalFogOfWar.Height / (float)texture.Height);
             }
         }
         #endregion
@@ -68,9 +68,8 @@ namespace Orion.Game.Presentation.Renderers
                 dirtyRegion = null;
             }
 
-            Rectangle terrainBounds = new Rectangle(0, 0,
-                faction.LocalFogOfWar.Size.Width, faction.LocalFogOfWar.Size.Height);
-            graphics.Fill(terrainBounds, texture, TextureRectangle, fogColor);
+            Rectangle bounds = new Rectangle(faction.LocalFogOfWar.Width, faction.LocalFogOfWar.Height);
+            graphics.Fill(bounds, texture, TextureRectangle, fogColor);
         }
 
         private void OnVisibilityChanged(Faction faction, Region region)
@@ -127,8 +126,7 @@ namespace Orion.Game.Presentation.Renderers
                 for (int y = 0; y < surface.Size.Height; ++y)
                 {
                     int pixelIndex = y * surface.Size.Width + x;
-                    Point point = new Point(x, y);
-                    TileVisibility visibility = faction.LocalFogOfWar.GetTileVisibility(point);
+                    TileVisibility visibility = faction.LocalFogOfWar.GetTileVisibility(x, y);
                     if (visibility == TileVisibility.Visible)
                         surface.Data.Array[pixelIndex] = 0;
                     else if (visibility == TileVisibility.Discovered)

@@ -107,17 +107,24 @@ namespace Orion.Game.Simulation
             {
                 if (value == center) return;
 
-                if (regionType == FogOfWarRegionType.None)
+                if (regionType == FogOfWarRegionType.LineOfSight)
                 {
-                    center = value;
-                }
-                else
+                    Circle currentLineOfSight = new Circle(center, sightRange);
+                    Circle newLineOfSight = new Circle(value, sightRange);
+                    fogOfWar.UpdateCircle(currentLineOfSight, newLineOfSight);
+                } 
+                else if (regionType == FogOfWarRegionType.Glow)
                 {
-                    // TODO: Do not update the fog of war for insignificant position changes
-                    RemoveRegion();
-                    center = value;
-                    AddRegion();
+                    Region currentRegion = GetRegion(center, size);
+                    Region newRegion = GetRegion(value, size);
+                    if (newRegion != currentRegion)
+                    {
+                        fogOfWar.ModifyRegion(currentRegion, false);
+                        fogOfWar.ModifyRegion(newRegion, true);
+                    }
                 }
+
+                center = value;
             }
         }
 
@@ -166,7 +173,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Region Region
         {
-            get { return Spatial.GetGridRegion(center - (Vector2)size * 0.5f, size); }
+            get { return GetRegion(center, size); }
         }
         #endregion
 
@@ -179,20 +186,25 @@ namespace Orion.Game.Simulation
             RegionType = FogOfWarRegionType.None;
         }
 
+        private static Region GetRegion(Vector2 center, Size size)
+        {
+            return Spatial.GetGridRegion(center - (Vector2)size * 0.5f, size);
+        }
+
         private void AddRegion()
         {
             if (regionType == FogOfWarRegionType.LineOfSight)
-                fogOfWar.AddLineOfSight(LineOfSight);
+                fogOfWar.ModifyCircle(LineOfSight, true);
             else if (regionType == FogOfWarRegionType.Glow)
-                fogOfWar.AddRegion(Region);
+                fogOfWar.ModifyRegion(Region, true);
         }
 
         private void RemoveRegion()
         {
             if (regionType == FogOfWarRegionType.LineOfSight)
-                fogOfWar.RemoveLineOfSight(LineOfSight);
+                fogOfWar.ModifyCircle(LineOfSight, false);
             else if (regionType == FogOfWarRegionType.Glow)
-                fogOfWar.RemoveRegion(Region);
+                fogOfWar.ModifyRegion(Region, false);
         }
         #endregion
     }

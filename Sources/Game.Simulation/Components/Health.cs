@@ -37,13 +37,6 @@ namespace Orion.Game.Simulation.Components
         public Health(Entity entity) : base(entity) { }
         #endregion
 
-        #region Events
-        /// <summary>
-        /// Raised when the host <see cref="Entity"/> gets damaged or healed.
-        /// </summary>
-        public event Action<Health> DamageChanged;
-        #endregion
-
         #region Properties
         /// <summary>
         /// Accesses the maximum number of health points that can be had by the host <see cref="Entity"/>.
@@ -123,17 +116,6 @@ namespace Orion.Game.Simulation.Components
         public float Damage
         {
             get { return damage; }
-            set
-            {
-                Argument.EnsureNotNaN(value, "value");
-                float finalDamage = value - damageReduction;
-
-                if (finalDamage < 0) finalDamage = 0;
-                if (finalDamage == damage) return;
-
-                damage = finalDamage;
-                DamageChanged.Raise(this);
-            }
         }
 
         /// <summary>
@@ -150,23 +132,44 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public void SetValue(float value)
         {
-            Damage = (int)Entity.GetStatValue(MaxValueStat) - value;
+            Argument.EnsurePositive(value, "value");
+            int maxValue = (int)Entity.GetStatValue(MaxValueStat);
+            if (value > maxValue) value = maxValue;
+            damage = maxValue - value;
         }
 
-        protected override void Update(SimulationStep step)
+        /// <summary>
+        /// Decreases the health value of this entity.
+        /// </summary>
+        /// <param name="amount">The amount of health points to lose.</param>
+        /// <returns>
+        /// A value indicating if the entity has been killed.
+        /// </returns>
+        public bool Hurt(float amount)
         {
-            if (damage >= (int)Entity.GetStatValue(MaxValueStat))
-            {
-                Entity.Die();
-                return;
-            }
+            Argument.EnsurePositive(amount, "amount");
+            if (amount == 0) return false;
 
-            float regeneration = regenerationRate * step.TimeDeltaInSeconds;
-            float newDamage = damage - regeneration;
-            if (newDamage < 0) newDamage = 0;
-            if (newDamage != damage) DamageChanged.Raise(this);
-            
-            damage = newDamage;
+            damage += amount;
+
+            return DieIfOutOfHealth();
+        }
+
+        /// <summary>
+        /// Increses the health value of this entity.
+        /// </summary>
+        /// <param name="amount">The amount of health points to gain.</param>
+        public void Heal(float amount)
+        {
+            Argument.EnsurePositive(amount, "amount");
+            if (amount == 0) return;
+
+            damage = Math.Max(0, damage - amount);
+        }
+
+        public void FullyHeal()
+        {
+            damage = 0;
         }
 
         /// <summary>
@@ -175,7 +178,23 @@ namespace Orion.Game.Simulation.Components
         /// </summary>
         public void Suicide()
         {
-            damage = float.MaxValue;
+            damage = (int)Entity.GetStatValue(MaxValueStat);
+            Entity.Die();
+        }
+
+        protected override void Update(SimulationStep step)
+        {
+            if (DieIfOutOfHealth()) return;
+
+            Heal(regenerationRate * step.TimeDeltaInSeconds);
+        }
+
+        private bool DieIfOutOfHealth()
+        {
+            if (damage < (int)Entity.GetStatValue(MaxValueStat)) return false;
+            
+            Entity.Die();
+            return true;
         }
         #endregion
     }

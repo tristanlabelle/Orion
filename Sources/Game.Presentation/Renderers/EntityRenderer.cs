@@ -308,6 +308,7 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawLasers(GraphicsContext graphics, Rectangle bounds, CollisionLayer layer)
         {
+#warning EntityRenderer.DrawLasers doesn't seem to properly handle the lack of spatial components and such
             for (int i = lasers.Count - 1; i >= 0; i--)
             {
                 Laser laser = lasers[i];
@@ -318,14 +319,14 @@ namespace Orion.Game.Presentation.Renderers
 
                 float laserProgress = (float)(World.LastSimulationStep.Time - laser.Time).TotalSeconds / (float)rangedShootTime.TotalSeconds;
 
-                Vector2 delta = laser.Target.Center - shooterSpatial.Center;
+                Spatial targetSpatial = laser.Target.Spatial;
+                Vector2 delta = targetSpatial.Center - shooterSpatial.Center;
                 if (laserProgress > 1)
                 {
                     lasers.RemoveAt(i);
                     continue;
                 }
 
-                Spatial targetSpatial = laser.Target.Spatial;
                 if (!Rectangle.Intersects(shooterSpatial.BoundingRectangle, bounds)
                     && !Rectangle.Intersects(targetSpatial.BoundingRectangle, bounds))
                     continue;

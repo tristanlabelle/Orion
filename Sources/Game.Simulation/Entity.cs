@@ -106,6 +106,7 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Gets the position of the center of this <see cref="Entity"/>.
         /// </summary>
+        [Obsolete("Use Spatial.Center (but ensure the entity has a Spatial component!)")]
         public Vector2 Center
         {
             get { return Spatial.Center; }

@@ -237,7 +237,7 @@ namespace Orion.Game.Simulation.Components
             if (targetHealth == null) return;
 
             float damage = GetDamage(targetHealth);
-            targetHealth.Damage += damage;
+            if (targetHealth.Hurt(damage)) AddKills(1);
 
             HitEventArgs args = new HitEventArgs(Entity, target);
             World.RaiseHitOccured(args);
@@ -265,7 +265,8 @@ namespace Orion.Game.Simulation.Components
                     float distance = (splashCircle.Center - splashedEntitySpatial.Center).LengthFast;
                     if (distance > splashRadius) continue;
 
-                    splashedEntityHealth.Damage += GetDamage(splashedEntityHealth) * (1 - distance / splashRadius);
+                    float splashDamage = GetDamage(splashedEntityHealth) * (1 - distance / splashRadius);
+                    if (splashedEntityHealth.Hurt(splashDamage)) AddKills(1);
                 }
             }
 

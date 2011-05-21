@@ -117,15 +117,17 @@ namespace Orion.Game.Presentation.Audio
             Faction faction = FactionMembership.GetFaction(entity);
             if (faction != LocalFaction) return;
 
+            Spatial spatial = entity.Spatial;
+            Vector2? position = spatial == null ? (Vector2?)null : spatial.Center;
+
             if (entity.Components.Has<BuildProgress>())
             {
-                audio.PlaySfx("UnderConstruction", entity.Center);
+                audio.PlaySfx("UnderConstruction", position);
                 return;
             }
 
             string soundName = audio.GetUnitSoundName(entity, "Select");
-            Spatial spatial = entity.Spatial;
-            audio.PlaySfx(soundName, spatial.Center);
+            audio.PlaySfx(soundName, position);
         }
 
         private void OnEntityDied(World world, Entity entity)

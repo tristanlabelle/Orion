@@ -142,7 +142,7 @@ namespace Orion.Game.Simulation.Components
                 float distanceFromCenter = (explosionCircle.Center - damagedEntity.Spatial.Center).LengthFast;
                 float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
                     * explosionDamage;
-                damagedEntity.Components.Get<Health>().Damage += damage;
+                damagedEntity.Components.Get<Health>().Hurt(damage);
             }
 
             foreach (Entity damagedEntity in damagedEntities)

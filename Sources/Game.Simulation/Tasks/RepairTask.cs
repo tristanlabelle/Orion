@@ -157,7 +157,7 @@ namespace Orion.Game.Simulation.Tasks
                 healthToRepair = alageneCreditRemaining / alageneCost * maxHealth;
             }
 
-            targetHealth.Damage -= healthToRepair;
+            targetHealth.Heal(healthToRepair);
             aladdiumCreditRemaining -= frameAladdiumCost;
             alageneCreditRemaining -= frameAlageneCost;
         }

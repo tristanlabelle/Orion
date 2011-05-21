@@ -56,7 +56,7 @@ namespace Orion.Game.Simulation.Tasks
 
             if (target != null)
             {
-                spatial.LookAt(target.Center);
+                if (target.Spatial != null) spatial.LookAt(target.Spatial.Center);
                 attacker.TryHit(target);
             }
         }

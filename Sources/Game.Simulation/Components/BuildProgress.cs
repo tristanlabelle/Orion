@@ -81,7 +81,7 @@ namespace Orion.Game.Simulation.Components
             if (health != null)
             {
                 float ratio = (float)(time.TotalSeconds / requiredTime.TotalSeconds);
-                health.Damage -= ratio * (float)Entity.GetStatValue(Health.MaxValueStat);
+                health.Heal(ratio * (float)Entity.GetStatValue(Health.MaxValueStat));
             }
 
             CheckCompletion();
@@ -103,7 +103,7 @@ namespace Orion.Game.Simulation.Components
         public void Complete()
         {
             Health health = Entity.Components.TryGet<Health>();
-            if (health != null) health.Damage = 0;
+            if (health != null) health.FullyHeal();
 
             Entity.Components.Remove(this);
             Entity.Components.Add(new TaskQueue(Entity));

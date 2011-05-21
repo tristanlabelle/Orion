@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Orion.Engine.Collections;
-using Orion.Engine;
 using OpenTK;
-using Orion.Game.Simulation.Components;
+using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -40,9 +38,19 @@ namespace Orion.Game.Simulation
             return groundGrid[point];
         }
 
+        public Spatial GetGroundGridObstacleAt(int x, int y)
+        {
+            return groundGrid[x, y];
+        }
+
         public Spatial GetAirGridObstacleAt(Point point)
         {
             return airGrid[point];
+        }
+
+        public Spatial GetAirGridObstacleAt(int x, int y)
+        {
+            return airGrid[x, y];
         }
 
         public Spatial GetGridObstacleAt(Point point, CollisionLayer collisionLayer)

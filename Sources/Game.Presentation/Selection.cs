@@ -230,14 +230,14 @@ namespace Orion.Game.Presentation
 
             // An identity component is needed to determine of other entities
             // have the same type.
-            if (entity.Identity == null)
+            if (entity.Spatial == null || entity.Identity == null)
             {
                 Set(entity);
                 return;
             }
 
             Faction faction = FactionMembership.GetFaction(entity);
-            Circle circle = new Circle(entity.Center, nearbyRadius);
+            Circle circle = new Circle(entity.Spatial.Center, nearbyRadius);
 
             var entities = world.SpatialManager
                 .Intersecting(circle)

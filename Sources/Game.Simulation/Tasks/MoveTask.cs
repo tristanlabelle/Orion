@@ -177,7 +177,19 @@ namespace Orion.Game.Simulation.Tasks
         private Func<Point, bool> GetWalkabilityTester()
         {
             CollisionLayer layer = Entity.Spatial.CollisionLayer;
-            if (layer == CollisionLayer.Ground) return IsGroundPathable;
+            if (layer == CollisionLayer.Ground)
+            {
+                // Tile visibility was previously taken into account here but,
+                // as we have so many pathfinding queries,
+                // this had a huge impact on performance.
+
+                // Create locals to be captured by the lambda so they do not have to
+                // go through the property getters.
+                Terrain terrain = World.Terrain;
+                SpatialManager spatialManager = World.SpatialManager;
+                return point => terrain.IsWalkable(point)
+                    && spatialManager.GetGroundGridObstacleAt(point.X, point.Y) == null;
+            }
             if (layer == CollisionLayer.Air) return IsAirPathable;
             throw new InvalidOperationException(
                 "Cannot pathfind for a unit on collision layer {0}.".FormatInvariant(Entity));
@@ -185,24 +197,23 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool IsGroundPathable(Point point)
         {
-            Faction faction = FactionMembership.GetFaction(Entity);
-            if (faction != null && !faction.HasSeen(point)) return true;
-            return Entity.World.Terrain.IsWalkable(point) && World.SpatialManager.GetGroundGridObstacleAt(point) == null;
+            return Entity.World.Terrain.IsWalkable(point)
+                && World.SpatialManager.GetGroundGridObstacleAt(point.X, point.Y) == null;
         }
 
         private bool IsAirPathable(Point minPoint)
         {
             Spatial spatial = Entity.Spatial;
-            Region region = new Region(minPoint, spatial.Size);
-            if (region.ExclusiveMaxX > World.Size.Width || region.ExclusiveMaxY > World.Size.Height)
+            int exclusiveMaxX = minPoint.X + spatial.Width;
+            int exclusiveMaxY = minPoint.Y + spatial.Height;
+            if (exclusiveMaxX > World.Width || exclusiveMaxY > World.Height)
                 return false;
 
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+            for (int y = minPoint.Y; y < exclusiveMaxY; ++y)
             {
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+                for (int x = minPoint.X; x < exclusiveMaxX; ++x)
                 {
-                    Point point = new Point(x, y);
-                    Spatial obstacleSpatial = World.SpatialManager.GetAirGridObstacleAt(point);
+                    Spatial obstacleSpatial = World.SpatialManager.GetAirGridObstacleAt(x, y);
                     if (obstacleSpatial != null && obstacleSpatial.Entity != Entity) return false;
                 }
             }

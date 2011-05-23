@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Game.Simulation;
-using Orion.Engine.Collections;
-using Orion.Engine;
 using OpenTK;
+using Orion.Engine;
+using Orion.Engine.Collections;
+using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation

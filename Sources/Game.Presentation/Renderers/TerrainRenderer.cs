@@ -14,11 +14,12 @@ namespace Orion.Game.Presentation.Renderers
     public sealed class TerrainRenderer : IDisposable
     {
         #region Fields
-        private static readonly float GrassTextureSizeInTiles = 4;
-        private static readonly float SandTextureSizeInTiles = 12;
-        private static readonly float ObstacleTextureSizeInTiles = 6;
-        private static readonly ColorRgb MiniatureWalkableColor = ColorRgb.FromBytes(232, 207, 144);
-        private static readonly ColorRgb MiniatureObstacleColor = ColorRgb.FromBytes(100, 78, 60);
+        private static readonly float grassTextureSizeInTiles = 4;
+        private static readonly float sandTextureSizeInTiles = 12;
+        private static readonly float obstacleTextureSizeInTiles = 8;
+        private static readonly ColorRgb grassColor = ColorRgb.FromBytes(57, 74, 29);
+        private static readonly ColorRgb sandColor = ColorRgb.FromBytes(183, 128, 73);
+        private static readonly ColorRgb lavaColor = ColorRgb.FromBytes(98, 11, 1);
 
         private readonly Terrain terrain;
         private readonly Texture obstacleMaskTexture;
@@ -69,8 +70,8 @@ namespace Orion.Game.Presentation.Renderers
             get
             {
                 return new Rectangle(
-                    terrain.Width / GrassTextureSizeInTiles,
-                    terrain.Height / GrassTextureSizeInTiles);
+                    terrain.Width / grassTextureSizeInTiles,
+                    terrain.Height / grassTextureSizeInTiles);
             }
         }
 
@@ -79,8 +80,8 @@ namespace Orion.Game.Presentation.Renderers
             get
             {
                 return new Rectangle(
-                    terrain.Width / SandTextureSizeInTiles,
-                    terrain.Height / SandTextureSizeInTiles);
+                    terrain.Width / sandTextureSizeInTiles,
+                    terrain.Height / sandTextureSizeInTiles);
             }
         }
 
@@ -89,8 +90,8 @@ namespace Orion.Game.Presentation.Renderers
             get
             {
                 return new Rectangle(
-                    terrain.Width / ObstacleTextureSizeInTiles,
-                    terrain.Height / ObstacleTextureSizeInTiles);
+                    terrain.Width / obstacleTextureSizeInTiles,
+                    terrain.Height / obstacleTextureSizeInTiles);
             }
         }
         #endregion
@@ -105,7 +106,9 @@ namespace Orion.Game.Presentation.Renderers
 
         public void DrawMiniature(GraphicsContext graphics)
         {
-            Draw(graphics);
+            graphics.Fill(TerrainBounds, grassColor);
+            graphics.Fill(TerrainBounds, splattingMaskTexture, UnitTextureRectangle, sandColor);
+            graphics.Fill(TerrainBounds, obstacleMaskTexture, UnitTextureRectangle, lavaColor);
         }
 
         public void Dispose()

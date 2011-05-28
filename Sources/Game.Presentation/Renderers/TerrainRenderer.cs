@@ -128,8 +128,7 @@ namespace Orion.Game.Presentation.Renderers
                 for (int x = 0; x < terrain.Width; ++x)
                 {
                     int pixelIndex = y * textureSize.Width + x;
-                    Point point = new Point(x, y);
-                    pixels[pixelIndex] = terrain.IsWalkable(point) ? (byte)0 : (byte)255;
+                    pixels[pixelIndex] = terrain[x, y] == TileType.Walkable ? (byte)0 : (byte)255;
                 }
             }
 

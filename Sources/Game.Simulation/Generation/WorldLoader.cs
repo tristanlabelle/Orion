@@ -12,7 +12,7 @@ using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
-    public class WorldLoader : WorldGenerator
+    public sealed class WorldLoader : WorldBuilder
     {
         #region Fields
         private readonly WorldData worldData;
@@ -27,14 +27,20 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Methods
-        public override Terrain GenerateTerrain()
+        #region Properties
+        public override Size? FixedSize
         {
-            return worldData.Terrain;
+            get { return worldData.Terrain.Size; }
         }
+        #endregion
 
-        public override void PrepareWorld(World world, PrototypeRegistry prototypes)
+        #region Methods
+        public override void Build(World world, PrototypeRegistry prototypes)
         {
+            for (int y = 0; y < worldData.Terrain.Height; ++y)
+                for (int x = 0; x < worldData.Terrain.Width; ++x)
+                    world.Terrain[x, y] = worldData.Terrain[x, y];
+
             CreateResourceNodes(world, prototypes);
             CreateUnits(world, prototypes);
         }

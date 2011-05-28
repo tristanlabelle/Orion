@@ -147,7 +147,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 Debug.Assert(Entity.Components.Has<Spatial>(), "Unit has no spatial component!");
                 if (Entity.Spatial.CollisionLayer == CollisionLayer.Ground
-                    && !World.Terrain.IsWalkable(point)) return false;
+                    && World.Terrain[point] != TileType.Walkable) return false;
 
                 Spatial obstacleSpatial = World.SpatialManager.GetGridObstacleAt(point, spatial.CollisionLayer);
                 if (obstacleSpatial != null && obstacleSpatial.Entity != Entity) return false;
@@ -187,7 +187,7 @@ namespace Orion.Game.Simulation.Tasks
                 // go through the property getters.
                 Terrain terrain = World.Terrain;
                 SpatialManager spatialManager = World.SpatialManager;
-                return point => terrain.IsWalkable(point)
+                return point => terrain[point] == TileType.Walkable
                     && spatialManager.GetGroundGridObstacleAt(point.X, point.Y) == null;
             }
             if (layer == CollisionLayer.Air) return IsAirPathable;
@@ -197,7 +197,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool IsGroundPathable(Point point)
         {
-            return Entity.World.Terrain.IsWalkable(point)
+            return Entity.World.Terrain[point] == TileType.Walkable
                 && World.SpatialManager.GetGroundGridObstacleAt(point.X, point.Y) == null;
         }
 

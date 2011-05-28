@@ -107,11 +107,12 @@
     <Compile Include="DiplomaticStanceChange.cs" />
     <Compile Include="FogOfWarToken.cs" />
     <Compile Include="Faction.FoodToken.cs" />
+    <Compile Include="Generation\PerlinNoiseTerrainGenerator.cs" />
+    <Compile Include="Generation\TerrainGenerator.cs" />
     <Compile Include="IO\ResourceNodeTemplate.cs" />
     <Compile Include="IO\UnitTemplate.cs" />
     <Compile Include="IO\WorldData.cs" />
-    <Compile Include="PlainWorldGenerator.cs" />
-    <Compile Include="RandomWorldGenerator.cs" />
+    <Compile Include="Generation\WorldGenerator.cs" />
     <Compile Include="ResourceAmount.cs" />
     <Compile Include="SpatialGrid.cs" />
     <Compile Include="SpatialHashTable.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="Tasks\LoadTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="EntityUpgrade.cs" />
+    <Compile Include="TileType.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />
     <Compile Include="Utilities\RememberedEntity.cs" />
     <Compile Include="Utilities\UnderAttackMonitor.cs" />
@@ -164,8 +166,8 @@
     <Compile Include="Utilities\WorkerActivityMonitor.cs" />
     <Compile Include="Utilities\WorldFoodSampler.cs" />
     <Compile Include="World.cs" />
-    <Compile Include="WorldGenerator.cs" />
-    <Compile Include="WorldLoader.cs" />
+    <Compile Include="Generation\WorldBuilder.cs" />
+    <Compile Include="Generation\WorldLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

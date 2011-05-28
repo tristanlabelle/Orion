@@ -191,9 +191,9 @@ namespace Orion.Game.Simulation.IO
             writer.Write((short)terrain.Height);
             writer.Write((byte)unitsByFaction.Count);
 
-            for (int i = 0; i < terrain.Height; i++)
-                for (int j = 0; j < terrain.Width; j++)
-                    writer.Write(terrain.IsWalkable(new Point(j, i)));
+            for (int y = 0; y < terrain.Height; y++)
+                for (int x = 0; x < terrain.Width; x++)
+                    writer.Write((byte)terrain[x, y]);
 
             writer.Write((short)AladdiumNodes.Count());
             writer.Write((short)AlageneNodes.Count());

@@ -94,9 +94,12 @@ namespace Orion.Game.Main
 
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
-            WorldGenerator generator = new RandomWorldGenerator(random, matchSettings.MapSize, !matchSettings.StartNomad);
-            Terrain terrain = generator.GenerateTerrain();
-            World world = new World(terrain, random, matchSettings.FoodLimit);
+#warning This code assumes that saved replays used the perlin noise terrain generator.
+            WorldBuilder worldBuilder = new WorldGenerator(random,
+                new PerlinNoiseTerrainGenerator(), !matchSettings.StartNomad);
+
+            Size worldSize = worldBuilder.FixedSize ?? matchSettings.MapSize;
+            World world = new World(worldSize, random, matchSettings.FoodLimit);
 
             Match match = new Match(Manager.AssetsDirectory, world, random);
             match.AreRandomHeroesEnabled = matchSettings.AreRandomHeroesEnabled;
@@ -117,7 +120,7 @@ namespace Orion.Game.Main
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
             }
 
-            generator.PrepareWorld(world, match.Prototypes);
+            worldBuilder.Build(world, match.Prototypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

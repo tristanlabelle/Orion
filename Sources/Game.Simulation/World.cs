@@ -35,19 +35,19 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Initializes a new <see cref="World"/>.
         /// </summary>
-        /// <param name="terrain">The <see cref="Terrain"/> of this world.</param>
+        /// <param name="size">The size of this world, in tiles.</param>
         /// <param name="random">The random number generator that can be used within the simulation.</param>
         /// <param name="maxFood">The maximum allowed amount of food per faction.</param>
-        public World(Terrain terrain, Random random, int maxFood)
+        public World(Size size, Random random, int maxFood)
         {
-            Argument.EnsureNotNull(terrain, "terrain");
+            Argument.EnsureNotNull(random, "random");
 
-            this.maxFoodAmount = maxFood;
-            this.terrain = terrain;
+            this.terrain = new Terrain(size);
             this.entities = new EntityCollection(this);
-            this.spatialManager = new SpatialManager(terrain.Size, maxFood * 5);
-            this.pathfinder = new Pathfinder(terrain.Size);
+            this.spatialManager = new SpatialManager(size, maxFood * 5);
+            this.pathfinder = new Pathfinder(size);
             this.random = random;
+            this.maxFoodAmount = maxFood;
         }
         #endregion
 
@@ -210,7 +210,7 @@ namespace Orion.Game.Simulation
                 Debug.Fail("Testing if an out-of-bounds point is free.");
                 return false;
             }
-            if (layer == CollisionLayer.Ground && !terrain.IsWalkable(point)) return false;
+            if (layer == CollisionLayer.Ground && terrain[point] != TileType.Walkable) return false;
             return spatialManager.GetGridObstacleAt(point, layer) == null;
         }
 

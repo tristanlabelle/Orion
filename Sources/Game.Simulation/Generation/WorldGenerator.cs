@@ -11,68 +11,43 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// A world generator which generates random topology using perlin noise.
+    /// A world generator which generates random topology and creates camps for each faction.
     /// </summary>
-    public sealed class RandomWorldGenerator : WorldGenerator
+    public sealed class WorldGenerator : WorldBuilder
     {
         #region Fields
-        private readonly double resourcesDensity;
-        private readonly int campSize;
-        private readonly float initialMinimumDistanceBetweenCamps;
+        private static readonly double resourcesDensity = 0.00518798828125;
+        private static readonly int campSize = 15;
+        private static readonly float initialMinimumDistanceBetweenCamps = 50;
+
         private readonly Random random;
+        private readonly TerrainGenerator terrainGenerator;
         private readonly bool createPyramids;
-        private readonly Size terrainSize;
         #endregion
 
         #region Constructors
-        public RandomWorldGenerator(Random random, Size terrainSize, bool createPyramids)
+        public WorldGenerator(Random random, TerrainGenerator terrainGenerator, bool createPyramids)
         {
-            resourcesDensity = 0.00518798828125;
-            campSize = 15;
-            initialMinimumDistanceBetweenCamps = 50;
+            Argument.EnsureNotNull(random, "random");
+            Argument.EnsureNotNull(terrainGenerator, "terrainGenerator");
+
             this.random = random;
-            this.terrainSize = terrainSize;
+            this.terrainGenerator = terrainGenerator;
             this.createPyramids = createPyramids;
         }
         #endregion
 
         #region Methods
-        #region Overrides
-        public override void PrepareWorld(World world, PrototypeRegistry prototypes)
+        public override void Build(World world, PrototypeRegistry prototypes)
         {
+            terrainGenerator.Generate(world.Terrain, random);
+
             foreach (Faction faction in world.Factions)
                 GenerateFactionCamp(world, prototypes, faction, createPyramids);
 
             GenerateResourceNodes(world, prototypes);
         }
 
-        public override Terrain GenerateTerrain()
-        {
-            PerlinNoise noise = new PerlinNoise(random);
-
-            BitArray2D tiles = new BitArray2D(terrainSize);
-            double[] rawTerrain = new double[terrainSize.Area];
-            for (int y = 0; y < terrainSize.Height; y++)
-            {
-                for (int x = 0; x < terrainSize.Width; x++)
-                {
-                    rawTerrain[y * terrainSize.Width + x] = noise[x, y];
-                }
-            }
-
-            double max = rawTerrain.Max();
-            int k = 0;
-            foreach (double noiseValue in rawTerrain.Select(d => d / max))
-            {
-                tiles[k % terrainSize.Width, k / terrainSize.Width] = noiseValue >= 0.5;
-                k++;
-            }
-
-            return new Terrain(tiles);
-        }
-        #endregion
-
-        #region Private
         private void GenerateResourceNodes(World world, PrototypeRegistry prototypes)
         {
             Argument.EnsureNotNull(world, "world");
@@ -182,7 +157,6 @@ namespace Orion.Game.Simulation
             CreateResourceNode(world, prototypes, ResourceType.Alagene,
                 (Point)(campCenter + new Vector2(campSize / -4f, campSize / 4f)));
         }
-        #endregion
         #endregion
     }
 }

@@ -15,34 +15,38 @@ namespace Orion.Game.Simulation
     {
         #region Fields
         /// <summary>
-        /// Values indicating the walkability of every tile.
+        /// Values indicating the solidity of every tile.
+        /// The tile values can be casted to <see cref="TileType"/> instances.
         /// </summary>
-        /// <remarks>
-        /// Stored as a bool array as it offers the best retrieval time.
-        /// </remarks>
-        private readonly bool[] tiles;
-        private readonly Size size;
+        private readonly byte[] tiles;
+        private readonly int width;
+        private readonly int height;
         #endregion
 
         #region Constructors
-        public Terrain(BitArray2D tiles)
+        public Terrain(Size size)
         {
-            Argument.EnsureNotNull(tiles, "tiles");
-            this.tiles = new bool[tiles.Area];
-            tiles.Bits.CopyTo(this.tiles, 0);
-            this.size = tiles.Size;
+            this.width = size.Width;
+            this.height = size.Height;
+            this.tiles = new byte[size.Area];
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the width of this terrain, in tiles.
+        /// </summary>
         public int Width
         {
-            get { return size.Width; }
+            get { return width; }
         }
 
+        /// <summary>
+        /// Gets the height of this terrain, in tiles.
+        /// </summary>
         public int Height
         {
-            get { return size.Height; }
+            get { return height; }
         }
 
         /// <summary>
@@ -50,39 +54,84 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Size Size
         {
-            get { return size; }
+            get { return new Size(width, height); }
+        }
+        #endregion
+
+        #region Indexers
+        /// <summary>
+        /// Accesses the type of a tile at a given coordinate.
+        /// </summary>
+        /// <param name="x">The X coordinate of the tile.</param>
+        /// <param name="y">The Y coordinate of the tile.</param>
+        /// <returns>The type of the tile at those coordinates</returns>
+        /// <remarks>
+        /// Be very careful setting tiles after the game has been initialized.
+        /// </remarks>
+        public TileType this[int x, int y]
+        {
+            get
+            {
+                Debug.Assert(x >= 0 && y >= 0 && x < width && y < height);
+                return (TileType)tiles[x + y * width];
+            }
+            set
+            {
+                Debug.Assert(x >= 0 && y >= 0 && x < width && y < height);
+                tiles[x + y * width] = (byte)value;
+            }
+        }
+
+        /// <summary>
+        /// Accesses the type of a tile at a given coordinate.
+        /// </summary>
+        /// <param name="point">The coordinate of the tile.</param>
+        /// <returns>The type of the tile at those coordinates</returns>
+        /// <remarks>
+        /// Be very careful setting tiles after the game has been initialized.
+        /// </remarks>
+        public TileType this[Point point]
+        {
+            get { return this[point.X, point.Y]; }
+            set { this[point.X, point.Y] = value; }
         }
         #endregion
 
         #region Methods
-        public bool IsWalkable(Point point)
+        /// <summary>
+        /// Obtains the type of a tile at a given coordinate, considering
+        /// out-of-bounds tiles as obstacles.
+        /// </summary>
+        /// <param name="x">The X coordinate of the tile.</param>
+        /// <param name="y">The Y coordinate of the tile.</param>
+        /// <returns>
+        /// The type of the tile at those coordinates,
+        /// or <see cref="TileType.Obstacle"/> if the coordinates were out of bounds.
+        /// </returns>
+        public TileType GetTileTypeOrObstacle(int x, int y)
         {
-            Debug.Assert(point.X >= 0 && point.Y >= 0 && point.X < size.Width && point.Y < size.Height);
-            int index = point.Y * size.Width + point.X;
-            return !tiles[index];
+            return x >= 0 && y >= 0 && x < width && y < height
+                ? (TileType)tiles[x + y * width] : TileType.Obstacle;
         }
 
-        public bool IsWalkable(Rectangle rectangle)
-        {
-            int minX = Math.Max(0, (int)rectangle.MinX);
-            int minY = Math.Max(0, (int)rectangle.MinY);
-            int maxX = Math.Min(Size.Width - 1, (int)rectangle.MaxX);
-            int maxY = Math.Min(Size.Height - 1, (int)rectangle.MaxY);
-
-            Region region = Region.FromMinInclusiveMax(new Point(minX, minY), new Point(maxX, maxY));
-            return IsWalkable(region);
-        }
-
+        /// <summary>
+        /// Tests if a given terrain region is fully walkable.
+        /// </summary>
+        /// <param name="region">The terrain region to be tested.</param>
+        /// <returns>A value indicating if it is fully walkable.</returns>
         public bool IsWalkable(Region region)
         {
-            return region.Points.All(point => IsWalkable(point));
-        }
+            int exclusiveMaxX = region.ExclusiveMaxX;
+            int exclusiveMaxY = region.ExclusiveMaxY;
+            Debug.Assert(region.MinX >= 0 && region.MinY >= 0
+                && exclusiveMaxX <= width && exclusiveMaxY <= height);
 
-        public bool IsWalkableAndWithinBounds(Point point)
-        {
-            Region region = (Region)Size;
-            if (!region.Contains(point)) return false;
-            return IsWalkable(point);
+            for (int y = region.MinY; y < exclusiveMaxY; ++y)
+                for (int x = region.MinX; x < exclusiveMaxX; ++x)
+                    if ((TileType)tiles[x + y * width] != TileType.Walkable)
+                        return false;
+
+            return true;
         }
         #endregion
     }

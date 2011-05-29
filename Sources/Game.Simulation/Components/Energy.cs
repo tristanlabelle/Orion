@@ -51,6 +51,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return maximumEnergy ^ spentEnergy.GetHashCode() ^ regenerationRate.GetHashCode();
+        }
+
         protected override void Update(SimulationStep step)
         {
             spentEnergy -= regenerationRate * step.TimeDeltaInSeconds;

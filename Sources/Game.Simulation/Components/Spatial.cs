@@ -15,7 +15,6 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private CollisionLayer collisionLayer;
         private Size size = new Size(1, 1);
-
         private Vector2 position;
         private float angle;
         #endregion
@@ -138,6 +137,12 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return collisionLayer.GetHashCode() ^ size.GetHashCode()
+                ^ position.GetHashCode() ^ angle.GetHashCode();
+        }
+
         /// <summary>
         /// Rotates this <see cref="Entity"/> so that it faces a target.
         /// </summary>

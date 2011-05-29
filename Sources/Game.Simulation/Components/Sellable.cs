@@ -38,5 +38,12 @@ namespace Orion.Game.Simulation.Components
             set { aladdiumValue = value; }
         }
         #endregion
+
+        #region Methods
+        public override int GetStateHashCode()
+        {
+            return alageneValue.GetHashCode() ^ aladdiumValue.GetHashCode();
+        }
+        #endregion
     }
 }

@@ -70,6 +70,12 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return faction.Handle.GetHashCode() ^ isKeepAlive.GetHashCode()
+                ^ providedFood;
+        }
+
         public override StatValue GetStatBonus(Stat stat)
         {
             StatValue technologyBonuses = faction == null

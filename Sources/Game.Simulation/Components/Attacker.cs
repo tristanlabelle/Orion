@@ -133,6 +133,13 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return power.GetHashCode() ^ range.GetHashCode() ^ delay.GetHashCode()
+                ^ splashRadius.GetHashCode() ^ damageFilters.Count ^ lastHitTime.GetHashCode()
+                ^ killCount;
+        }
+
         /// <summary>
         /// Increases the kill counter of this <see cref="Entity"/>.
         /// </summary>

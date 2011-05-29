@@ -56,6 +56,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            int hashCode = range;
+            if (fogOfWarToken != null)
+                hashCode ^= fogOfWarToken.Center.GetHashCode() ^ fogOfWarToken.SightRange.GetHashCode();
+            return hashCode;
+        }
+
         /// <summary>
         /// Gets a value indicating if this <see cref="Entity"/> can see a given point.
         /// </summary>

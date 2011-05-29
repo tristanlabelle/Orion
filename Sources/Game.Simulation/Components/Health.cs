@@ -100,7 +100,11 @@ namespace Orion.Game.Simulation.Components
         public float RegenerationRate
         {
             get { return regenerationRate; }
-            set { regenerationRate = value; }
+            set
+            {
+                Argument.EnsurePositive(value, "RegenerationRate");
+                regenerationRate = value;
+            }
         }
 
         [Persistent]
@@ -130,6 +134,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return maxValue ^ constitution.GetHashCode() ^ armorType.GetHashCode()
+                ^ threatLevel.GetHashCode() ^ regenerationRate.GetHashCode()
+                ^ damageReduction.GetHashCode() ^ armor.GetHashCode()
+                ^ damage.GetHashCode() ^ canSuicide.GetHashCode();
+        }
+
         public void SetValue(float value)
         {
             Argument.EnsurePositive(value, "value");

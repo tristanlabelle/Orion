@@ -43,6 +43,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return speed.GetHashCode();
+        }
+
         /// <summary>
         /// Tests if an <see cref="Entity"/> described by a given prototype can be built by the host <see cref="Entity"/>.
         /// </summary>

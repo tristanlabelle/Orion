@@ -257,6 +257,21 @@ namespace Orion.Game.Simulation
             return handle.GetHashCode();
         }
 
+        /// <summary>
+        /// Gets a deep hash code of this entity's state.
+        /// </summary>
+        /// <returns>The resulting hash code.</returns>
+        public int GetStateHashCode()
+        {
+            int hashCode = handle.GetHashCode()
+                ^ (isActive.GetHashCode() << 13)
+                ^ (isAlive.GetHashCode() << 25);
+            foreach (Component component in components)
+                hashCode ^= component.GetStateHashCode();
+
+            return hashCode;
+        }
+
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();

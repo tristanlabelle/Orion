@@ -56,6 +56,11 @@ namespace Orion.Game.Simulation.Components
 
             faction.AddResources(type, amount);
         }
+
+        public override int GetStateHashCode()
+        {
+            return tax;
+        }
         #endregion
     }
 }

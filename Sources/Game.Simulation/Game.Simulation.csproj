@@ -97,7 +97,6 @@
     <Compile Include="Components\Serialization\XmlDeserializer.cs" />
     <Compile Include="Components\StatValue.cs" />
     <Compile Include="Components\StatType.cs" />
-    <Compile Include="Components\Tags.cs" />
     <Compile Include="Components\TimedExistence.cs" />
     <Compile Include="Components\Trainer.cs" />
     <Compile Include="Components\BuildProgress.cs" />

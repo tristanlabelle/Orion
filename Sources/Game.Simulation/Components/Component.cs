@@ -115,6 +115,12 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
+        /// Gets a hash code based on the state of this component.
+        /// </summary>
+        /// <returns>The hash code value.</returns>
+        public abstract int GetStateHashCode();
+
+        /// <summary>
         /// Gets the bonus this <see cref="Component"/> provides to a given <see cref="Stat"/>.
         /// </summary>
         /// <param name="stat">The <see cref="Stat"/> for which the bonus is to be computed.</param>

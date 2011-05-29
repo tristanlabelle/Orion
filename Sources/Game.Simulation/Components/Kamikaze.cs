@@ -61,6 +61,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return targets.Count ^ radius.GetHashCode() ^ damage;
+        }
+
         /// <summary>
         /// Tests if a given <see cref="Entity"/> provokes an explosion.
         /// </summary>

@@ -9,6 +9,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Matchmaking.Commands.Pipeline;
+using Orion.Game.Matchmaking.Networking.Packets;
 
 namespace Orion.Game.Matchmaking.Networking
 {
@@ -103,7 +104,18 @@ namespace Orion.Game.Matchmaking.Networking
             if (ReceivedFromAllPeers && updatesForCommandFrame.Count == 0)
             {
                 updatesForCommandFrame.Add(updatesSinceLastCommandFrame);
-                peers.ForEach(peer => peer.SendDone(commandFrameNumber, updatesSinceLastCommandFrame));
+
+                int worldStateHashCode = 0;
+#if DEBUG
+                worldStateHashCode = match.World.GetStateHashCode();
+#endif
+
+                var packet = new CommandFrameCompletedPacket(commandFrameNumber,
+                    updatesSinceLastCommandFrame, worldStateHashCode);
+                foreach (FactionEndPoint peer in peers)
+                {
+                    peer.SendDone(packet);
+                }
             }
 
             if (updatesSinceLastCommandFrame >= TargetUpdatesPerCommandFrame * 2)

@@ -240,6 +240,11 @@ namespace Orion.Game.Simulation.Components
             Changed.Raise(this);
         }
 
+        public override int GetStateHashCode()
+        {
+            return tasks.Count;
+        }
+
         private Task FindOccupation()
         {
             Builder builder = Entity.Components.TryGet<Builder>();

@@ -18,8 +18,6 @@ namespace Orion.Game.Simulation.Components
 
         private float speed = 1;
         private int maxCarryingAmount = 1;
-
-        private ResourceAmount transportedAmount;
         #endregion
 
         #region Constructor
@@ -44,15 +42,14 @@ namespace Orion.Game.Simulation.Components
                 maxCarryingAmount = value;
             }
         }
-
-        public ResourceAmount TransportedAmount
-        {
-            get { return transportedAmount; }
-            set { transportedAmount = value; }
-        }
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return speed.GetHashCode() ^ maxCarryingAmount;
+        }
+
         /// <summary>
         /// Determines if a given <see cref="Entity"/> can be harvested.
         /// </summary>

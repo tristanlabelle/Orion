@@ -16,16 +16,19 @@ namespace Orion.Game.Matchmaking.Networking.Packets
         #region Fields
         private readonly int commandFrameNumber;
         private readonly int updateFrameCount;
+        private readonly int worldStateHashCode;
         #endregion
 
         #region Constructors
-        public CommandFrameCompletedPacket(int commandFrameNumber, int updateFrameCount)
+        public CommandFrameCompletedPacket(int commandFrameNumber, int updateFrameCount,
+            int worldStateHashCode)
         {
             Argument.EnsurePositive(commandFrameNumber, "commandFrameNumber");
             Argument.EnsureStrictlyPositive(updateFrameCount, "updateFrameCount");
 
             this.commandFrameNumber = commandFrameNumber;
             this.updateFrameCount = updateFrameCount;
+            this.worldStateHashCode = worldStateHashCode;
         }
         #endregion
 
@@ -39,6 +42,11 @@ namespace Orion.Game.Matchmaking.Networking.Packets
         {
             get { return updateFrameCount; }
         }
+
+        public int WorldStateHashCode
+        {
+            get { return worldStateHashCode; }
+        }
         #endregion
 
         #region Methods
@@ -49,6 +57,7 @@ namespace Orion.Game.Matchmaking.Networking.Packets
 
             writer.Write(packet.commandFrameNumber);
             writer.Write(packet.updateFrameCount);
+            writer.Write(packet.worldStateHashCode);
         }
 
         public static CommandFrameCompletedPacket Deserialize(BinaryReader reader)
@@ -57,7 +66,9 @@ namespace Orion.Game.Matchmaking.Networking.Packets
 
             int commandFrameNumber = reader.ReadInt32();
             int updateFrameCount = reader.ReadInt32();
-            return new CommandFrameCompletedPacket(commandFrameNumber, updateFrameCount);
+            int worldStateHashCode = reader.ReadInt32();
+            return new CommandFrameCompletedPacket(commandFrameNumber, updateFrameCount,
+                worldStateHashCode);
         }
         #endregion
     }

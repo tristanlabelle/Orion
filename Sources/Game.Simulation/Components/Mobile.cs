@@ -37,5 +37,12 @@ namespace Orion.Game.Simulation.Components
             }
         }
         #endregion
+
+        #region Methods
+        public override int GetStateHashCode()
+        {
+            return speed.GetHashCode();
+        }
+        #endregion
     }
 }

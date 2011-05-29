@@ -103,6 +103,14 @@ namespace Orion.Game.Simulation.Components
                 : new ResourceAmount(cost.aladdium, cost.alagene, cost.food);
         }
 
+        public override int GetStateHashCode()
+        {
+            int hashCode = aladdium ^ alagene ^ food ^ spawnTime.GetHashCode();
+            if (usedFoodToken != null)
+                hashCode ^= usedFoodToken.Amount ^ usedFoodToken.Type.GetHashCode();
+            return hashCode;
+        }
+
         protected override void Update(SimulationStep step)
         {
             Faction faction = FactionMembership.GetFaction(Entity);

@@ -11,5 +11,10 @@ namespace Orion.Game.Simulation.Components
     public sealed class AlageneExtractor : Component
     {
         public AlageneExtractor(Entity entity) : base(entity) { }
+
+        public override int GetStateHashCode()
+        {
+            return 0;
+        }
     }
 }

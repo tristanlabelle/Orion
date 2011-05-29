@@ -53,6 +53,15 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            int hashCode = capacity;
+            foreach (Entity entity in passengers.Keys)
+                hashCode ^= (int)entity.Handle.GetHashCode();
+            
+            return hashCode;
+        }
+
         /// <summary>
         /// Determines if a given <see cref="Entity"/> can be embarked in this transport.
         /// </summary>

@@ -54,6 +54,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return amount ^ (int)type;
+        }
+
         /// <summary>
         /// Removes resources from this <see cref="Entity"/>.
         /// </summary>

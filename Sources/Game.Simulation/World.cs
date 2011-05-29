@@ -341,6 +341,19 @@ namespace Orion.Game.Simulation
             Updated.Raise(this, step);
         }
 
+        /// <summary>
+        /// Gets a hash code based on the state of the world and its contents.
+        /// </summary>
+        /// <returns>The resulting hash code.</returns>
+        public int GetStateHashCode()
+        {
+            int hashCode = Terrain.Size.GetHashCode();
+            foreach (Entity entity in entities)
+                hashCode ^= entity.GetStateHashCode();
+
+            return hashCode;
+        }
+
         #region Event Raising and listening
         /// <remarks>Invoked by World.EntityCollection.</remarks>
         private void OnEntityAdded(Entity entity)

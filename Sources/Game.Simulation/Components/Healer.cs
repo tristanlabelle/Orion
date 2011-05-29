@@ -56,6 +56,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return speed.GetHashCode() ^ range.GetHashCode();
+        }
+
         /// <summary>
         /// Tests if a given <see cref="Entity"/> is within this <see cref="Entity"/>'s healing range.
         /// </summary>

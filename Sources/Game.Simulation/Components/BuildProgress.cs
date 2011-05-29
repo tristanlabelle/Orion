@@ -66,6 +66,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return (int)(timeSpent.Ticks ^ requiredTime.Ticks);
+        }
+
         /// <summary>
         /// Adds some time to the build time accumulator.
         /// </summary>

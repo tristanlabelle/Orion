@@ -85,6 +85,13 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            int hashCode = isBuilding ? 1 : 13;
+            if (!string.IsNullOrEmpty(name)) hashCode |= name[0];
+            return hashCode;
+        }
+
 #warning HACK: Upgrades should be retought to work in the component-based design
         public void UpgradeTo(Identity target)
         {

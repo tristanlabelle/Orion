@@ -48,5 +48,12 @@ namespace Orion.Game.Simulation.Components
             set { rotates = value; }
         }
         #endregion
+
+        #region Methods
+        public override int GetStateHashCode()
+        {
+            return 0;
+        }
+        #endregion
     }
 }

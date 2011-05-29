@@ -49,6 +49,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return lifeSpan.GetHashCode() ^ elapsedTime.GetHashCode();
+        }
+
         protected override void Update(SimulationStep step)
         {
             elapsedTime += step.TimeDeltaInSeconds;

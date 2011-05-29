@@ -63,6 +63,12 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return speed.GetHashCode() ^ rallyPoint.GetHashCode()
+                ^ trainableTypes.Count;
+        }
+
         public bool Supports(Entity prototype)
         {
             Argument.EnsureNotNull(prototype, "prototype");

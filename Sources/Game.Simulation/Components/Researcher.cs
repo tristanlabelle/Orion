@@ -35,6 +35,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override int GetStateHashCode()
+        {
+            return technologies.Count;
+        }
+
         /// <summary>
         /// Tests if a given <see cref="Technology"/> can be researched by this <see cref="Entity"/>.
         /// </summary>

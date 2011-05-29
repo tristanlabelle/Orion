@@ -26,6 +26,8 @@ namespace Orion.Game.Matchmaking.Networking
 
         private Action<GameNetworking, GamePacketEventArgs> packetReceivedEventHandler;
         private Action<GameNetworking, IPv4EndPoint> peerTimedOutEventHandler;
+
+        private bool hasDesynced;
         #endregion
 
         #region Constructors
@@ -84,9 +86,8 @@ namespace Orion.Game.Matchmaking.Networking
             networking.Send(new RemovePlayerPacket(), hostEndPoint);
         }
 
-        public void SendDone(int commandFrame, int numberOfUpdates)
+        public void SendDone(CommandFrameCompletedPacket packet)
         {
-            var packet = new CommandFrameCompletedPacket(commandFrame, numberOfUpdates);
             networking.Send(packet, hostEndPoint);
         }
 
@@ -129,6 +130,19 @@ namespace Orion.Game.Matchmaking.Networking
             {
                 var packet = (CommandFrameCompletedPacket)args.Packet;
                 updatesForDone[packet.CommandFrameNumber] = packet.UpdateFrameCount;
+
+#if DEBUG
+                if (!hasDesynced && packet.WorldStateHashCode != 0)
+                {
+                    int worldStateHashCode = faction.World.GetStateHashCode();
+                    if (worldStateHashCode != packet.WorldStateHashCode)
+                    {
+                        Debug.Fail("Desync detected with faction {0} at ip {1}!"
+                            .FormatInvariant(faction.Name, hostEndPoint));
+                        hasDesynced = true;
+                    }
+                }
+#endif
             }
         }
 

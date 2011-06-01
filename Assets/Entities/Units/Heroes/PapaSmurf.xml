@@ -65,10 +65,4 @@
 	<Vision>
 		<Range>7</Range>
 	</Vision>
-	
-	<Tags>
-		<List>
-			<Item>worker</Item>
-		</List>
-	</Tags>
 </Entity>

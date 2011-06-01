@@ -58,10 +58,4 @@
 	<Vision>
 		<Range>3</Range>
 	</Vision>
-	
-	<Tags>
-		<List>
-			<Item>worker</Item>
-		</List>
-	</Tags>
 </Entity>

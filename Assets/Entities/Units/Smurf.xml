@@ -79,10 +79,4 @@
 	<Vision>
 		<Range>5</Range>
 	</Vision>
-	
-	<Tags>
-		<List>
-			<Item>worker</Item>
-		</List>
-	</Tags>
 </Entity>

@@ -139,7 +139,14 @@ namespace Orion.Game.Presentation.Renderers
             foreach (Entity entity in World.Entities)
             {
                 Spatial spatial = entity.Spatial;
-                if (spatial == null || !faction.CanSee(entity)) continue;
+                Sprite sprite = entity.Components.TryGet<Sprite>();
+                if (spatial == null
+                    || !faction.CanSee(entity)
+                    || sprite == null
+                    || !sprite.IsVisibleOnMinimap)
+                {
+                    continue;
+                }
 
                 Faction entityFaction = FactionMembership.GetFaction(entity);
                 DrawMiniature(graphics, entity, spatial.Position, entityFaction);

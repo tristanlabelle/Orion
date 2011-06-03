@@ -15,6 +15,7 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private string name;
         private bool rotates = true;
+        private bool isVisibleOnMinimap = true;
         #endregion
 
         #region Constructors
@@ -46,6 +47,16 @@ namespace Orion.Game.Simulation.Components
         {
             get { return rotates; }
             set { rotates = value; }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if this sprite appears on the minimap.
+        /// </summary>
+        [Persistent]
+        public bool IsVisibleOnMinimap
+        {
+            get { return isVisibleOnMinimap; }
+            set { isVisibleOnMinimap = value; }
         }
         #endregion
 

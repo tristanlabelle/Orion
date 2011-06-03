@@ -374,7 +374,7 @@ namespace Orion.Game.Simulation
             entities.Remove(entity);
 
             if (entity.Components.Has<Health>())
-                CreateRuinsForEntity(entity);
+                CreateRuins(entity);
         }
 
         internal void RaiseBuildingConstructed(Entity entity)
@@ -384,7 +384,7 @@ namespace Orion.Game.Simulation
             BuildingConstructed.Raise(this, entity);
         }
 
-        private void CreateRuinsForEntity(Entity entity)
+        private void CreateRuins(Entity entity)
         {
             Spatial spatial = entity.Spatial;
             if (spatial == null)
@@ -403,7 +403,8 @@ namespace Orion.Game.Simulation
 
             ruins.Components.Add(new Sprite(ruins)
             {
-                Rotates = false
+                Rotates = false,
+                IsVisibleOnMinimap = false
             });
 
             ruins.Components.Add(new TimedExistence(ruins)

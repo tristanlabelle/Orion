@@ -310,6 +310,12 @@ namespace Orion.Game.Simulation
             return region.Contains(point);
         }
 
+        public bool IsWithinBounds(Region region)
+        {
+            Region worldRegion = (Region)Size;
+            return worldRegion.Contains(region);
+        }
+
         /// <summary>
         /// Gets the coordinates of the tile on which a point is, clamped within this <see cref="World"/>'s bounds.
         /// </summary>

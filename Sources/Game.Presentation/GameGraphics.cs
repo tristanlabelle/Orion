@@ -13,6 +13,7 @@ using Orion.Game.Simulation.Technologies;
 using Keys = System.Windows.Forms.Keys;
 using Orion.Game.Simulation.Components;
 using System.Diagnostics;
+using System.Text;
 
 namespace Orion.Game.Presentation
 {
@@ -26,6 +27,20 @@ namespace Orion.Game.Presentation
         private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
         private readonly UIManager uiManager;
         private readonly TextureManager textureManager;
+
+        /// <summary>
+        /// Temporary variable used to build paths in order
+        /// to minimize garbage involved by <see cref="Path.Combine"/>.
+        /// </summary>
+        private readonly StringBuilder tempPathStringBuilder = new StringBuilder();
+
+        /// <summary>
+        /// A cache of textures that correspond to sprite names.
+        /// This prevents having to create paths (and creating garbage) at every
+        /// entity texture query (which are frequent).
+        /// </summary>
+        private readonly Dictionary<string, Texture> entityTextureCache
+            = new Dictionary<string, Texture>();
         #endregion
 
         #region Constructors
@@ -118,8 +133,19 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(name, "name");
 
-            string fullName = Path.Combine("Entities", name);
-            return GetTexture(fullName);
+            Texture texture;
+            if (entityTextureCache.TryGetValue(name, out texture))
+                return texture;
+
+            tempPathStringBuilder.Clear();
+            string path = tempPathStringBuilder.Append("Entities")
+                .Append(Path.DirectorySeparatorChar)
+                .Append(name)
+                .ToString();
+
+            texture = GetTexture(path);
+            entityTextureCache.Add(name, texture);
+            return texture;
         }
         
         /// <summary>
@@ -131,8 +157,11 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(name, "name");
 
-            string fullName = Path.Combine("Gui", name);
-            return GetTexture(fullName);
+            tempPathStringBuilder.Clear();
+            tempPathStringBuilder.Append("Gui")
+                .Append(Path.DirectorySeparatorChar)
+                .Append(name);
+            return GetTexture(tempPathStringBuilder.ToString());
         }
         
         /// <summary>
@@ -144,8 +173,13 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(name, "name");
 
-            string fullName = Path.Combine("Gui", Path.Combine("Cursors", name));
-            return GetTexture(fullName);
+            tempPathStringBuilder.Clear();
+            tempPathStringBuilder.Append("Gui")
+                .Append(Path.DirectorySeparatorChar)
+                .Append("Cursors")
+                .Append(Path.DirectorySeparatorChar)
+                .Append(name);
+            return GetTexture(tempPathStringBuilder.ToString());
         }
 
         /// <summary>
@@ -182,7 +216,14 @@ namespace Orion.Game.Presentation
         public Texture GetResourceTexture(Entity node)
         {
             Argument.EnsureNotNull(node, "node");
-            Debug.Assert(node.Components.Has<Harvestable>(), "Entity is not a resource node!");
+
+            Harvestable harvestable = node.Components.TryGet<Harvestable>();
+            if (harvestable == null)
+            {
+                Debug.Fail("Cannot get the resource texture for an entity that is not a resource node.");
+                return DefaultTexture;
+            }
+
             return GetResourceTexture(node.Components.Get<Harvestable>().Type);
         }
 
@@ -193,8 +234,13 @@ namespace Orion.Game.Presentation
         /// <returns>The <see cref="Texture"/> for that action.</returns>
         public Texture GetActionTexture(string actionName)
         {
-            string fullName = Path.Combine(Path.Combine("Gui", "Actions"), actionName);
-            return GetTexture(fullName);
+            tempPathStringBuilder.Clear();
+            tempPathStringBuilder.Append("Gui")
+                .Append(Path.DirectorySeparatorChar)
+                .Append("Actions")
+                .Append(Path.DirectorySeparatorChar)
+                .Append(actionName);
+            return GetTexture(tempPathStringBuilder.ToString());
         }
 
         /// <summary>
@@ -205,7 +251,8 @@ namespace Orion.Game.Presentation
         public Texture GetActionTexture(Task task)
         {
             string taskName = task.GetType().Name;
-            string actionName = taskName.EndsWith("Task") ? taskName.Substring(0, taskName.Length - "Task".Length) : taskName;
+            string actionName = taskName.EndsWith("Task")
+                ? taskName.Substring(0, taskName.Length - "Task".Length) : taskName;
             return GetActionTexture(actionName);
         }
 
@@ -217,8 +264,12 @@ namespace Orion.Game.Presentation
         public Texture GetTechnologyTexture(Technology technology)
         {
             Argument.EnsureNotNull(technology, "technology");
-            string fullName = Path.Combine("Technologies", technology.Name);
-            return GetTexture(fullName);
+
+            tempPathStringBuilder.Clear();
+            tempPathStringBuilder.Append("Technologies")
+                .Append(Path.DirectorySeparatorChar)
+                .Append(technology.Name);
+            return GetTexture(tempPathStringBuilder.ToString());
         }
 
         private Texture GetTexture(string name)

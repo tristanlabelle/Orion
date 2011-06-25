@@ -210,13 +210,33 @@ namespace Orion.Game.Simulation
                 Debug.Fail("Testing if an out-of-bounds point is free.");
                 return false;
             }
-            if (layer == CollisionLayer.Ground && terrain[point] != TileType.Walkable) return false;
-            return spatialManager.GetGridObstacleAt(point, layer) == null;
+
+            return IsFree_NoBoundsCheck(point, layer);
         }
 
         public bool IsFree(Region region, CollisionLayer layer)
         {
-            return region.Points.All(point => IsFree(point, layer));
+            int exclusiveMaxX = region.ExclusiveMaxX;
+            int exclusiveMaxY = region.ExclusiveMaxY;
+
+            if (region.MinX < 0 || region.MinY < 0
+                || exclusiveMaxX > Width || exclusiveMaxY > Height)
+            {
+                return false;
+            }
+
+            for (int y = region.MinY; y < exclusiveMaxY; ++y)
+                for (int x = region.MinX; x < exclusiveMaxX; ++x)
+                    if (!IsFree_NoBoundsCheck(new Point(x, y), layer))
+                        return false;
+
+            return true;
+        }
+
+        private bool IsFree_NoBoundsCheck(Point point, CollisionLayer layer)
+        {
+            if (layer == CollisionLayer.Ground && terrain[point] != TileType.Walkable) return false;
+            return spatialManager.GetGridObstacleAt(point, layer) == null;
         }
 
         /// <summary>

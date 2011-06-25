@@ -110,14 +110,13 @@ namespace Orion.Game.Main
         
         private static string GetAssetsPath()
         {
-            string lastAbsolutePath = null;
             string currentDirectory = Directory.GetCurrentDirectory();
             string assetsPath = "Assets";
             string absolutePath = Path.GetFullPath(Path.Combine(currentDirectory, assetsPath));
             while (!Directory.Exists(assetsPath))
             {
             	assetsPath = "../" + assetsPath;
-            	lastAbsolutePath = absolutePath;
+            	string lastAbsolutePath = absolutePath;
             	absolutePath = Path.GetFullPath(Path.Combine(currentDirectory, assetsPath));
             	if (absolutePath == lastAbsolutePath)
             		throw new FileNotFoundException("Could not find the assets folder!");

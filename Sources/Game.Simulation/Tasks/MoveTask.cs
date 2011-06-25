@@ -143,14 +143,23 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool CanMoveOn(Spatial spatial, Region targetRegion)
         {
-            foreach (Point point in targetRegion.Points)
-            {
-                Debug.Assert(Entity.Components.Has<Spatial>(), "Unit has no spatial component!");
-                if (Entity.Spatial.CollisionLayer == CollisionLayer.Ground
-                    && World.Terrain[point] != TileType.Walkable) return false;
+            Debug.Assert(Entity.Components.Has<Spatial>(), "Unit has no spatial component!");
 
-                Spatial obstacleSpatial = World.SpatialManager.GetGridObstacleAt(point, spatial.CollisionLayer);
-                if (obstacleSpatial != null && obstacleSpatial.Entity != Entity) return false;
+            int exclusiveMaxX = targetRegion.ExclusiveMaxX;
+            int exclusiveMaxY = targetRegion.ExclusiveMaxY;
+
+            for (int y = targetRegion.MinY; y < exclusiveMaxY; ++y)
+            {
+                for (int x = targetRegion.MinX; x < exclusiveMaxX; ++x)
+                {
+                    Point point = new Point(x, y);
+
+                    if (Entity.Spatial.CollisionLayer == CollisionLayer.Ground
+                        && World.Terrain[point] != TileType.Walkable) return false;
+
+                    Spatial obstacleSpatial = World.SpatialManager.GetGridObstacleAt(point, spatial.CollisionLayer);
+                    if (obstacleSpatial != null && obstacleSpatial.Entity != Entity) return false;
+                }
             }
 
             return true;

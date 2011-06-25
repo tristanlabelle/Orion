@@ -87,13 +87,23 @@ namespace Orion.Game.Simulation.Pathfinding
                 while (i != points.Count - 2)
                 {
                     Point destinationPoint = points[i + 2];
-
+                    
                     Region region = Region.FromPoints(sourcePoint, destinationPoint);
-                    if (region.Area >= 40 || !region.Points.All(isWalkable))
-                        break;
+                    if (region.Area >= 40) break;
+
+                    int exclusiveMaxX = region.ExclusiveMaxX;
+                    int exclusiveMaxY = region.ExclusiveMaxY;
+
+                    // The following goto is used to break out of three nested loops at once
+                    for (int y = region.MinY; y < exclusiveMaxY; ++y)
+                        for (int x = region.MinX; x < exclusiveMaxX; ++x)
+                            if (!isWalkable(new Point(x, y)))
+                                goto cannotSmooth;
 
                     points.RemoveAt(i + 1);
                 }
+
+            cannotSmooth: ;
             }
         }
         #endregion

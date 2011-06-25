@@ -24,6 +24,7 @@ namespace Orion.Engine.Graphics
         private readonly PixelFormat pixelFormat;
         private bool hasMipmaps = true;
         private int id;
+        private byte[] lockBuffer;
         #endregion
 
         #region Constructors
@@ -258,22 +259,26 @@ namespace Orion.Engine.Graphics
             Argument.EnsureNotNull(accessor, "accessor");
 
             if (access == Access.None) return;
-            byte[] data = new byte[size.Area * pixelFormat.GetBytesPerPixel()];
+
+            if (lockBuffer == null)
+                lockBuffer = new byte[Size.Area * pixelFormat.GetBytesPerPixel()];
 
             BindWhile(() =>
             {
                 GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
-                GL.GetTexImage(TextureTarget.Texture2D, 0, GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte, data);
+                GL.GetTexImage(TextureTarget.Texture2D, 0, GetGLPixelFormat(pixelFormat),
+                    PixelType.UnsignedByte, lockBuffer);
 
                 BufferedPixelSurface surface = new BufferedPixelSurface(size, pixelFormat,
-                    new Subarray<byte>(data), access);
+                    lockBuffer, access);
                 surface.Lock(region, access, accessor);
 
                 if ((access & Access.Write) == Access.Write)
                 {
                     GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
                     GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(pixelFormat),
-                        size.Width, size.Height, 0, GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte, data);
+                        size.Width, size.Height, 0, GetGLPixelFormat(pixelFormat),
+                        PixelType.UnsignedByte, lockBuffer);
                 }
             });
         }

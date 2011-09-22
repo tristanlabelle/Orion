@@ -50,6 +50,7 @@ namespace Orion.Game.Main
                 ui.Players.Add(player, true, true);
             });
 
+
             this.ui.PlayerKicked += (sender, player) =>
             {
                 playerSettings.RemovePlayer(player);
@@ -124,8 +125,11 @@ namespace Orion.Game.Main
                 }
                 else if (player is AIPlayer)
                 {
-                    Commander commander = new HarvestingAICommander(match, faction);
-                    aiCommanders.Add(commander);
+                    if (player.Name == "Harvesting Computer")
+                    {
+                        Commander commander = new HarvestingAICommander(match, faction);
+                        aiCommanders.Add(commander);
+                    }
                 }
                 else
                 {

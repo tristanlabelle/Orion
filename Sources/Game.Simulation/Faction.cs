@@ -103,6 +103,7 @@ namespace Orion.Game.Simulation
         {
             Warning.Raise(this, message);
         }
+
         #endregion
 
         #region Properties

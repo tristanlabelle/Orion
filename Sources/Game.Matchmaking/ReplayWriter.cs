@@ -101,7 +101,7 @@ namespace Orion.Game.Matchmaking
 
         #region Static
         #region Fields
-        private static readonly DirectoryInfo directory = new DirectoryInfo("Replays");
+        private static readonly DirectoryInfo directory = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Orion\\Replays");
         #endregion
 
         #region Methods
@@ -111,6 +111,7 @@ namespace Orion.Game.Matchmaking
             if (stream == null) return null;
 
             return new ReplayWriter(stream, settings, playerSettings);
+            
         }
 
         private static Stream TryOpenFileStream()

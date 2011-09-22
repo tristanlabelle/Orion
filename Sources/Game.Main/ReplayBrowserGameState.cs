@@ -18,7 +18,7 @@ namespace Orion.Game.Main
     public sealed class ReplayBrowserGameState : GameState
     {
         #region Fields
-        private static readonly string replayFolderName = "Replays";
+        private static readonly string replayFolderName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "Orion\\Replays";
         private static readonly string replayExtension = "replay";
         
         private readonly ReplayBrowser ui;

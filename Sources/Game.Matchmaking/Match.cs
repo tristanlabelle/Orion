@@ -53,7 +53,7 @@ namespace Orion.Game.Matchmaking
         /// <summary>
         /// Raised when a message was received from a <see cref="Faction"/>.
         /// </summary>
-        public event Action<Match, FactionMessage> FactionMessageReceived;
+        public event Action<Match, FactionMessage> FactionMessageReceived;        
         #endregion
 
         #region Properties

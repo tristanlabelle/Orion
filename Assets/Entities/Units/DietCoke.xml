@@ -17,7 +17,7 @@
 		<Radius>10</Radius>
 		<Damage>400</Damage>
 		<Targets>
-			<Target>Mentos</Target>
+			<Item>Mentos</Item>
 		</Targets>
 	</Kamikaze>
 	

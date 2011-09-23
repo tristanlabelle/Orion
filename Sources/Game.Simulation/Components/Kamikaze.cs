@@ -145,6 +145,8 @@ namespace Orion.Game.Simulation.Components
                 if (damagedEntity.Components.Has<Kamikaze>()) continue;
 
                 float distanceFromCenter = (explosionCircle.Center - damagedEntity.Spatial.Center).LengthFast;
+                //Sometimes, the entity intersects with the explosion circle but its center is a little further away resulting in negative damage attempting to be dealt.  This line corrects the situation.
+                if (distanceFromCenter > explosionCircle.Radius) distanceFromCenter = explosionCircle.Radius;
                 float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
                     * explosionDamage;
                 damagedEntity.Components.Get<Health>().Hurt(damage);

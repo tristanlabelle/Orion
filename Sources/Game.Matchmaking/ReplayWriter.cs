@@ -101,7 +101,11 @@ namespace Orion.Game.Matchmaking
 
         #region Static
         #region Fields
+#if DEBUG
+        private static readonly DirectoryInfo directory = new DirectoryInfo("Replays");
+#else
         private static readonly DirectoryInfo directory = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Orion\\Replays");
+#endif
         #endregion
 
         #region Methods

@@ -15,10 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Main", "Game.Main\Game
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI.Felix", "..\..\..\ordi\OrionAI\trunk\AI.Felix.csproj", "{99538E23-0C0D-436D-95C5-F7C1C96019F6}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{6F3B0A72-AECB-48CD-A3C6-C36054595B9B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,22 +95,6 @@ Global
 		{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}.Release|Mixed Platforms.Build.0 = Release|x86
 		{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}.Release|x86.ActiveCfg = Release|x86
 		{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}.Release|x86.Build.0 = Release|x86
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{99538E23-0C0D-436D-95C5-F7C1C96019F6}.Release|x86.ActiveCfg = Release|Any CPU
-		{6F3B0A72-AECB-48CD-A3C6-C36054595B9B}.Debug|Any CPU.ActiveCfg = Debug
-		{6F3B0A72-AECB-48CD-A3C6-C36054595B9B}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{6F3B0A72-AECB-48CD-A3C6-C36054595B9B}.Debug|x86.ActiveCfg = Debug
-		{6F3B0A72-AECB-48CD-A3C6-C36054595B9B}.Release|Any CPU.ActiveCfg = Release
-		{6F3B0A72-AECB-48CD-A3C6-C36054595B9B}.Release|Mixed Platforms.ActiveCfg = Release
-		{6F3B0A72-AECB-48CD-A3C6-C36054595B9B}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -68,7 +68,7 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public override int GetStateHashCode()
         {
-            return (int)(timeSpent.Ticks ^ requiredTime.Ticks);
+            return unchecked((int)(timeSpent.Ticks ^ requiredTime.Ticks));
         }
 
         /// <summary>

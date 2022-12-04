@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="Current">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Orion</RootNamespace>
+    <AssemblyName>Orion.Core</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>..\bin\release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\$(Configuration)\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="irrKlang.NET2.0, Version=1.3.0.0, Culture=neutral, PublicKeyToken=a854741bd80517c7">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\irrKlang.NET2.0.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK.Utilities, Version=0.9.8.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Debug\OpenTK.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Access.cs" />
+    <Compile Include="Argument.cs" />
+    <Compile Include="DisposableHandle.cs" />
+    <Compile Include="Engine\Audio\SoundContext.cs" />
+    <Compile Include="Engine\Audio\Sound.cs" />
+    <Compile Include="Engine\Audio\SoundGroup.cs" />
+    <Compile Include="Engine\Audio\SoundSource.cs" />
+    <Compile Include="Collections\BitArray2D.cs" />
+    <Compile Include="Collections\BufferPool.cs" />
+    <Compile Include="ColorRgb.cs" />
+    <Compile Include="ColorRgba.cs" />
+    <Compile Include="Colors.cs" />
+    <Compile Include="Engine\Graphics\BufferedPixelSurface.cs" />
+    <Compile Include="Engine\Graphics\GraphicsContext.cs" />
+    <Compile Include="Engine\Graphics\IPixelSurface.cs" />
+    <Compile Include="Engine\Graphics\PixelFormat.cs" />
+    <Compile Include="Engine\Graphics\PixelSurface.cs" />
+    <Compile Include="Engine\Graphics\RawPixelSurface.cs" />
+    <Compile Include="Engine\Graphics\Text.cs" />
+    <Compile Include="Engine\Graphics\Texture.cs" />
+    <Compile Include="Engine\Graphics\TextureManager.cs" />
+    <Compile Include="Engine\Networking\PacketType.cs" />
+    <Compile Include="Engine\Networking\PeerLink.cs" />
+    <Compile Include="Engine\Networking\PeerState.cs" />
+    <Compile Include="Engine\Networking\Protocol.cs" />
+    <Compile Include="Engine\Networking\SafePacket.cs" />
+    <Compile Include="Engine\Networking\SafeTransporter.cs" />
+    <Compile Include="Collections\PooledList.cs" />
+    <Compile Include="EventsExtensions.cs" />
+    <Compile Include="FrameRateCounter.cs" />
+    <Compile Include="Geometry\Circle.cs" />
+    <Compile Include="Geometry\Ellipse.cs" />
+    <Compile Include="Formatting.cs" />
+    <Compile Include="Geometry\Intersection.cs" />
+    <Compile Include="Geometry\LineSegment.cs" />
+    <Compile Include="Engine\Networking\IPv4Address.cs" />
+    <Compile Include="Engine\Networking\IPv4EndPoint.cs" />
+    <Compile Include="MouseEventArgs.cs" />
+    <Compile Include="Engine\Networking\NetworkTimeoutEventArgs.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="Point16.cs" />
+    <Compile Include="PerlinNoise.cs" />
+    <Compile Include="Engine\Networking\NetworkEventArgs.cs" />
+    <Compile Include="Collections\Pool.cs" />
+    <Compile Include="PowerOfTwo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Geometry\Rectangle.cs" />
+    <Compile Include="Geometry\Triangle.cs" />
+    <Compile Include="KeyboardEventArgs.cs" />
+    <Compile Include="Region.cs" />
+    <Compile Include="Collections\Sequence.cs" />
+    <Compile Include="Size.cs" />
+    <Compile Include="Transform.cs" />
+    <Compile Include="UpdateEventArgs.cs" />
+    <Compile Include="MersenneTwister.cs" />
+    <Compile Include="SimulationStep.cs" />
+    <Compile Include="ValueChangedEventHandler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Engine\Widgets\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

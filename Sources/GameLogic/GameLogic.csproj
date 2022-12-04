@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="Current">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Orion.GameLogic</RootNamespace>
+    <AssemblyName>Orion.GameLogic</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>..\bin\release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\$(Configuration)\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Utilities\FogOfWarMemory.cs" />
+    <Compile Include="Utilities\RememberedBuilding.cs" />
+    <Compile Include="Utilities\UnderAttackWarningProvider.cs" />
+    <Compile Include="Handle.cs" />
+    <Compile Include="HitEventArgs.cs" />
+    <Compile Include="Pathfinding\Pathfinder.OpenList.cs" />
+    <Compile Include="Skills\HealSkill.cs" />
+    <Compile Include="Skills\SuicideBombSkill.cs" />
+    <Compile Include="Skills\TransportSkill.cs" />
+    <Compile Include="Tasks\BuildingPlan.cs" />
+    <Compile Include="CollisionLayer.cs" />
+    <Compile Include="DiplomaticStance.cs" />
+    <Compile Include="Entity.cs" />
+    <Compile Include="EntityGrid.cs" />
+    <Compile Include="EntityZoneManager.cs" />
+    <Compile Include="FactionStatus.cs" />
+    <Compile Include="Faction.cs" />
+    <Compile Include="FogOfWar.cs" />
+    <Compile Include="Pathfinding\Path.cs" />
+    <Compile Include="Pathfinding\Pathfinder.cs" />
+    <Compile Include="Pathfinding\PathNode.cs" />
+    <Compile Include="Pathfinding\PathNodeQueue.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceNode.cs" />
+    <Compile Include="ResourceType.cs" />
+    <Compile Include="Skills\Skill.cs" />
+    <Compile Include="Skills\SkillCollection.cs" />
+    <Compile Include="Skills\SkillDependencyAttribute.cs" />
+    <Compile Include="Skills\AttackSkill.cs" />
+    <Compile Include="Skills\BuildSkill.cs" />
+    <Compile Include="Skills\ExtractAlageneSkill.cs" />
+    <Compile Include="Skills\HarvestSkill.cs" />
+    <Compile Include="Skills\MoveSkill.cs" />
+    <Compile Include="Skills\ResearchSkill.cs" />
+    <Compile Include="Skills\StoreFoodSkill.cs" />
+    <Compile Include="Skills\StoreResourcesSkill.cs" />
+    <Compile Include="Skills\TrainSkill.cs" />
+    <Compile Include="Tasks\EmbarkTask.cs" />
+    <Compile Include="Tasks\HealTask.cs" />
+    <Compile Include="Tasks\MoveTask.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tasks\StandGuardTask.cs" />
+    <Compile Include="Tasks\Task.cs" />
+    <Compile Include="Tasks\TaskQueue.cs" />
+    <Compile Include="Tasks\AttackTask.cs" />
+    <Compile Include="Tasks\BuildTask.cs" />
+    <Compile Include="Tasks\FollowTask.cs" />
+    <Compile Include="Tasks\HarvestTask.cs" />
+    <Compile Include="Tasks\RepairTask.cs" />
+    <Compile Include="Tasks\ResearchTask.cs" />
+    <Compile Include="Tasks\TrainTask.cs" />
+    <Compile Include="Tasks\ZoneAttackTask.cs" />
+    <Compile Include="Technologies\Technology.cs" />
+    <Compile Include="Technologies\TechnologyBuilder.cs" />
+    <Compile Include="Technologies\TechnologyEffect.cs" />
+    <Compile Include="Technologies\TechnologyRequirements.cs" />
+    <Compile Include="Technologies\TechnologyTree.cs" />
+    <Compile Include="Terrain.cs" />
+    <Compile Include="TileVisibility.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="EntityManager.cs" />
+    <Compile Include="UnitStat.cs" />
+    <Compile Include="UnitType.cs" />
+    <Compile Include="UnitTypeBuilder.cs" />
+    <Compile Include="UnitTypeRegistry.cs" />
+    <Compile Include="Utilities\WorkerActivityMonitor.cs" />
+    <Compile Include="World.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

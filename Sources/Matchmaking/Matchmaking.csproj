@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="Current">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{84DCA135-541D-41F5-9118-C83324225E2B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Orion.Matchmaking</RootNamespace>
+    <AssemblyName>Orion.Matchmaking</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>..\bin\release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\$(Configuration)\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Deathmatch\AgressiveAICommander.cs" />
+    <Compile Include="AICommander.cs" />
+    <Compile Include="Commands\IMultipleExecutingEntitiesCommand.cs" />
+    <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\Pipeline\CommandExecutor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\Pipeline\CommandFilter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\Pipeline\CommandOptimizer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\Pipeline\CommandPipeline.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\Pipeline\ICommandSink.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\Pipeline\ReplayPlayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\Pipeline\ReplayRecorder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\ResearchCommand.cs" />
+    <Compile Include="Commands\StandGuardCommand.cs" />
+    <Compile Include="FactionSettings.cs" />
+    <Compile Include="CheatCodeManager.cs" />
+    <Compile Include="Commander.cs" />
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\AttackCommand.cs" />
+    <Compile Include="Commands\BuildCommand.cs" />
+    <Compile Include="Commands\ChangeDiplomaticStanceCommand.cs" />
+    <Compile Include="Commands\ChangeRallyPointCommand.cs" />
+    <Compile Include="Commands\HealCommand.cs" />
+    <Compile Include="Commands\HarvestCommand.cs" />
+    <Compile Include="Commands\CancelCommand.cs" />
+    <Compile Include="Commands\SendMessageCommand.cs" />
+    <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Commands\RepairCommand.cs" />
+    <Compile Include="Commands\SendResourcesCommand.cs" />
+    <Compile Include="Commands\SuicideCommand.cs" />
+    <Compile Include="Commands\TrainCommand.cs" />
+    <Compile Include="Commands\ZoneAttackCommand.cs" />
+    <Compile Include="FactionMessage.cs" />
+    <Compile Include="Match.cs" />
+    <Compile Include="PlayerSlot.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReplayEvent.cs" />
+    <Compile Include="ReplayReader.cs" />
+    <Compile Include="ReplayWriter.cs" />
+    <Compile Include="SelectionManager.cs" />
+    <Compile Include="TowerDefense\CreepPath.cs" />
+    <Compile Include="TowerDefense\CreepTask.cs" />
+    <Compile Include="TowerDefense\CreepWaveCommander.cs" />
+    <Compile Include="UserInputCommand.cs" />
+    <Compile Include="UICommander.cs" />
+    <Compile Include="WorldGenerator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameLogic\GameLogic.csproj">
+      <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
+      <Name>GameLogic</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

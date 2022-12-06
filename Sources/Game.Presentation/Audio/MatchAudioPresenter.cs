@@ -147,9 +147,6 @@ namespace Orion.Game.Presentation.Audio
             if (!isGameStarted && step.TimeInSeconds > 0.5f)
             {
                 isGameStarted = true;
-
-                if (userInputManager.LocalFaction.Color == Colors.Magenta)
-                    audio.PlayUISound("Tapette");
             }
         }
 

@@ -5486,26 +5486,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_890BCD9C24744DE2A1F3174BE3DD7BA8"
-            {
-            "SourcePath" = "8:..\\..\\Assets\\Sounds\\Tapette.ogg"
-            "TargetName" = "8:Tapette.ogg"
-            "Tag" = "8:"
-            "Folder" = "8:_05294237965F4A7984A69704ECFC5725"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_892D4F9DF121405D872CBD6BA55BFD21"
             {
             "SourcePath" = "8:..\\..\\Assets\\Entities\\Units\\Heroes\\RaptorJesus.xml"

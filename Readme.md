@@ -1,6 +1,6 @@
 # Orion
 
-<img src="Assets\Textures\MenuBackground.png" style="zoom:50%;" />
+<img src="Assets/Textures/GUI/MenuBackground.png" style="width:500px; height:400px" />
 
 Orion is a Real-Time Strategy game (RTS) originally created by a team of high-schoolers from the Cégep du Vieux Montréal for their project management class, during the Fall 2009 and Winter 2010 semesters.
 

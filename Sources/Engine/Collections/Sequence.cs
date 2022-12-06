@@ -789,13 +789,6 @@ namespace Orion.Engine.Collections
             return new ChunkList<T>(sequence);
         }
         #endregion
-
-        #region ToHashSet
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> sequence)
-        {
-            return new HashSet<T>(sequence);
-        }
-        #endregion
         #endregion
     }
 }

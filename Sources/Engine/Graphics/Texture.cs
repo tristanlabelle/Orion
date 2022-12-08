@@ -45,7 +45,7 @@ namespace Orion.Engine.Graphics
                     {
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1);
                     }
-                    catch (GraphicsException)
+                    catch
                     {
                         Debug.WriteLine("Automatic mipmap generation not supported and disabled.");
                         hasMipmaps = false;
@@ -189,7 +189,7 @@ namespace Orion.Engine.Graphics
             {
                 SetWrapMode(on ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge);
             }
-            catch (GraphicsException)
+            catch
             {
                 Debug.WriteLine("Clamp to edge wrap mode not supported, defaulting to clamp."
                     + " Some artifacts may occur around the edges of the textures.");

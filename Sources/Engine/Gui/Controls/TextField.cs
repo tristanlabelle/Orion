@@ -4,9 +4,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using OpenTK;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using Orion.Engine.Graphics;
 using Orion.Engine.Input;
-using Key = OpenTK.Input.Key;
 using SystemInformation = System.Windows.Forms.SystemInformation;
 
 namespace Orion.Engine.Gui
@@ -284,23 +284,23 @@ namespace Orion.Engine.Gui
 
             switch (@event.Key)
             {
-                case Key.Left:
+                case Keys.Left:
                     if (caretIndex > 0) --caretIndex;
                     break;
 
-                case Key.Right:
+                case Keys.Right:
                     if (caretIndex < text.Length) ++caretIndex;
                     break;
 
-                case Key.Home:
+                case Keys.Home:
                     caretIndex = 0;
                     break;
 
-                case Key.End:
+                case Keys.End:
                     caretIndex = text.Length;
                     break;
 
-                case Key.Back:
+                case Keys.Backspace:
                     if (caretIndex > 0)
                     {
                         text = text.Substring(0, caretIndex - 1) + text.Substring(caretIndex);
@@ -309,7 +309,7 @@ namespace Orion.Engine.Gui
                     }
                     break;
 
-                case Key.Delete:
+                case Keys.Delete:
                     if (caretIndex < text.Length)
                     {
                         text = text.Substring(0, caretIndex) + text.Substring(caretIndex + 1);

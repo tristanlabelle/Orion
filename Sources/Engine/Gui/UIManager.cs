@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
-using Key = OpenTK.Input.Key;
+using TKKeys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 using Keys = System.Windows.Forms.Keys;
 using Input = Orion.Engine.Input;
 
@@ -465,8 +465,8 @@ namespace Orion.Engine.Gui
 
             Arrange();
 
-            Key key = Input.InputEnums.GetTKKey(keyAndModifiers & Keys.KeyCode);
-            if (key == Key.Unknown) return false;
+            TKKeys key = Input.InputEnums.GetTKKey(keyAndModifiers & Keys.KeyCode);
+            if (key == TKKeys.Unknown) return false;
 
             KeyEvent @event = new KeyEvent(type, modifierKeys, key);
             return InjectKeyEvent(@event);

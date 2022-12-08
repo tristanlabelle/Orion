@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TKKey = OpenTK.Input.Key;
-using TKMouseButton = OpenTK.Input.MouseButton;
+using TKKeys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
+using TKMouseButton = OpenTK.Windowing.GraphicsLibraryFramework.MouseButton;
 using FormsKeys = System.Windows.Forms.Keys;
 using FormsMouseButtons = System.Windows.Forms.MouseButtons;
 using OrionModifierKeys = Orion.Engine.Gui.ModifierKeys;
@@ -16,107 +16,107 @@ namespace Orion.Engine.Input
     public static class InputEnums
     {
         #region Fields
-        private static readonly Dictionary<TKKey, FormsKeys> tkKeyToFormsKeys = new Dictionary<TKKey, FormsKeys>();
-        private static readonly Dictionary<FormsKeys, TKKey> formsKeysToTKKey = new Dictionary<FormsKeys, TKKey>();
+        private static readonly Dictionary<TKKeys, FormsKeys> tkKeyToFormsKeys = new Dictionary<TKKeys, FormsKeys>();
+        private static readonly Dictionary<FormsKeys, TKKeys> formsKeysToTKKey = new Dictionary<FormsKeys, TKKeys>();
         #endregion
 
         #region Constructors
         static InputEnums()
         {
             // The following is taken from OpenTK's source (and reversed)
-            AddConversion(TKKey.Escape, FormsKeys.Escape);
+            AddConversion(TKKeys.Escape, FormsKeys.Escape);
 
             // Function FormsKeys
-            for (int i = 0; i < 24; i++) AddConversion(TKKey.F1 + i, (FormsKeys)((int)FormsKeys.F1 + i));
+            for (int i = 0; i < 24; i++) AddConversion(TKKeys.F1 + i, (FormsKeys)((int)FormsKeys.F1 + i));
 
             // Number FormsKeys (0-9)
-            for (int i = 0; i <= 9; i++) AddConversion(TKKey.Number0 + i, (FormsKeys)('0' + i));
+            for (int i = 0; i <= 9; i++) AddConversion(TKKeys.D0 + i, (FormsKeys)('0' + i));
 
             // Letters (A-Z)
-            for (int i = 0; i < 26; i++) AddConversion(TKKey.A + i, (FormsKeys)('A' + i));
+            for (int i = 0; i < 26; i++) AddConversion(TKKeys.A + i, (FormsKeys)('A' + i));
 
-            AddConversion(TKKey.Tab, FormsKeys.Tab);
-            AddConversion(TKKey.CapsLock, FormsKeys.Capital);
-            AddConversion(TKKey.ControlLeft, FormsKeys.LControlKey);
-            AddConversion(TKKey.ShiftLeft, FormsKeys.LShiftKey);
-            AddConversion(TKKey.WinLeft, FormsKeys.LWin);
-            AddConversion(TKKey.AltLeft, FormsKeys.LMenu);
-            AddConversion(TKKey.Space, FormsKeys.Space);
-            AddConversion(TKKey.AltRight, FormsKeys.RMenu);
-            AddConversion(TKKey.WinRight, FormsKeys.RWin);
-            AddConversion(TKKey.Menu, FormsKeys.Apps);
-            AddConversion(TKKey.ControlRight, FormsKeys.RControlKey);
-            AddConversion(TKKey.ShiftRight, FormsKeys.RShiftKey);
-            AddConversion(TKKey.Enter, FormsKeys.Return);
-            AddConversion(TKKey.BackSpace, FormsKeys.Back);
+            AddConversion(TKKeys.Tab, FormsKeys.Tab);
+            AddConversion(TKKeys.CapsLock, FormsKeys.Capital);
+            AddConversion(TKKeys.LeftControl, FormsKeys.LControlKey);
+            AddConversion(TKKeys.LeftShift, FormsKeys.LShiftKey);
+            AddConversion(TKKeys.LeftSuper, FormsKeys.LWin);
+            AddConversion(TKKeys.LeftAlt, FormsKeys.LMenu);
+            AddConversion(TKKeys.Space, FormsKeys.Space);
+            AddConversion(TKKeys.RightAlt, FormsKeys.RMenu);
+            AddConversion(TKKeys.RightSuper, FormsKeys.RWin);
+            AddConversion(TKKeys.Menu, FormsKeys.Apps);
+            AddConversion(TKKeys.RightControl, FormsKeys.RControlKey);
+            AddConversion(TKKeys.RightShift, FormsKeys.RShiftKey);
+            AddConversion(TKKeys.Enter, FormsKeys.Return);
+            AddConversion(TKKeys.Backspace, FormsKeys.Back);
 
-            AddConversion(TKKey.Semicolon, FormsKeys.Oem1);      // Varies by keyboard, ;: on Win2K/US
-            AddConversion(TKKey.Slash, FormsKeys.Oem2);          // Varies by keyboard, /? on Win2K/US
-            AddConversion(TKKey.Tilde, FormsKeys.Oem3);          // Varies by keyboard, `~ on Win2K/US
-            AddConversion(TKKey.BracketLeft, FormsKeys.Oem4);    // Varies by keyboard, [{ on Win2K/US
-            AddConversion(TKKey.BackSlash, FormsKeys.Oem5);      // Varies by keyboard, \| on Win2K/US
-            AddConversion(TKKey.BracketRight, FormsKeys.Oem6);   // Varies by keyboard, ]} on Win2K/US
-            AddConversion(TKKey.Quote, FormsKeys.Oem7);          // Varies by keyboard, '" on Win2K/US
-            AddConversion(TKKey.Plus, FormsKeys.Oemplus);        // Invariant: +
-            AddConversion(TKKey.Comma, FormsKeys.Oemcomma);      // Invariant: ,
-            AddConversion(TKKey.Minus, FormsKeys.OemMinus);      // Invariant: -
-            AddConversion(TKKey.Period, FormsKeys.OemPeriod);    // Invariant: .
+            AddConversion(TKKeys.Semicolon, FormsKeys.Oem1);      // Varies by keyboard, ;: on Win2K/US
+            AddConversion(TKKeys.Slash, FormsKeys.Oem2);          // Varies by keyboard, /? on Win2K/US
+            AddConversion(TKKeys.GraveAccent, FormsKeys.Oem3);          // Varies by keyboard, `~ on Win2K/US
+            AddConversion(TKKeys.LeftBracket, FormsKeys.Oem4);    // Varies by keyboard, [{ on Win2K/US
+            AddConversion(TKKeys.Backslash, FormsKeys.Oem5);      // Varies by keyboard, \| on Win2K/US
+            AddConversion(TKKeys.RightBracket, FormsKeys.Oem6);   // Varies by keyboard, ]} on Win2K/US
+            AddConversion(TKKeys.Apostrophe, FormsKeys.Oem7);          // Varies by keyboard, '" on Win2K/US
+            AddConversion(TKKeys.Equal, FormsKeys.Oemplus);        // Invariant: +
+            AddConversion(TKKeys.Comma, FormsKeys.Oemcomma);      // Invariant: ,
+            AddConversion(TKKeys.Minus, FormsKeys.OemMinus);      // Invariant: -
+            AddConversion(TKKeys.Period, FormsKeys.OemPeriod);    // Invariant: .
 
-            AddConversion(TKKey.Home, FormsKeys.Home);
-            AddConversion(TKKey.End, FormsKeys.End);
-            AddConversion(TKKey.Delete, FormsKeys.Delete);
-            AddConversion(TKKey.PageUp, FormsKeys.Prior);
-            AddConversion(TKKey.PageDown, FormsKeys.Next);
-            AddConversion(TKKey.PrintScreen, FormsKeys.Print);
-            AddConversion(TKKey.Pause, FormsKeys.Pause);
-            AddConversion(TKKey.NumLock, FormsKeys.NumLock);
+            AddConversion(TKKeys.Home, FormsKeys.Home);
+            AddConversion(TKKeys.End, FormsKeys.End);
+            AddConversion(TKKeys.Delete, FormsKeys.Delete);
+            AddConversion(TKKeys.PageUp, FormsKeys.Prior);
+            AddConversion(TKKeys.PageDown, FormsKeys.Next);
+            AddConversion(TKKeys.PrintScreen, FormsKeys.Print);
+            AddConversion(TKKeys.Pause, FormsKeys.Pause);
+            AddConversion(TKKeys.NumLock, FormsKeys.NumLock);
 
-            AddConversion(TKKey.ScrollLock, FormsKeys.Scroll);
-            AddConversion(TKKey.Clear, FormsKeys.Clear);
-            AddConversion(TKKey.Insert, FormsKeys.Insert);
+            AddConversion(TKKeys.ScrollLock, FormsKeys.Scroll);
+            //AddConversion(TKKeys.Clear, FormsKeys.Clear);
+            AddConversion(TKKeys.Insert, FormsKeys.Insert);
 
-            AddConversion(TKKey.Sleep, FormsKeys.Sleep);
+            //AddConversion(TKKeys.Sleep, FormsKeys.Sleep);
 
             // Keypad
             for (int i = 0; i <= 9; i++)
             {
-                AddConversion(TKKey.Keypad0 + i, (FormsKeys)((int)FormsKeys.NumPad0 + i));
+                AddConversion(TKKeys.KeyPad0 + i, (FormsKeys)((int)FormsKeys.NumPad0 + i));
             }
 
-            AddConversion(TKKey.KeypadDecimal, FormsKeys.Decimal);
-            AddConversion(TKKey.KeypadAdd, FormsKeys.Add);
-            AddConversion(TKKey.KeypadSubtract, FormsKeys.Subtract);
-            AddConversion(TKKey.KeypadDivide, FormsKeys.Divide);
-            AddConversion(TKKey.KeypadMultiply, FormsKeys.Multiply);
+            AddConversion(TKKeys.KeyPadDecimal, FormsKeys.Decimal);
+            AddConversion(TKKeys.KeyPadAdd, FormsKeys.Add);
+            AddConversion(TKKeys.KeyPadSubtract, FormsKeys.Subtract);
+            AddConversion(TKKeys.KeyPadDivide, FormsKeys.Divide);
+            AddConversion(TKKeys.KeyPadMultiply, FormsKeys.Multiply);
 
             // Navigation
-            AddConversion(TKKey.Up, FormsKeys.Up);
-            AddConversion(TKKey.Down, FormsKeys.Down);
-            AddConversion(TKKey.Left, FormsKeys.Left);
-            AddConversion(TKKey.Right, FormsKeys.Right);
+            AddConversion(TKKeys.Up, FormsKeys.Up);
+            AddConversion(TKKeys.Down, FormsKeys.Down);
+            AddConversion(TKKeys.Left, FormsKeys.Left);
+            AddConversion(TKKeys.Right, FormsKeys.Right);
 
             // Side-agnostic modifier FormsKeys
-            formsKeysToTKKey.Add(FormsKeys.ShiftKey, TKKey.ShiftLeft);
-            formsKeysToTKKey.Add(FormsKeys.ControlKey, TKKey.ControlLeft);
-            formsKeysToTKKey.Add(FormsKeys.Menu, TKKey.AltLeft);
+            formsKeysToTKKey.Add(FormsKeys.ShiftKey, TKKeys.LeftShift);
+            formsKeysToTKKey.Add(FormsKeys.ControlKey, TKKeys.LeftControl);
+            formsKeysToTKKey.Add(FormsKeys.Menu, TKKeys.LeftAlt);
         }
         #endregion
 
         #region Methods
-        private static void AddConversion(TKKey tkKey, FormsKeys formsKeys)
+        private static void AddConversion(TKKeys tkKey, FormsKeys formsKeys)
         {
             tkKeyToFormsKeys.Add(tkKey, formsKeys);
             formsKeysToTKKey.Add(formsKeys, tkKey);
         }
 
-        public static TKKey GetTKKey(FormsKeys formsKeys)
+        public static TKKeys GetTKKey(FormsKeys formsKeys)
         {
-            TKKey tkKey;
+            TKKeys tkKey;
             formsKeysToTKKey.TryGetValue(formsKeys, out tkKey);
             return tkKey;
         }
 
-        public static FormsKeys GetFormsKeys(TKKey tkKey)
+        public static FormsKeys GetFormsKeys(TKKeys tkKey)
         {
             FormsKeys formsKeys;
             tkKeyToFormsKeys.TryGetValue(tkKey, out formsKeys);
@@ -130,8 +130,8 @@ namespace Orion.Engine.Input
                 case TKMouseButton.Left: return FormsMouseButtons.Left;
                 case TKMouseButton.Middle: return FormsMouseButtons.Middle;
                 case TKMouseButton.Right: return FormsMouseButtons.Right;
-                case TKMouseButton.Button1: return FormsMouseButtons.XButton1;
-                case TKMouseButton.Button2: return FormsMouseButtons.XButton2;
+                case TKMouseButton.Button4: return FormsMouseButtons.XButton1;
+                case TKMouseButton.Button5: return FormsMouseButtons.XButton2;
                 default: return FormsMouseButtons.None;
             }
         }

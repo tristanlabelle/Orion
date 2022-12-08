@@ -5,8 +5,11 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
 using Orion.Engine.Input;
-using TKMouseButton = OpenTK.Input.MouseButton;
+using TKKeys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
+using TKMouseButton = OpenTK.Windowing.GraphicsLibraryFramework.MouseButton;
 
 namespace Orion.Engine.Graphics
 {
@@ -165,7 +168,7 @@ namespace Orion.Engine.Graphics
             RaiseKeyboardEvent(KeyboardEventType.ButtonReleased, key.Key);
         }
 
-        private void RaiseKeyboardEvent(KeyboardEventType type, Key key)
+        private void RaiseKeyboardEvent(KeyboardEventType type, TKKeys key)
         {
             Keys keys = Input.InputEnums.GetFormsKeys(key);
             if (keys == Keys.None)
@@ -223,16 +226,16 @@ namespace Orion.Engine.Graphics
                 Orion.Engine.Input.MouseButton.None, 0, e.DeltaPrecise);
         }
 
-        private static Orion.Engine.Input.MouseButton GetMouseButton(OpenTK.Input.MouseButton button)
+        private static Orion.Engine.Input.MouseButton GetMouseButton(OpenTK.Windowing.GraphicsLibraryFramework.MouseButton button)
         {
-            if (button == OpenTK.Input.MouseButton.Left) return Orion.Engine.Input.MouseButton.Left;
-            if (button == OpenTK.Input.MouseButton.Right) return Orion.Engine.Input.MouseButton.Right;
-            if (button == OpenTK.Input.MouseButton.Middle) return Orion.Engine.Input.MouseButton.Middle;
+            if (button == OpenTK.Windowing.GraphicsLibraryFramework.MouseButton.Left) return Orion.Engine.Input.MouseButton.Left;
+            if (button == OpenTK.Windowing.GraphicsLibraryFramework.MouseButton.Right) return Orion.Engine.Input.MouseButton.Right;
+            if (button == OpenTK.Windowing.GraphicsLibraryFramework.MouseButton.Middle) return Orion.Engine.Input.MouseButton.Middle;
             return Orion.Engine.Input.MouseButton.None;
         }
 
         private void RaiseMouseButtonEvent(MouseEventType type, System.Drawing.Point clientPoint,
-            OpenTK.Input.MouseButton button, int clickCount)
+            OpenTK.Windowing.GraphicsLibraryFramework.MouseButton button, int clickCount)
         {
             Orion.Engine.Input.MouseButton orionButton = GetMouseButton(button);
             if (orionButton == Orion.Engine.Input.MouseButton.None) return;

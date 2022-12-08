@@ -5,7 +5,7 @@ using System.Text;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Input;
-using Key = OpenTK.Input.Key;
+using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 
 namespace Orion.Engine.Gui
 {
@@ -100,7 +100,7 @@ namespace Orion.Engine.Gui
 
         protected override bool OnKeyEvent(KeyEvent @event)
         {
-            if (@event.Key == Key.Enter && @event.ModifierKeys == ModifierKeys.None)
+            if (@event.Key == Keys.Enter && @event.ModifierKeys == ModifierKeys.None)
             {
                 if (@event.IsDown) Click();
                 return true;

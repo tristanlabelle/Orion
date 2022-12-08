@@ -354,7 +354,7 @@ namespace Orion.Engine.Graphics
         public void Fill(Ellipse ellipse, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.Polygon);
+            GL.Begin(PrimitiveType.Polygon);
             DrawVertices(ellipse);
             GL.End();
         }
@@ -367,7 +367,7 @@ namespace Orion.Engine.Graphics
         public void Stroke(Ellipse ellipse, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.LineLoop);
+            GL.Begin(PrimitiveType.LineLoop);
             DrawVertices(ellipse);
             GL.End();
         }
@@ -393,7 +393,7 @@ namespace Orion.Engine.Graphics
         public void Fill(Rectangle rectangle, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.Quads);
+            GL.Begin(PrimitiveType.Quads);
             DrawVertices(rectangle);
             GL.End();
         }
@@ -406,7 +406,7 @@ namespace Orion.Engine.Graphics
         public void Stroke(Rectangle rectangle, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.LineLoop);
+            GL.Begin(PrimitiveType.LineLoop);
             DrawVertices(rectangle);
             GL.End();
         }
@@ -424,7 +424,7 @@ namespace Orion.Engine.Graphics
         public void FillRoundedRectangle(Rectangle rectangle, float cornerRadius, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.TriangleFan);
+            GL.Begin(PrimitiveType.TriangleFan);
             DrawRoundedRectangleVertices(rectangle, cornerRadius);
             GL.End();
         }
@@ -432,7 +432,7 @@ namespace Orion.Engine.Graphics
         public void StrokeRoundedRectangle(Rectangle rectangle, float cornerRadius, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.LineLoop);
+            GL.Begin(PrimitiveType.LineLoop);
             DrawRoundedRectangleVertices(rectangle, cornerRadius);
             GL.End();
         }
@@ -485,7 +485,7 @@ namespace Orion.Engine.Graphics
         public void Fill(Triangle triangle, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.Triangles);
+            GL.Begin(PrimitiveType.Triangles);
             DrawVertices(triangle);
             GL.End();
         }
@@ -498,7 +498,7 @@ namespace Orion.Engine.Graphics
         public void Stroke(Triangle triangle, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.LineLoop);
+            GL.Begin(PrimitiveType.LineLoop);
             DrawVertices(triangle);
             GL.End();
         }
@@ -537,7 +537,7 @@ namespace Orion.Engine.Graphics
         public void StrokeLineStrip(IEnumerable<Vector2> points, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.LineStrip);
+            GL.Begin(PrimitiveType.LineStrip);
             DrawVertices(points);
             GL.End();
         }
@@ -545,7 +545,7 @@ namespace Orion.Engine.Graphics
         public void Stroke(LineSegment lineSegment, ColorRgba color)
         {
             CommitColor(color);
-            GL.Begin(BeginMode.LineStrip);
+            GL.Begin(PrimitiveType.LineStrip);
             DrawVertex(lineSegment.EndPoint1);
             DrawVertex(lineSegment.EndPoint2);
             GL.End();
@@ -581,7 +581,7 @@ namespace Orion.Engine.Graphics
             if (texture.PixelFormat.HasAlphaChannel())
             {
                 GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             }
 
             DrawTexturedQuad(rectangle, textureRectangle);
@@ -629,7 +629,7 @@ namespace Orion.Engine.Graphics
             GL.ColorMask(true, true, true, false);
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.DstAlpha, BlendingFactorDest.OneMinusDstAlpha);
+            GL.BlendFunc(BlendingFactor.DstAlpha, BlendingFactor.OneMinusDstAlpha);
             maskedTexture.BindWhile(() => DrawTexturedQuad(rectangle, maskedTextureRectangle));
             GL.Disable(EnableCap.Blend);
             GL.Disable(EnableCap.Texture2D);
@@ -639,7 +639,7 @@ namespace Orion.Engine.Graphics
 
         private void DrawTexturedQuad(Rectangle rectangle, Rectangle textureRectangle)
         {
-            GL.Begin(BeginMode.Quads);
+            GL.Begin(PrimitiveType.Quads);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
             DrawVertex(rectangle.MinX, rectangle.MinY);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
@@ -685,7 +685,7 @@ namespace Orion.Engine.Graphics
             if (color.A < 1f)
             {
                 GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             }
             else
                 GL.Disable(EnableCap.Blend);

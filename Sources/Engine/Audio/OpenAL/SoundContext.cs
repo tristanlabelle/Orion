@@ -15,8 +15,8 @@ namespace Orion.Engine.Audio.OpenAL
     public sealed class SoundContext : ISoundContext
     {
         #region Fields
-        private readonly IntPtr deviceHandle;
-        private readonly ContextHandle contextHandle;
+        private readonly ALDevice deviceHandle;
+        private readonly ALContext contextHandle;
         private bool isMuted;
         private float volume = 1;
         #endregion
@@ -26,21 +26,21 @@ namespace Orion.Engine.Audio.OpenAL
         {
             try
             {
-                deviceHandle = Alc.OpenDevice(null);
-                contextHandle = Alc.CreateContext(deviceHandle, (int[])null);
-                Alc.MakeContextCurrent(contextHandle);
-                if (Alc.GetError(deviceHandle) != AlcError.NoError) throw new NotSupportedException("OpenAL is fucked up.");
+                deviceHandle = ALC.OpenDevice(null);
+                contextHandle = ALC.CreateContext(deviceHandle, (int[])null);
+                ALC.MakeContextCurrent(contextHandle);
+                if (ALC.GetError(deviceHandle) != AlcError.NoError) throw new NotSupportedException("OpenAL is fucked up.");
             }
             catch
             {
-                if (contextHandle != ContextHandle.Zero)
+                if (contextHandle != ALContext.Null)
                 {
-                    if (Alc.GetCurrentContext() == contextHandle)
-                        Alc.MakeContextCurrent(ContextHandle.Zero);
-                    Alc.DestroyContext(contextHandle);
+                    if (ALC.GetCurrentContext() == contextHandle)
+                        ALC.MakeContextCurrent(ALContext.Null);
+                    ALC.DestroyContext(contextHandle);
                 }
 
-                if (deviceHandle != IntPtr.Zero) Alc.CloseDevice(deviceHandle);
+                if (deviceHandle != IntPtr.Zero) ALC.CloseDevice(deviceHandle);
                 throw;
             }
         }
@@ -130,8 +130,8 @@ namespace Orion.Engine.Audio.OpenAL
 
         public void Dispose()
         {
-            Alc.DestroyContext(contextHandle);
-            Alc.CloseDevice(deviceHandle);
+            ALC.DestroyContext(contextHandle);
+            ALC.CloseDevice(deviceHandle);
         }
         #endregion
     }

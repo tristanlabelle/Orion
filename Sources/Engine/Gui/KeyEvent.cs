@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
-using OpenTK.Input;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Orion.Engine.Gui
 {
@@ -91,9 +91,9 @@ namespace Orion.Engine.Gui
         /// <summary>
         /// Gets the key that was pressed, released or repeated.
         /// </summary>
-        public Key Key
+        public Keys Key
         {
-            get { return (Key)key; }
+            get { return (Keys)key; }
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Orion.Engine.Gui
         /// </summary>
         public bool IsAnyShift
         {
-            get { return Key == Key.ShiftLeft || Key == Key.ShiftRight; }
+            get { return Key == Keys.LeftShift || Key == Keys.RightShift; }
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Orion.Engine.Gui
         /// </summary>
         public bool IsAnyControl
         {
-            get { return Key == Key.ControlLeft || Key == Key.ControlRight; }
+            get { return Key == Keys.LeftControl || Key == Keys.RightControl; }
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Orion.Engine.Gui
         /// </summary>
         public bool IsAnyAlt
         {
-            get { return Key == Key.AltLeft || Key == Key.AltRight; }
+            get { return Key == Keys.LeftAlt || Key == Keys.RightAlt; }
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Orion.Engine.Gui
         /// </summary>
         public bool IsAnySuper
         {
-            get { return Key == Key.WinLeft || Key == Key.WinRight; }
+            get { return Key == Keys.LeftSuper || Key == Keys.RightSuper; }
         }
         #endregion
 
